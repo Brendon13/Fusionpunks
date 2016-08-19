@@ -1,11 +1,12 @@
 # Fusionpunks
 Term 6 Project TFS
 
-Any branch other than MASTER branch (i.e. fusionpunks v1) is a direct clone of the files inside MASTER branch,
-meaning branches other than MASTER branch are intended to be used for modifying the project. Think of a branch as a 'Snapshot' of Master branch
+Any branch other than MASTER branch is a direct clone of the files inside MASTER branch (until you modify them),
+meaning NEW branches are intended to be used for modifying the project.
 
-After successful changes have been made to files in other branches you can create a "pull request", or in other words
-merge the content from one branch into the MASTER branch
+Think of it this way; creating a NEW branch is essentially creating a 'Snapshot' of the Master branch. You can do whatever you want with the files inside the new branch you created. Lets say I change some code around in my new branch. When I have everything working in my new branch I can commit those changes to the Master branch by pressing "pull request". 
+
+They won't be committed right away, they have to be approved first. Once the pull request is approved the NEW branch you made will merge with the Master branch.
 
 If someone else made changes to the master branch while you were working on your branch, you could pull in those updates.
 
