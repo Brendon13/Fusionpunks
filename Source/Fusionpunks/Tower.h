@@ -3,13 +3,16 @@
 #pragma once
 #include "Projectile.h"
 #include "HealthBarWidgetComponent.h"
+
 #include "BaseHealthBar.h"
 #include <Classes/Kismet/KismetMathLibrary.h>
 #include "GameFramework/Actor.h"
 #include <Components/LineBatchComponent.h>
 #include "Tower.generated.h"
 
-
+// OLD TOWER CLASS... NOT USING ANYMORE!!!!!!
+// OLD TOWER CLASS... NOT USING ANYMORE!!!!!!
+// OLD TOWER CLASS... NOT USING ANYMORE!!!!!!
 
 UCLASS()
 class FUSIONPUNKS_API ATower : public AActor
