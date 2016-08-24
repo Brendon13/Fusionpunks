@@ -4,7 +4,9 @@
 #include "Fusionpunks.h"
 #include "Tower.h"
 
-
+// OLD TOWER CLASS... NOT USING ANYMORE!!!!!!
+// OLD TOWER CLASS... NOT USING ANYMORE!!!!!!
+// OLD TOWER CLASS... NOT USING ANYMORE!!!!!!
 
 // Sets default values
 ATower::ATower()
