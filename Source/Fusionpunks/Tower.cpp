@@ -16,9 +16,9 @@ ATower::ATower()
 	rootCldr = CreateDefaultSubobject<UBoxComponent>(TEXT("Root"));
 	RootComponent = rootCldr;
 	visualTower = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualCube"));
-	visualTower->AttachTo(RootComponent);
+	visualTower->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	radius = CreateDefaultSubobject<USphereComponent>(TEXT("Radius"));
-	radius->AttachTo(RootComponent);
+	radius->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	radius->bGenerateOverlapEvents = true;
 	radius->OnComponentBeginOverlap.AddDynamic(this, &ATower::TriggerEnter);	
 	radius->OnComponentEndOverlap.AddDynamic(this, &ATower::TriggerExit);
@@ -27,14 +27,14 @@ ATower::ATower()
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ps(TEXT("ParticleSystem'/Game/BluePrints/LaserBeam.LaserBeam'"));
 	beam = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Beam Particle"));
 	beam->SetTemplate(ps.Object);
-	beam->AttachTo(RootComponent);
+	beam->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
 
 	bCanBeDamaged = true;
 	currHP = maxHP;
 	
 	healthBar = CreateDefaultSubobject<UHealthBarWidgetComponent>(TEXT("HealthBar"));
-	healthBar->AttachTo(RootComponent);
+	healthBar->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	//static ConstructorHelpers::FObjectFinder<UUserWidget> hbWidget(TEXT("WidgetBlueprint'/Game/BluePrints/UnitHealthBar.UnitHealthBar'"));
 	/*if (hbWidget.Object != nullptr) 
 	{
@@ -141,7 +141,7 @@ void ATower::Tick( float DeltaTime )
 }
 
 
-void ATower::TriggerEnter(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ATower::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	if (OtherActor->IsA(ACharacter::StaticClass()))
 	{
@@ -159,7 +159,7 @@ void ATower::TriggerEnter(class AActor* OtherActor, class UPrimitiveComponent* O
 	
 
 }
-void ATower::TriggerExit(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ATower::TriggerExit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	//bIsEnemyUnit = false;
 	enemyUnits.Remove(OtherActor);

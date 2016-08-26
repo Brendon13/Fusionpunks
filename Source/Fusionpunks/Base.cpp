@@ -14,9 +14,9 @@ ABase::ABase()
 	rootCldr = CreateDefaultSubobject<UBoxComponent>(TEXT("Root"));
 	RootComponent = rootCldr;
 	baseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
-	baseMesh->AttachTo(RootComponent);
+	baseMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	healthBar = CreateDefaultSubobject<UHealthBarWidgetComponent>(TEXT("HealthBar"));
-	healthBar->AttachTo(RootComponent);
+	healthBar->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
 	bCanBeDamaged = true;
 	currHP = maxHP;

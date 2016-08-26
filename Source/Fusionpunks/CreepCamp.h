@@ -54,12 +54,11 @@ protected:
 protected:
 	//function for Trigger Events
 	UFUNCTION()
-		void OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		void OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
 
 	//function for Trigger Exit Events
 	UFUNCTION()
-		void OnOverlapEnd(class AActor * OtherActor, class UPrimitiveComponent * OtherComp, int32 OtherBodyIndex);
-
+		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 //Capture Camp stuff
 protected:

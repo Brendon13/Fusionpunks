@@ -12,7 +12,7 @@ ATestCreep::ATestCreep()
 	boxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Colider"));
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = boxCollider;
-	mesh->AttachTo(boxCollider);
+	mesh->AttachToComponent(boxCollider, FAttachmentTransformRules::KeepRelativeTransform); (boxCollider);
 
 }
 

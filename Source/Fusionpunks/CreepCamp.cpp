@@ -25,13 +25,13 @@ ACreepCamp::ACreepCamp()
 	ringMesh->SetStaticMesh(ringStaticMesh.Object);
 	ringMesh->SetRelativeScale3D(FVector(4.0f, 4.0f, 3.25f));
 	ringMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 5.5f));
-	ringMesh->AttachTo(RootComponent);
+	ringMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
 	//create & Set box trigger for capturing the camp
 	sphereTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("TriggerCollider"));
 	sphereTrigger->SetSphereRadius(280.0f, true);
 	sphereTrigger->bGenerateOverlapEvents = true;
-	sphereTrigger->AttachTo(RootComponent);
+	sphereTrigger->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
 	//starting status
 	status = "neutral";
@@ -156,7 +156,8 @@ void ACreepCamp::Tick( float DeltaTime )
 }
 
 //On Trigger Function 
-void ACreepCamp::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ACreepCamp::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
+								int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Player Entered Camp Trigger"));
 
@@ -189,7 +190,7 @@ void ACreepCamp::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCompon
 }
 
 
-void ACreepCamp::OnOverlapEnd(class AActor * OtherActor, class UPrimitiveComponent * OtherComp, int32 OtherBodyIndex)
+void ACreepCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Player Exited Camp Trigger"));
 

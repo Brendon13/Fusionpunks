@@ -10,6 +10,10 @@ ACreep::ACreep()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	creepMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CreepMeshComponent"));
+	creepMesh->SetSimulatePhysics(true);
+	creepMesh->bGenerateOverlapEvents = true;
+	RootComponent = creepMesh;
 }
 
 // Called when the game starts or when spawned

@@ -2,6 +2,7 @@
 #pragma once
 #include "GameFramework/Character.h"
 #include "CreepCamp.h"
+#include "DustParticleEffect.h"
 #include "FusionpunksCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -131,5 +132,21 @@ private:
 
 	void AdjustCameraZoom(float Value);
 
+protected:
+	UPROPERTY(EditAnywhere, Category = "AbilityEffects")
+	TSubclassOf<AActor> dustParticleSystemClass;
+
+private:
+	//function for Trigger Events
+	UFUNCTION()
+		void OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
+
+	//function for Trigger Exit Events
+	UFUNCTION()
+		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	//functons for hit events (physics)
+	UFUNCTION()
+		void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };
 
