@@ -1,3 +1,15 @@
+**IMPORTANT: When you are making a pull request you need to make sure that ONLY the following files/folders are in the root folder:
+
+      Binaries
+      Config
+      Content
+      Source
+      Fusionpunks.sln
+      Fusionpunks.uproject
+      README.md
+      
+There should be no other files/folders in the root folder. 
+
 # Fusionpunks
 Term 6 Project TFS
 
