@@ -5,7 +5,9 @@
 #include "GameFramework/Pawn.h"
 #include "Creep.generated.h"
 
-UCLASS()
+class ACreepCamp;
+
+UCLASS(abstract)
 class FUSIONPUNKS_API ACreep : public APawn
 {
 	GENERATED_BODY()
@@ -23,6 +25,23 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Stats")
+		const float GetHealthAsDecimal() const
+	{
+		return currentHealth / maxHealth;
+	}
+
+	UFUNCTION(BlueprintCallable, category = "Stats")
+	void LevelUp()
+	{
+		if (currentLevel + 1 <= maxLevel)
+		{
+			currentLevel++;
+			maxHealth += healthIncreasePerLevel;
+			damage += damageIncreasePerLevel;
+		}
+	}
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Stats")
 		float maxHealth;
@@ -36,6 +55,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Stats")
 		float damage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+		float healthIncreasePerLevel;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+		float damageIncreasePerLevel;
+
 private:
 	float currentHealth;
 	int currentLevel;
@@ -44,5 +69,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Appearance)
 	UStaticMeshComponent* creepMesh;
 	
+
+public:
+	//function to set home creep camp
+	void SetCreepCampHome(ACreepCamp* home)
+	{
+		creepCampHome = home;
+	}
+
+private:
+	ACreepCamp* creepCampHome;
 	
 };

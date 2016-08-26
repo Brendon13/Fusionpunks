@@ -29,7 +29,7 @@ AMobaCharacter::AMobaCharacter()
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->AttachTo(RootComponent);
+	CameraBoom->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
@@ -137,11 +137,12 @@ void AMobaCharacter::MoveForward(float Value)
 		AddMovementInput(Direction, Value);
 	}
 }
+
+//NOTE: Change the way camera zoom operates, don't use field of view, move the actual camera
+//Field of view will give a fish eye effect 
 void AMobaCharacter::AdjustCameraZoom(float Value) 
 {
-	
-	
-	
+
 	if (Value < 0 && FollowCamera->FieldOfView >= 90)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Zooming Camera Down"));

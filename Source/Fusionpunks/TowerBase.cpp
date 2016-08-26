@@ -12,9 +12,9 @@ ATowerBase::ATowerBase()
 	rootCldr = CreateDefaultSubobject<UBoxComponent>(TEXT("Root"));
 	RootComponent = rootCldr;
 	visualTower = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualCube"));
-	visualTower->AttachTo(RootComponent);
+	visualTower->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	radius = CreateDefaultSubobject<USphereComponent>(TEXT("Radius"));
-	radius->AttachTo(RootComponent);
+	radius->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	radius->bGenerateOverlapEvents = true;
 	radius->OnComponentBeginOverlap.AddDynamic(this, &ATowerBase::TriggerEnter);
 	radius->OnComponentEndOverlap.AddDynamic(this, &ATowerBase::TriggerExit);
@@ -32,13 +32,13 @@ ATowerBase::ATowerBase()
 	//healthBar->AttachTo(RootComponent);
 }
 
-void ATowerBase::TriggerExit(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ATowerBase::TriggerExit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	
 	enemyUnits.Remove(OtherActor);
 }
 
-void ATowerBase::TriggerEnter(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ATowerBase::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	if (OtherActor->IsA(ACharacter::StaticClass()))
 	{

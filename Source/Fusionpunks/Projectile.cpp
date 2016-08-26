@@ -13,7 +13,7 @@ AProjectile::AProjectile()
 	sphereShape = CreateDefaultSubobject<USphereComponent>(TEXT("Root"));
 	RootComponent = sphereShape;
 	sphereDisplay = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sphere"));
-	sphereDisplay ->AttachTo(RootComponent);
+	sphereDisplay->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	sphereShape->bGenerateOverlapEvents = true;
 	sphereShape->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::TriggerEnter);
 	
@@ -50,7 +50,7 @@ void AProjectile::SetTarget(class AActor* OtherActor)
 	enemyPlayer = OtherActor;
 }
 
-void AProjectile::TriggerEnter(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AProjectile::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	if (OtherActor->IsA(ACharacter::StaticClass()))
 	{

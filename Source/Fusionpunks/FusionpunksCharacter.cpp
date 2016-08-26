@@ -29,7 +29,7 @@ AFusionpunksCharacter::AFusionpunksCharacter()
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->AttachTo(RootComponent);
+	CameraBoom->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
@@ -40,6 +40,9 @@ AFusionpunksCharacter::AFusionpunksCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+	//dust particle system class 
+	//static ConstructorHelpers::FObjectFinder<AActor> dustPS(TEXT("ParticleSystem'/Game/ParticleEffects/Stomp_Smoke.Stomp_Smoke'"));
 
 	maxHealth = 10;
 	currentHealth = maxHealth;
@@ -63,6 +66,9 @@ void AFusionpunksCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AFusionpunksCharacter::OnOverlapBegin);
+	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AFusionpunksCharacter::OnOverlapEnd);
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AFusionpunksCharacter::OnHit);
 	GetWorld()->GetAuthGameMode()->Children.Add(this);
 }
 
@@ -76,7 +82,6 @@ void AFusionpunksCharacter::Tick(float DeltaTime)
 
 		if (timeInAirTimer <= 0)
 		{
-			bIsLeaping = false;
 			LaunchCharacter(FVector::UpVector * -1 * leapDownwardForce, true, true);
 		}
 	}
@@ -87,8 +92,8 @@ void AFusionpunksCharacter::Tick(float DeltaTime)
 		//UE_LOG(LogTemp, Warning, TEXT("Is Dashing!"));
 		if (dashTimer <= 0)
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("Stop Dashing Force!"));
 			bIsDashing = false;
+			//UE_LOG(LogTemp, Warning, TEXT("Stop Dashing Force!"));
 			GetCharacterMovement()->Velocity = FVector::ZeroVector;
 		}
 	}
@@ -199,9 +204,6 @@ void AFusionpunksCharacter::Leap()
 	bIsLeaping = true;
 }
 
-
-
-
 void AFusionpunksCharacter::Dash()
 {
 	//can dash if leap is not being used
@@ -284,5 +286,37 @@ void AFusionpunksCharacter::AdjustCameraZoom(float Value)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Zooming Camera UP"));
 		FollowCamera->FieldOfView += Value* 5.0f;
+	}
+}
+
+void AFusionpunksCharacter::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+{
+	
+}
+
+void AFusionpunksCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+
+}
+
+void AFusionpunksCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor->Tags.Contains("Ground"))
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("HIT GROUND AFTER LEAP! SPAWN DUST!"));
+		if (bIsLeaping)
+		{
+			bIsLeaping = false;
+
+			FActorSpawnParameters SpawnParameters;
+			SpawnParameters.Instigator = Instigator;
+			SpawnParameters.Owner = this;
+
+			ADustParticleEffect* particleEffect = (ADustParticleEffect*)GetWorld()->SpawnActor<ADustParticleEffect>
+				(dustParticleSystemClass,
+					GetActorLocation(),
+					FRotator::ZeroRotator,
+					SpawnParameters);
+		}
 	}
 }

@@ -14,15 +14,11 @@ AChainLightning::AChainLightning()
 	boxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Colider"));
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = boxCollider;
-	mesh->AttachTo(boxCollider);
+	mesh->AttachToComponent(boxCollider, FAttachmentTransformRules::KeepRelativeTransform);
 	beam = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Beam Particle"));
 	beam->SetTemplate(ps.Object);
 	boxCollider->bGenerateOverlapEvents = true;
 	boxCollider->OnComponentBeginOverlap.AddDynamic(this, &AChainLightning::TriggerEnter);
-	
-	
-	
-	
 }
 
 // Called when the game starts or when spawned
@@ -39,7 +35,6 @@ void AChainLightning::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 	if (target) 
 	{
-		
 		FVector newLocation = FMath::Lerp(GetActorLocation(), target->GetActorLocation(), 5.0f * DeltaTime);
 		SetActorLocation(newLocation);
 		beam->SetBeamSourcePoint(0,source->GetActorLocation(),0);
@@ -74,7 +69,8 @@ void AChainLightning::SetBeamPoints(AActor* a, AActor* b)
 	target = b;
 	
 }
-void AChainLightning::TriggerEnter(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AChainLightning::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, 
+									int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	if (OtherActor->IsA(ATestCreep::StaticClass()))
 	{
