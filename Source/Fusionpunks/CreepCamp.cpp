@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
-#include "FusionpunksCharacter.h"
+#include "HeroBase.h"
 #include "CreepCamp.h"
 
 
@@ -163,9 +163,9 @@ void ACreepCamp::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActo
 
 	if (OtherActor->Tags.Contains("CyberPlayer") || OtherActor->Tags.Contains("DieselPlayer"))
 	{
-		if (Cast<AFusionpunksCharacter>(OtherActor))
+		if (Cast<AHeroBase>(OtherActor))
 		{
-			AFusionpunksCharacter* heroChar = Cast<AFusionpunksCharacter>(OtherActor);
+			AHeroBase* heroChar = Cast<AHeroBase>(OtherActor);
 			heroChar->ShowCampProgress(this);
 		}
 
@@ -196,9 +196,9 @@ void ACreepCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 	if (OtherActor->Tags.Contains("CyberPlayer") || OtherActor->Tags.Contains("DieselPlayer"))
 	{
-		if (Cast<AFusionpunksCharacter>(OtherActor))
+		if (Cast<AHeroBase>(OtherActor))
 		{
-			AFusionpunksCharacter* heroChar = Cast<AFusionpunksCharacter>(OtherActor);
+			AHeroBase* heroChar = Cast<AHeroBase>(OtherActor);
 			heroChar->HideCampProgress();
 		}
 
