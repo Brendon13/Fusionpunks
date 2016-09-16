@@ -30,6 +30,7 @@ ABase::ABase()
 void ABase::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	playerCam = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	playerChar = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	if (Cast<UBaseHealthBar>(healthBar->GetUserWidgetObject()))
