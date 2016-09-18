@@ -5,24 +5,37 @@
 #include "GameFramework/Actor.h"
 #include "CreepCamp.generated.h"
 
+UENUM(BlueprintType)
+enum class ECampType : uint8
+{
+	CT_Neutral    UMETA(DisplayName = "Neutral"),
+	CT_Cyber      UMETA(DisplayName = "Cyber"),
+	CT_Diesel	  UMETA(DisplayName = "Diesel")
+};
+
 UCLASS()
 class FUSIONPUNKS_API ACreepCamp : public AActor
 {
 	GENERATED_BODY()
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		ECampType campType;
 	
 public:	
-	// Sets default values for this actor's properties
 	ACreepCamp();
-
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
 private:
-	FString status;
+	UPROPERTY(EditDefaultsOnly, Category = "Creeps")
+		 TSubclassOf<class ANeutralCreep> neutralCreepRef;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Creeps")
+		TSubclassOf<class ACyberCreep> cyberCreepRef;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Creeps")
+		TSubclassOf<class ADieselCreep> dieselCreepRef;
 
 //Meshes and triggers 
 protected:
@@ -43,7 +56,7 @@ protected:
 	float ringRotationSpeed;
 
 	UPROPERTY(EditAnywhere, Category = CampVariables)
-		float ringMaterialAlphaSpeed;
+	float ringMaterialAlphaSpeed;
 
 	FRotator ringRotation;
 	float ringMaterialAlpha;
@@ -60,6 +73,7 @@ protected:
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+
 //Capture Camp stuff
 protected:
 	UPROPERTY(EditAnywhere, Category = CampVariables)
@@ -73,8 +87,14 @@ public:
 private:
 	float cyberCaptureProgress;
 	float dieselCaptureProgress;
+
 	bool bCyberIsCapturing;
 	bool bDieselIsCapturing;
+
+	int creepCount; //Spawn rate for creeps is based on how many are currently at the camp... Less = faster spawn rate, More = slower spawn rate
+public:
+	UFUNCTION(BlueprintCallable, Category = CampFunctions)
+		void MinusOneFromCreepCamp();
 
 
 //Creep Spawn Locations
@@ -89,6 +109,7 @@ protected:
 		FVector creep3SpawnLocation;
 
 	TArray<FVector> creepSpawnArray;
+
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)

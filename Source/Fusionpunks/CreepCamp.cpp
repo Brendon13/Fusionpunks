@@ -2,8 +2,10 @@
 
 #include "Fusionpunks.h"
 #include "HeroBase.h"
+#include "NeutralCreep.h"
+#include "CyberCreep.h"
+#include "DieselCreep.h"
 #include "CreepCamp.h"
-
 
 // Sets default values
 ACreepCamp::ACreepCamp()
@@ -13,7 +15,7 @@ ACreepCamp::ACreepCamp()
 
 	//Create and Set the Static Mesh Component
 	campMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CampMesh"));
-	const ConstructorHelpers::FObjectFinder<UStaticMesh> campStaticMesh(TEXT("StaticMesh'/Game/Geometry/Meshes/mk6_goerge.mk6_goerge'"));
+	const ConstructorHelpers::FObjectFinder<UStaticMesh> campStaticMesh(TEXT("StaticMesh'/Game/Models/CreepCamp/mk6_goerge.mk6_goerge'"));
 	campMesh->SetStaticMesh(campStaticMesh.Object);
 	campMesh->bGenerateOverlapEvents = false;
 	campMesh->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
@@ -21,7 +23,7 @@ ACreepCamp::ACreepCamp()
 
 	//Create our ring around the camp
 	ringMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CaptureRing"));
-	const ConstructorHelpers::FObjectFinder<UStaticMesh> ringStaticMesh(TEXT("StaticMesh'/Game/Geometry/Meshes/CreepCampCircle.CreepCampCircle'"));
+	const ConstructorHelpers::FObjectFinder<UStaticMesh> ringStaticMesh(TEXT("StaticMesh'/Game/Models/CreepCamp/CreepCampCircle.CreepCampCircle'"));
 	ringMesh->SetStaticMesh(ringStaticMesh.Object);
 	ringMesh->SetRelativeScale3D(FVector(4.0f, 4.0f, 3.25f));
 	ringMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 5.5f));
@@ -34,7 +36,7 @@ ACreepCamp::ACreepCamp()
 	sphereTrigger->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
 	//starting status
-	status = "neutral";
+	campType = ECampType::CT_Neutral;
 
 	//speed at which camp rotates
 	ringRotationSpeed = 25.0f;
@@ -48,6 +50,8 @@ ACreepCamp::ACreepCamp()
 	cyberCaptureProgress = 0.0f;
 	bCyberIsCapturing = false;
 	bDieselIsCapturing = false; 
+
+	creepCount = 3;
 }
 
 // Called when the game starts or when spawned
@@ -59,6 +63,7 @@ void ACreepCamp::BeginPlay()
 	sphereTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACreepCamp::OnOverlapBegin);
 	sphereTrigger->OnComponentEndOverlap.AddDynamic(this, &ACreepCamp::OnOverlapEnd);
 	
+	//EVENTUALLY IMPLEMENT 1 SPAWN LOCATION + ANIMATION.... i.e. creep is created (Animation Plays) and then creep moves to the front of the camp and begins a patrolling camp Behavior
 	//set locations
 	creep1SpawnLocation = FVector(this->GetActorLocation().X + 500, this->GetActorLocation().Y, this->GetActorLocation().Z + 50);
 	creep2SpawnLocation = FVector(this->GetActorLocation().X - 500, this->GetActorLocation().Y, this->GetActorLocation().Z + 50);
@@ -66,6 +71,28 @@ void ACreepCamp::BeginPlay()
 	creepSpawnArray.Add(creep1SpawnLocation);
 	creepSpawnArray.Add(creep2SpawnLocation);
 	creepSpawnArray.Add(creep3SpawnLocation);
+
+	if (campType == ECampType::CT_Neutral)
+	{
+		FActorSpawnParameters spawnParameters;
+		spawnParameters.bNoCollisionFail = true;
+		spawnParameters.Owner = this;
+
+		for (int i = 0; i < creepSpawnArray.Num(); i++)
+		{
+			ANeutralCreep* neutralCreep = (ANeutralCreep*)GetWorld()->SpawnActor<ANeutralCreep>
+				(neutralCreepRef,
+					creepSpawnArray[i],
+					FRotator::ZeroRotator,
+					spawnParameters);
+
+			if (neutralCreep->IsValidLowLevel())
+			{
+				neutralCreep->Tags.Add(TEXT("CampCreep"));
+				neutralCreep->SetCreepCampHome(this);
+			}
+		}
+	}
 }
 
 // Called every frame
@@ -77,7 +104,7 @@ void ACreepCamp::Tick( float DeltaTime )
 	ringRotation.Yaw += DeltaTime * ringRotationSpeed;
 	ringMesh->SetRelativeRotation(ringRotation);
 
-	if (status != "diesel" && bDieselIsCapturing && !bCyberIsCapturing)
+	if (campType != ECampType::CT_Diesel && bDieselIsCapturing && !bCyberIsCapturing)
 	{
 		if (ringMaterialAlpha >= 1)
 		{
@@ -115,7 +142,7 @@ void ACreepCamp::Tick( float DeltaTime )
 			SetToDieselCamp();
 		}
 	}
-	else if (status != "cyber" && !bDieselIsCapturing && bCyberIsCapturing)
+	else if (campType != ECampType::CT_Cyber && !bDieselIsCapturing && bCyberIsCapturing)
 	{
 		if (ringMaterialAlpha >= 1)
 		{
@@ -179,14 +206,6 @@ void ACreepCamp::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActo
 			bDieselIsCapturing = true;
 		}
 	}
-	//teamInCampStringArray.Add(OtherActor->Tags[0].ToString());
-	/*if (OtherActor->Tags.Contains("DieselPlayer") || OtherActor->Tags.Contains("CyberPlayer"))
-	{
-		teamInCampStringArray.Add(OtherActor->Tags[0].ToString());
-
-		UE_LOG(LogTemp, Warning, TEXT("Player Entered Camp Trigger"));
-		bIsBeingCaptured = true;
-	}*/
 }
 
 
@@ -213,15 +232,6 @@ void ACreepCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 		}
 		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
 	}
-	//if (OtherActor->Tags.Contains("DieselPlayer"))
-	//{
-	//	//int i = teamInCampStringArray.Find("Diesel");
-	//	//teamInCampStringArray[i] == " ";
-	//	UE_LOG(LogTemp, Warning, TEXT("Player Exited Camp Trigger"));
-	//	bIsBeingCaptured = false;
-	//}
-
-	//end capture timer if camp hasn't finished being captured 
 }
 
 float ACreepCamp::GetCyberCapturePercentage()
@@ -240,7 +250,7 @@ void ACreepCamp::SetToDieselCamp()
 	ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0, 0, 0));
 	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
 
-	status = "diesel";
+	campType = ECampType::CT_Diesel;
 }
 
 //change camp functionality to cyber function
@@ -250,7 +260,7 @@ void ACreepCamp::SetToCyberCamp()
 	ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0.0, 0.0f, 1.0f));
 	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
 
-	status = "cyber";
+	campType = ECampType::CT_Cyber;
 }
 
 void ACreepCamp::SetToNeutralCamp()
@@ -259,5 +269,10 @@ void ACreepCamp::SetToNeutralCamp()
 	ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(1.0f, 1.0f, 1.0f));
 	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
 
-	status = "neutral";
+	campType = ECampType::CT_Neutral;
+}
+
+void ACreepCamp::MinusOneFromCreepCamp()
+{
+	creepCount--;
 }
