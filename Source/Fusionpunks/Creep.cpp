@@ -60,8 +60,13 @@ void ACreep::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
-	widgetCompRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), localPlayer->GetActorLocation());
-	widgetComponent->SetWorldRotation(widgetCompRotation);
+	if (localPlayer)
+	{
+		UCameraComponent* cameraComponent = Cast<UCameraComponent>(localPlayer->GetComponentByClass(UCameraComponent::StaticClass()));
+		widgetCompRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), cameraComponent->GetComponentLocation());
+		widgetCompRotation.Pitch = 0;
+		widgetComponent->SetWorldRotation(widgetCompRotation);
+	}
 }
 
 void ACreep::SetupPlayerInputComponent(class UInputComponent* InputComponent)

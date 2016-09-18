@@ -46,12 +46,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float damageIncreasePerLevel;
 
-protected:
 	float currentHealth;
 	int currentLevel;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = Appearance)
+	UPROPERTY(EditDefaultsOnly, Category = Appearance)
 		USkeletalMeshComponent* creepSkeletalMeshComp;
 	
 public:
