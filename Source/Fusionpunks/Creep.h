@@ -27,6 +27,7 @@ public:
 	UFUNCTION(BlueprintCallable, category = Stats)
 		void LevelUp();
 
+//editable stats 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float maxHealth;
@@ -52,7 +53,9 @@ protected:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = Appearance)
 		USkeletalMeshComponent* creepSkeletalMeshComp;
-	
+
+
+//Creep Camp stuff
 public:
 	void SetCreepCampHome(ACreepCamp* home, bool BelongsToCamp = true);
 	bool bBelongsToCamp; //false means the creep belongs to a player (i.e. is apart of a player army)
@@ -60,6 +63,7 @@ protected:
 	ACreepCamp* creepCampHome;
 	
 
+//health bar widget stuff
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = Widgets)
 	UWidgetComponent* widgetComponent;
@@ -69,5 +73,9 @@ protected:
 	FRotator widgetCompRotation;
 	AActor* localPlayer;
 
+//Damage stuff
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	TSubclassOf<class UFloatingDamageWidget> FloatingDamageWidgetClass; 
+	//UWidgetComponent* floatingDamageWidget;
 };

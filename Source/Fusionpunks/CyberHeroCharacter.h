@@ -11,7 +11,6 @@ class ACyberHeroCharacter: public AHeroBase
 {
 	GENERATED_BODY()
 
-	
 public:
 	ACyberHeroCharacter();
 
@@ -23,7 +22,6 @@ public:
 	
 
 private:
-	
 	UPROPERTY(EditAnywhere, category = Ability)
 		TSubclassOf<class AAbilityBase> chainLightningAbility;
 	
@@ -31,11 +29,7 @@ private:
 	bool skillSelected = false;
 
 
-
 public:
-	
-
-	
 	void DetermineClickEvent();
 	void OnSkillPressed();
 	void UseSkill(AActor* enemy);
@@ -53,8 +47,6 @@ private:
 	TArray<FOverlapResult> skillTargetResults;
 	TArray<FOverlapResult> oldTargetResults;
 
-	
-		
 	
 };
 

@@ -3,6 +3,7 @@
 #include "Fusionpunks.h"
 #include "CreepCamp.h"
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
+#include "FloatingDamageWidget.h"
 #include "Creep.h"
 
 ACreep::ACreep()
@@ -11,7 +12,8 @@ ACreep::ACreep()
 	PrimaryActorTick.bCanEverTick = true;
 
 	creepSkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
-	creepSkeletalMeshComp->SetSimulatePhysics(true);
+	creepSkeletalMeshComp->SetSimulatePhysics(false);
+
 	creepSkeletalMeshComp->bGenerateOverlapEvents = true; 
 	RootComponent = creepSkeletalMeshComp;
 
@@ -27,6 +29,15 @@ ACreep::ACreep()
 		widgetComponent->bGenerateOverlapEvents = false;
 		widgetComponent->AttachToComponent(creepSkeletalMeshComp, FAttachmentTransformRules::KeepRelativeTransform);
 	}
+
+	const ConstructorHelpers::FObjectFinder<UBlueprint>
+		FloatingDamageWidgetFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widgets/FloatingDamageWidget_BP.FloatingDamageWidget_BP'"));
+
+	if (FloatingDamageWidgetFinder.Object != nullptr)
+	{
+		FloatingDamageWidgetClass = Cast<UClass>(FloatingDamageWidgetFinder.Object->GeneratedClass);
+	}
+	
 
 	//Will have to change current level based on players level when spawned from a controlled camp 
 	//i.e. Diesel hero is level 9 -> creep should also be level 9 
@@ -77,6 +88,14 @@ void ACreep::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	currentHealth -= Damage;
+
+	UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
+	floatingDamageWidget->SetIncDamage(Damage);
+	floatingDamageWidget->AddToViewport();
+	//floatingDamageWidget->PlayTextFloatUpAnimation();
+	
+	FVector2D creepLocationToScreen;
+
 	if (currentHealth <= 0)
 	{
 		if (bBelongsToCamp)
