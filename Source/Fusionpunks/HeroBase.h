@@ -5,7 +5,7 @@
 #include "GameFramework/Character.h"
 #include "HeroBase.generated.h"
 
-UCLASS()
+UCLASS(abstract)
 class FUSIONPUNKS_API AHeroBase : public ACharacter
 {
 	GENERATED_BODY()
@@ -69,21 +69,48 @@ public:
 		float GetMaxHealth();
 
 protected:
-	UPROPERTY(EditAnywhere, Category = Stats) //Make private for final game
-	class ACreepCamp* CurrentCreepCamp;
 	void StartAttack();
 	void Attack(AActor* enemy);
 	void AdjustCameraZoom(float Value);
+
+
+	//editable stats in blueprint
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		float maxHealth;
+
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		int maxLevel;
+
+	UPROPERTY(EditAnywhere, Category = Stats)
+		float movementSpeed;
+
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		float basicAttackDamage;
+
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		float healthIncreasePerLevel;
+
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		float damageIncreasePerLevel;
+
 	float currentHealth;
-	float maxHealth;
+	int currentLevel;
+
+	UFUNCTION(BlueprintCallable, category = Stats)
+		virtual void LevelUp();
 	
+
 public:
-	
 	UFUNCTION(BlueprintCallable, Category = UIFunctions)
 		void ShowCampProgress(ACreepCamp* CurrentCamp);
 
 	UFUNCTION(BlueprintCallable, Category = UIFunctions)
 		void HideCampProgress();
+protected:
+	class ACreepCamp* CurrentCreepCamp;
+
+
 private:
 	//function for Trigger Events
 	UFUNCTION()

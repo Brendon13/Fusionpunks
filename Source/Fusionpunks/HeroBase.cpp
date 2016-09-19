@@ -40,11 +40,16 @@ AHeroBase::AHeroBase()
 	FollowCamera->AttachToComponent(CameraBoom, FAttachmentTransformRules::KeepRelativeTransform); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-												   // Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-												   // are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+	//defaults unless set in blueprint
+	currentLevel = 1;
+	basicAttackDamage = 10.0f;
 
-												   //dust particle system class 
-												   //static ConstructorHelpers::FObjectFinder<AActor> dustPS(TEXT("ParticleSystem'/Game/ParticleEffects/Stomp_Smoke.Stomp_Smoke'"));
+	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
+	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+	//dust particle system class 
+	//static ConstructorHelpers::FObjectFinder<AActor> dustPS(TEXT("ParticleSystem'/Game/ParticleEffects/Stomp_Smoke.Stomp_Smoke'"));
+
 }
 
 // Called when the game starts or when spawned
@@ -187,26 +192,23 @@ void AHeroBase::StartAttack()
 
 void AHeroBase::Attack(AActor* enemy)
 {
-
 	FDamageEvent DamageEvent;
 
-	float damage = enemy->TakeDamage(20.0f, DamageEvent, Cast<APlayerController>(GetController()), this);
-
-
+	float damage = enemy->TakeDamage(basicAttackDamage, DamageEvent, Cast<APlayerController>(GetController()), this);
 }
 
 void AHeroBase::AdjustCameraZoom(float Value)
 {
-
+	
 	if (Value < 0 && FollowCamera->FieldOfView >= 90)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Zooming Camera Down"));
-		FollowCamera->FieldOfView += Value* 5.0f;
+		GetCameraBoom()->TargetArmLength += Value * 10.0f;
 	}
 	else if (Value> 0 && FollowCamera->FieldOfView <= 120)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Zooming Camera UP"));
-		FollowCamera->FieldOfView += Value* 5.0f;
+		GetCameraBoom()->TargetArmLength += Value * 10.0f;
 	}
 }
 
@@ -233,5 +235,16 @@ float AHeroBase::GetCurrentHealth()
 float AHeroBase::GetMaxHealth()
 {
 	return maxHealth;
+}
+
+void AHeroBase::LevelUp()
+{
+	//implement how a character levels 
+	currentLevel++;
+
+	maxHealth += healthIncreasePerLevel;
+	currentHealth = maxHealth;
+
+	basicAttackDamage += damageIncreasePerLevel;
 }
 
