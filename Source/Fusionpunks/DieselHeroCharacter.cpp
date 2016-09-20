@@ -2,6 +2,7 @@
 
 #include "Fusionpunks.h"
 #include "PlayerHUD.h"
+#include "FusionpunksGameState.h"
 #include "DieselHeroCharacter.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -9,7 +10,6 @@
 
 ADieselHeroCharacter::ADieselHeroCharacter()
 {
-	
 	maxHealth = 10;
 	currentHealth = maxHealth;
 
@@ -32,7 +32,6 @@ ADieselHeroCharacter::ADieselHeroCharacter()
 void ADieselHeroCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 void ADieselHeroCharacter::Tick(float DeltaTime)
@@ -71,20 +70,10 @@ void ADieselHeroCharacter::SetupPlayerInputComponent(class UInputComponent* Inpu
 	// Set up gameplay key bindings
 	check(InputComponent);
 	
-
 	InputComponent->BindAction(TEXT("Leap"), IE_Pressed, this, &ADieselHeroCharacter::Leap);
 	InputComponent->BindAction(TEXT("ForcePull"), IE_Pressed, this, &ADieselHeroCharacter::ForcePull);
 	InputComponent->BindAction("Dash", IE_Pressed, this, &ADieselHeroCharacter::Dash);
-
-	
-
 }
-
-
-
-
-
-
 
 void ADieselHeroCharacter::Leap()
 {
@@ -128,6 +117,21 @@ void ADieselHeroCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* Othe
 					GetActorLocation(),
 					FRotator::ZeroRotator,
 					SpawnParameters);
+		}
+	}
+}
+
+void ADieselHeroCharacter::LevelUp()
+{
+	if (currentLevel < maxLevel)
+	{
+		Super::LevelUp();
+
+		//notify GameState we leveled up
+		if (GetWorld())
+		{
+			AFusionpunksGameState* gameState = Cast<AFusionpunksGameState>(GetWorld()->GetGameState());
+			gameState->DieselLevelUp();
 		}
 	}
 }

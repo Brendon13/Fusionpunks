@@ -19,7 +19,9 @@ public:
 	// End of APawn interface
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime);
-	
+
+protected:
+	virtual void LevelUp() override;
 
 private:
 	UPROPERTY(EditAnywhere, category = Ability)

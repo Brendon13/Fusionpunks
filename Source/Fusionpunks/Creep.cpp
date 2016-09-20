@@ -37,7 +37,6 @@ ACreep::ACreep()
 	{
 		FloatingDamageWidgetClass = Cast<UClass>(FloatingDamageWidgetFinder.Object->GeneratedClass);
 	}
-	
 
 	//Will have to change current level based on players level when spawned from a controlled camp 
 	//i.e. Diesel hero is level 9 -> creep should also be level 9 
@@ -92,20 +91,14 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 	UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
 	floatingDamageWidget->SetIncDamage(Damage);
 	floatingDamageWidget->AddToViewport();
-	//floatingDamageWidget->PlayTextFloatUpAnimation();
-	
-	FVector2D creepLocationToScreen;
 
 	if (currentHealth <= 0)
 	{
-		if (bBelongsToCamp)
+		if (bBelongsToCamp && creepCampHome != nullptr)
 		{
-			if (creepCampHome != nullptr)
-			{
-				creepCampHome->MinusOneFromCreepCamp();
-				this->Destroy();
-			}
+			creepCampHome->MinusOneFromCreepCamp();
 		}
+		this->Destroy();
 	}
 	return Damage;
 }
@@ -125,4 +118,5 @@ void ACreep::SetCreepCampHome(ACreepCamp* home, bool BelongsToCamp)
 	creepCampHome = home;
 	bBelongsToCamp = BelongsToCamp;
 }
+
 
