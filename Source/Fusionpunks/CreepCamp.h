@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "Creep.h"
 #include "CreepCamp.generated.h"
 
 UENUM(BlueprintType)
@@ -13,6 +14,62 @@ enum class ECampType : uint8
 	CT_Diesel	  UMETA(DisplayName = "Diesel")
 };
 
+USTRUCT(BlueprintType)
+struct FCaptureVariables
+{
+	GENERATED_BODY()
+	
+	FCaptureVariables()
+	{
+		//Default unless set in blueprint 
+		targetCaptureTime = 5.0f;
+		captureTimeMultiplier = 1.5f;
+		captureTime = targetCaptureTime;
+	}
+	/*The more creeps that are in the camp the higher the capture time should be
+	When a camp is captured all the creeps associated with it should die */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CampVariables)
+	float targetCaptureTime;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CampVariables)
+	float captureTimeMultiplier;
+	UPROPERTY()
+	float captureTime;
+	UPROPERTY()
+	float cyberCaptureProgress;
+	UPROPERTY()
+	float dieselCaptureProgress;
+	UPROPERTY()
+	bool bCyberIsCapturing;
+	UPROPERTY()
+	bool bDieselIsCapturing;
+};
+
+USTRUCT(BlueprintType)
+struct FSpawningVariables
+{
+	GENERATED_BODY()
+
+	FSpawningVariables()
+	{
+		creepCount = 3;
+		creepSpawnTimerTarget = 5.0f;
+		creepSpawnTimer = creepSpawnTimerTarget;
+		creepSpawnTimerMultiplier = 1.5f;
+	}
+
+	/*Spawn rate for creeps is based on how many are currently at the camp... 
+	Less = faster spawn rate, More = slower spawn rate*/
+	UPROPERTY()
+	int creepCount; 
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CampVariables)
+	float creepSpawnTimerTarget;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CampVariables)
+	float creepSpawnTimerMultiplier;
+	UPROPERTY()
+	float creepSpawnTimer;
+};
+
 UCLASS()
 class FUSIONPUNKS_API ACreepCamp : public AActor
 {
@@ -21,6 +78,12 @@ class FUSIONPUNKS_API ACreepCamp : public AActor
 private:
 	UPROPERTY(EditAnywhere, Category = Stats)
 		ECampType campType;
+public:
+	UPROPERTY(EditAnywhere, Category = Stats)
+	FCaptureVariables captureVariables;
+	UPROPERTY(EditAnywhere, Category = Stats)
+	FSpawningVariables spawningVariables;
+	
 	
 public:	
 	ACreepCamp();
@@ -37,16 +100,17 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Creeps")
 		TSubclassOf<class ADieselCreep> dieselCreepRef;
 
+
 //Meshes and triggers 
 protected:
-	UPROPERTY(EditDefaultsonly, Category = Appearance)
+	UPROPERTY(EditDefaultsOnly, Category = Appearance)
 		UStaticMeshComponent* campMesh; 
 
-	UPROPERTY(EditDefaultsonly, Category = CollisionComponents)
+	UPROPERTY(EditDefaultsOnly, Category = CollisionComponents)
 		USphereComponent* sphereTrigger;
 
 	//mesh for the ring around the camp
-	UPROPERTY(EditDefaultsonly, Category = Appearance)
+	UPROPERTY(EditDefaultsOnly, Category = Appearance)
 		UStaticMeshComponent* ringMesh;
 
 
@@ -73,33 +137,29 @@ protected:
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-
-//Capture Camp stuff
 public:
+//Camp Capture Functions
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		float GetCyberCapturePercentage();
 
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		float GetDieselCapturePercentage();
-protected:
-	float cyberCaptureProgress;
-	float dieselCaptureProgress;
 
-	bool bCyberIsCapturing;
-	bool bDieselIsCapturing;
 
-	//The more creeps that are in the camp the higher the capture time should be 
-	//When a camp is captured all the creeps associated with it should die 
-	float captureTime;
-	int creepCount; //Spawn rate for creeps is based on how many are currently at the camp... Less = faster spawn rate, More = slower spawn rate
-
+//Creep Spawning Functions
 public:
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		void MinusOneFromCreepCamp();
 
+	void RemoveCreep(ACreep* CreepInCamp);
+	void DestroyAllCreeps();
+
+
 
 //Creep Spawn Locations
 protected:
+	TArray<ACreep*> creepArray;
+
 	UPROPERTY(EditAnywhere, Category = SpawnLocation)
 		FVector creep1SpawnLocation;
 

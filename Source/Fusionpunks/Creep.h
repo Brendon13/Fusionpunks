@@ -24,7 +24,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Stats)
 		const float GetHealthAsDecimal() const  { return currentHealth / maxHealth; }
 
-	UFUNCTION(BlueprintCallable, category = Stats)
+	UFUNCTION(BlueprintCallable, Category = Stats)
 		void LevelUp();
 
 //editable stats 

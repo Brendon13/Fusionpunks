@@ -96,7 +96,8 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 	{
 		if (bBelongsToCamp && creepCampHome != nullptr)
 		{
-			creepCampHome->MinusOneFromCreepCamp();
+			creepCampHome->RemoveCreep(this);
+			//creepCampHome->MinusOneFromCreepCamp();
 		}
 		this->Destroy();
 	}
