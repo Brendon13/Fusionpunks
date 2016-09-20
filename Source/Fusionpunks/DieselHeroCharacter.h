@@ -16,10 +16,12 @@ public:
 	ADieselHeroCharacter();
 
 	virtual void BeginPlay() override;
-
 	virtual void Tick(float DeltaTime) override;
-
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+
+protected:
+	virtual void LevelUp() override;
+
 //Variables and functions for Leap Ability 
 protected:
 	UFUNCTION(BlueprintCallable, Category = Abilities)
@@ -44,15 +46,11 @@ private:
 
 //Pull Force Ability stuff
 protected:
-	
-
 	UPROPERTY(EditAnywhere, Category = PullAttack)
 		float pullRadius;
 
 	UPROPERTY(EditAnywhere, Category = PullAttack)
 		float pullForce;
-
-	
 
 //Dash Ability Stuff
 private:

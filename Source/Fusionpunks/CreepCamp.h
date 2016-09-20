@@ -19,7 +19,7 @@ class FUSIONPUNKS_API ACreepCamp : public AActor
 	GENERATED_BODY()
 
 private:
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	UPROPERTY(EditAnywhere, Category = Stats)
 		ECampType campType;
 	
 public:	
@@ -75,23 +75,24 @@ protected:
 
 
 //Capture Camp stuff
-protected:
-	UPROPERTY(EditAnywhere, Category = CampVariables)
-		float captureTime;
 public:
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		float GetCyberCapturePercentage();
 
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		float GetDieselCapturePercentage();
-private:
+protected:
 	float cyberCaptureProgress;
 	float dieselCaptureProgress;
 
 	bool bCyberIsCapturing;
 	bool bDieselIsCapturing;
 
+	//The more creeps that are in the camp the higher the capture time should be 
+	//When a camp is captured all the creeps associated with it should die 
+	float captureTime;
 	int creepCount; //Spawn rate for creeps is based on how many are currently at the camp... Less = faster spawn rate, More = slower spawn rate
+
 public:
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		void MinusOneFromCreepCamp();

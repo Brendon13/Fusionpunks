@@ -239,7 +239,6 @@ float AHeroBase::GetMaxHealth()
 
 void AHeroBase::LevelUp()
 {
-	//implement how a character levels 
 	currentLevel++;
 
 	maxHealth += healthIncreasePerLevel;

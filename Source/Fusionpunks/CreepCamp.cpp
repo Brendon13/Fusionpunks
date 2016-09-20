@@ -72,10 +72,50 @@ void ACreepCamp::BeginPlay()
 	creepSpawnArray.Add(creep2SpawnLocation);
 	creepSpawnArray.Add(creep3SpawnLocation);
 
-	if (campType == ECampType::CT_Neutral)
+	if (campType == ECampType::CT_Cyber)
 	{
 		FActorSpawnParameters spawnParameters;
-		spawnParameters.bNoCollisionFail = true;
+		spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		spawnParameters.Owner = this;
+
+		for (int i = 0; i < creepSpawnArray.Num(); i++)
+		{
+			ACyberCreep* cyberCreep = (ACyberCreep*)GetWorld()->SpawnActor<ACyberCreep>
+				(cyberCreepRef,
+					creepSpawnArray[i],
+					FRotator::ZeroRotator,
+					spawnParameters);
+
+			if (cyberCreep->IsValidLowLevel())
+			{
+				cyberCreep->SetCreepCampHome(this);
+			}
+		}
+	}
+	else if (campType == ECampType::CT_Diesel)
+	{
+		FActorSpawnParameters spawnParameters;
+		spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		spawnParameters.Owner = this;
+
+		for (int i = 0; i < creepSpawnArray.Num(); i++)
+		{
+			ADieselCreep* dieselCreep = (ADieselCreep*)GetWorld()->SpawnActor<ADieselCreep>
+				(dieselCreepRef,
+					creepSpawnArray[i],
+					FRotator::ZeroRotator,
+					spawnParameters);
+
+			if (dieselCreep->IsValidLowLevel())
+			{
+				dieselCreep->SetCreepCampHome(this);
+			}
+		}
+	}
+	else
+	{
+		FActorSpawnParameters spawnParameters;
+		spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		spawnParameters.Owner = this;
 
 		for (int i = 0; i < creepSpawnArray.Num(); i++)
@@ -88,7 +128,6 @@ void ACreepCamp::BeginPlay()
 
 			if (neutralCreep->IsValidLowLevel())
 			{
-				neutralCreep->Tags.Add(TEXT("CampCreep"));
 				neutralCreep->SetCreepCampHome(this);
 			}
 		}
@@ -180,6 +219,8 @@ void ACreepCamp::Tick( float DeltaTime )
 			SetToCyberCamp();
 		}
 	}
+
+	//spawning creeps
 }
 
 //On Trigger Function 

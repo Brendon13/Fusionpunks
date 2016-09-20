@@ -21,12 +21,9 @@ public:
 	AHeroBase();
 
 	virtual void BeginPlay() override;
-
 	virtual void Tick(float DeltaTime) override;
-
-	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
-	// End of APawn interface
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseTurnRate;
@@ -52,8 +49,6 @@ protected:
 	void LookUpAtRate(float Rate);
 
 
-	
-
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -63,8 +58,10 @@ public:
 public:
 	UFUNCTION(BlueprintCallable, Category = HeroFunctions)
 		float GetPlayerHealthPercentage();
+
 	UFUNCTION(BlueprintCallable, Category = HeroFunctions)
 		float GetCurrentHealth();
+
 	UFUNCTION(BlueprintCallable, Category = HeroFunctions)
 		float GetMaxHealth();
 
@@ -72,7 +69,6 @@ protected:
 	void StartAttack();
 	void Attack(AActor* enemy);
 	void AdjustCameraZoom(float Value);
-
 
 	//editable stats in blueprint
 protected:

@@ -3,6 +3,7 @@
 #include "Fusionpunks.h"
 #include "TestCreep.h"
 #include "ChainLightning.h"
+#include "FusionpunksGameState.h"
 #include "CyberHeroCharacter.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -192,6 +193,21 @@ void ACyberHeroCharacter::UnHighlightAll(TArray<FOverlapResult> enemies)
 		if (enemies[i].GetActor()->IsA(ATestCreep::StaticClass()))
 		{
 			Cast<ATestCreep>(enemies[i].GetActor())->GetMesh()->SetRenderCustomDepth(false);
+		}
+	}
+}
+
+void ACyberHeroCharacter::LevelUp()
+{
+	if (currentLevel < maxLevel)
+	{
+		Super::LevelUp();
+
+		//notify GameState we leveled up
+		if (GetWorld())
+		{
+			AFusionpunksGameState* gameState = Cast<AFusionpunksGameState>(GetWorld()->GetGameState());
+			gameState->CyberLevelUp();
 		}
 	}
 }

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
-
+#include "FloatingDamageWidget.h"
 #include "Base.h"
 
 
@@ -18,12 +18,17 @@ ABase::ABase()
 	healthBar = CreateDefaultSubobject<UHealthBarWidgetComponent>(TEXT("HealthBar"));
 	healthBar->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
+	const ConstructorHelpers::FObjectFinder<UBlueprint>
+		FloatingDamageWidgetFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widgets/FloatingDamageWidget_BP.FloatingDamageWidget_BP'"));
+
+	if (FloatingDamageWidgetFinder.Object != nullptr)
+	{
+		FloatingDamageWidgetClass = Cast<UClass>(FloatingDamageWidgetFinder.Object->GeneratedClass);
+	}
+
 	bCanBeDamaged = true;
 	currHP = maxHP;
-	
-	
-	
-	
+
 }
 
 // Called when the game starts or when spawned
@@ -33,6 +38,7 @@ void ABase::BeginPlay()
 	
 	playerCam = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	playerChar = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+
 	if (Cast<UBaseHealthBar>(healthBar->GetUserWidgetObject()))
 	{
 		UBaseHealthBar* hb = Cast<UBaseHealthBar>(healthBar->GetUserWidgetObject());
@@ -47,9 +53,8 @@ void ABase::BeginPlay()
 void ABase::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), playerChar->GetActorLocation());
-	healthBar->SetWorldRotation(newRotation);
-	
+	//FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), playerChar->GetActorLocation());
+	//healthBar->SetWorldRotation(newRotation);	
 }
 
 
@@ -57,15 +62,22 @@ float ABase::TakeDamage(float DamageAmount,struct FDamageEvent const & DamageEve
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	currHP -= DamageAmount;
+
+	UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
+	floatingDamageWidget->SetIncDamage(DamageAmount);
+	floatingDamageWidget->AddToViewport();
+
 	UE_LOG(LogTemp, Log, TEXT("Base took %f damage."), DamageAmount);
-    if (currHP <= 0) {
+    
+	if (currHP <= 0)
+	{
 		Destroy();
 	}
 	return DamageAmount;
-
 }
 
-float ABase::GetHpPercent() {
+float ABase::GetHpPercent() 
+{
 	
 	return currHP / maxHP;
 }
