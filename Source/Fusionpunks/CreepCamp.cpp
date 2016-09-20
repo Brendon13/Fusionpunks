@@ -45,13 +45,17 @@ ACreepCamp::ACreepCamp()
 	bCountUp = true;
 
 	//setting capture camp variables
-	captureTime = 5.0f;		//***If capture progress gets to 0 then Cyber captures camp, if captureprogress gets to captureThreshold Diesel captures camp
-	dieselCaptureProgress = 0.0f;
-	cyberCaptureProgress = 0.0f;
-	bCyberIsCapturing = false;
-	bDieselIsCapturing = false; 
+	//***If capture progress gets to 0 then Cyber captures camp, if captureprogress gets to captureThreshold Diesel captures camp
+	//targetCaptureTime = 5.0f;		
+	//captureTime = targetCaptureTime;
+	//captureTimeMultiplier = 1.5f;
+	//dieselCaptureProgress = 0.0f;
+	//cyberCaptureProgress = 0.0f;
+	//bCyberIsCapturing = false;
+	//bDieselIsCapturing = false; 
 
-	creepCount = 3;
+	//creepCount = 3;
+	//creepSpawnTimer = creepSpawnTimerTarget;
 }
 
 // Called when the game starts or when spawned
@@ -89,8 +93,11 @@ void ACreepCamp::BeginPlay()
 			if (cyberCreep->IsValidLowLevel())
 			{
 				cyberCreep->SetCreepCampHome(this);
+				creepArray.Add(cyberCreep);
 			}
 		}
+		captureVariables.cyberCaptureProgress = captureVariables.captureTime;
+		//cyberCaptureProgress = captureTime;
 	}
 	else if (campType == ECampType::CT_Diesel)
 	{
@@ -109,8 +116,11 @@ void ACreepCamp::BeginPlay()
 			if (dieselCreep->IsValidLowLevel())
 			{
 				dieselCreep->SetCreepCampHome(this);
+				creepArray.Add(dieselCreep);
 			}
 		}
+		captureVariables.dieselCaptureProgress = captureVariables.captureTime;
+		//dieselCaptureProgress = captureTime;
 	}
 	else
 	{
@@ -129,6 +139,7 @@ void ACreepCamp::BeginPlay()
 			if (neutralCreep->IsValidLowLevel())
 			{
 				neutralCreep->SetCreepCampHome(this);
+				creepArray.Add(neutralCreep);
 			}
 		}
 	}
@@ -143,8 +154,9 @@ void ACreepCamp::Tick( float DeltaTime )
 	ringRotation.Yaw += DeltaTime * ringRotationSpeed;
 	ringMesh->SetRelativeRotation(ringRotation);
 
-	if (campType != ECampType::CT_Diesel && bDieselIsCapturing && !bCyberIsCapturing)
+	if (campType != ECampType::CT_Diesel && !captureVariables.bDieselIsCapturing && !captureVariables.bCyberIsCapturing)
 	{
+		//Note: Make this better
 		if (ringMaterialAlpha >= 1)
 		{
 			bCountUp = false;
@@ -166,22 +178,23 @@ void ACreepCamp::Tick( float DeltaTime )
 		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), ringMaterialAlpha);
 
 		//check capture progress
-		if (cyberCaptureProgress >= 0)
+		if (captureVariables.cyberCaptureProgress >= 0)
 		{
-			cyberCaptureProgress -= DeltaTime;
+			captureVariables.cyberCaptureProgress -= DeltaTime;
 		}
 		
-		if (cyberCaptureProgress <= 0)
+		if (captureVariables.cyberCaptureProgress <= 0)
 		{
-			dieselCaptureProgress += DeltaTime;
+			captureVariables.dieselCaptureProgress += DeltaTime;
 		}
 
-		if (dieselCaptureProgress >= captureTime)
+		if (captureVariables.dieselCaptureProgress >= captureVariables.captureTime)
 		{
 			SetToDieselCamp();
+			DestroyAllCreeps();
 		}
 	}
-	else if (campType != ECampType::CT_Cyber && !bDieselIsCapturing && bCyberIsCapturing)
+	else if (campType != ECampType::CT_Cyber && !captureVariables.bDieselIsCapturing && captureVariables.bCyberIsCapturing)
 	{
 		if (ringMaterialAlpha >= 1)
 		{
@@ -204,19 +217,20 @@ void ACreepCamp::Tick( float DeltaTime )
 		//set ring material to fade in and out
 		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), FMath::Sin(ringMaterialAlpha));
 
-		if (dieselCaptureProgress >= 0)
+		if (captureVariables.dieselCaptureProgress >= 0)
 		{
-			dieselCaptureProgress -= DeltaTime;
+			captureVariables.dieselCaptureProgress -= DeltaTime;
 		}
 
-		if (dieselCaptureProgress <= 0)
+		if (captureVariables.dieselCaptureProgress <= 0)
 		{
-			cyberCaptureProgress += DeltaTime;
+			captureVariables.cyberCaptureProgress += DeltaTime;
 		}
 
-		if (cyberCaptureProgress >= captureTime)
+		if (captureVariables.cyberCaptureProgress >= captureVariables.captureTime)
 		{
 			SetToCyberCamp();
+			DestroyAllCreeps();
 		}
 	}
 
@@ -239,12 +253,12 @@ void ACreepCamp::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActo
 
 		if (OtherActor->Tags.Contains("CyberPlayer"))
 		{
-			bCyberIsCapturing = true; 
+			captureVariables.bCyberIsCapturing = true;
 		}
 
 		if (OtherActor->Tags.Contains("DieselPlayer"))
 		{
-			bDieselIsCapturing = true;
+			captureVariables.bDieselIsCapturing = true;
 		}
 	}
 }
@@ -264,12 +278,12 @@ void ACreepCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 		if (OtherActor->Tags.Contains("CyberPlayer"))
 		{
-			bCyberIsCapturing = false;
+			captureVariables.bCyberIsCapturing = false;
 		}
 
 		if (OtherActor->Tags.Contains("DieselPlayer"))
 		{
-			bDieselIsCapturing = false; 
+			captureVariables.bDieselIsCapturing = false;
 		}
 		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
 	}
@@ -277,12 +291,12 @@ void ACreepCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 float ACreepCamp::GetCyberCapturePercentage()
 {
-	return cyberCaptureProgress / captureTime;
+	return captureVariables.cyberCaptureProgress / captureVariables.captureTime;
 }
 
 float ACreepCamp::GetDieselCapturePercentage()
 {
-	return dieselCaptureProgress / captureTime;
+	return captureVariables.dieselCaptureProgress / captureVariables.captureTime;
 }
 
 void ACreepCamp::SetToDieselCamp()
@@ -315,5 +329,24 @@ void ACreepCamp::SetToNeutralCamp()
 
 void ACreepCamp::MinusOneFromCreepCamp()
 {
-	creepCount--;
+	spawningVariables.creepCount--;
+}
+
+
+void ACreepCamp::RemoveCreep(ACreep* CreepInCamp)
+{
+	if (creepArray.Contains<ACreep*>(CreepInCamp))
+	{
+		creepArray.Remove(CreepInCamp);
+		spawningVariables.creepCount--;
+	}
+}
+
+void ACreepCamp::DestroyAllCreeps()
+{
+	for (int i = 0; i < creepArray.Num(); i++)
+	{
+		creepArray[i]->Destroy();
+		spawningVariables.creepCount = 0;
+	}
 }
