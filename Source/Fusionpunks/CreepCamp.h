@@ -25,12 +25,16 @@ struct FCaptureVariables
 		targetCaptureTime = 5.0f;
 		captureTimeMultiplier = 1.5f;
 		captureTime = targetCaptureTime;
+		cyberCaptureProgress = 0;
+		dieselCaptureProgress = 0;
+		bDieselIsCapturing = false;
+		bCyberIsCapturing = false;
 	}
 	/*The more creeps that are in the camp the higher the capture time should be
 	When a camp is captured all the creeps associated with it should die */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CampVariables)
+	UPROPERTY(EditAnywhere, Category = CampVariables)
 	float targetCaptureTime;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CampVariables)
+	UPROPERTY(EditAnywhere, Category = CampVariables)
 	float captureTimeMultiplier;
 	UPROPERTY()
 	float captureTime;
@@ -55,16 +59,19 @@ struct FSpawningVariables
 		creepSpawnTimerTarget = 5.0f;
 		creepSpawnTimer = creepSpawnTimerTarget;
 		creepSpawnTimerMultiplier = 1.5f;
+		neutralCreepLimit = 3;
 	}
 
 	/*Spawn rate for creeps is based on how many are currently at the camp... 
 	Less = faster spawn rate, More = slower spawn rate*/
 	UPROPERTY()
 	int creepCount; 
+	UPROPERTY(EditAnywhere, Category = CampVariables)
+	int neutralCreepLimit;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CampVariables)
+	UPROPERTY(EditAnywhere, Category = CampVariables)
 	float creepSpawnTimerTarget;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CampVariables)
+	UPROPERTY(EditAnywhere, Category = CampVariables)
 	float creepSpawnTimerMultiplier;
 	UPROPERTY()
 	float creepSpawnTimer;
@@ -74,22 +81,24 @@ UCLASS()
 class FUSIONPUNKS_API ACreepCamp : public AActor
 {
 	GENERATED_BODY()
-
-private:
-	UPROPERTY(EditAnywhere, Category = Stats)
-		ECampType campType;
-public:
-	UPROPERTY(EditAnywhere, Category = Stats)
-	FCaptureVariables captureVariables;
-	UPROPERTY(EditAnywhere, Category = Stats)
-	FSpawningVariables spawningVariables;
-	
 	
 public:	
 	ACreepCamp();
 	virtual void BeginPlay() override;
 	virtual void Tick( float DeltaSeconds ) override;
 
+//enum, captureStruct, variablesStruct 
+private:
+	UPROPERTY(EditAnywhere, Category = Stats)
+		ECampType campType;
+
+	UPROPERTY(EditAnywhere, Category = Stats)
+		FCaptureVariables captureVariables;
+	UPROPERTY(EditAnywhere, Category = Stats)
+		FSpawningVariables spawningVariables;
+
+
+//creep class references
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Creeps")
 		 TSubclassOf<class ANeutralCreep> neutralCreepRef;
@@ -138,6 +147,7 @@ protected:
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 public:
+						//Brendon - Note: Move these to structs????
 //Camp Capture Functions
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		float GetCyberCapturePercentage();
@@ -153,7 +163,6 @@ public:
 
 	void RemoveCreep(ACreep* CreepInCamp);
 	void DestroyAllCreeps();
-
 
 
 //Creep Spawn Locations
