@@ -24,7 +24,7 @@ ATower::ATower()
 	radius->OnComponentEndOverlap.AddDynamic(this, &ATower::TriggerExit);
 
 	
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ps(TEXT("ParticleSystem'/Game/BluePrints/LaserBeam.LaserBeam'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ps(TEXT("ParticleSystem'/Game/ParticleEffects/LaserBeam.LaserBeam'"));
 	beam = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Beam Particle"));
 	beam->SetTemplate(ps.Object);
 	beam->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);

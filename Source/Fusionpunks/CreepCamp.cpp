@@ -7,6 +7,8 @@
 #include "DieselCreep.h"
 #include "CreepCamp.h"
 
+#define print(text) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Green,text)
+
 // Sets default values
 ACreepCamp::ACreepCamp()
 {
@@ -38,24 +40,14 @@ ACreepCamp::ACreepCamp()
 	//starting status
 	campType = ECampType::CT_Neutral;
 
+	captureVariables = FCaptureVariables::FCaptureVariables();
+	spawningVariables = FSpawningVariables::FSpawningVariables();
+
 	//speed at which camp rotates
 	ringRotationSpeed = 25.0f;
 	ringMaterialAlpha = 0.5f;
 	ringMaterialAlphaSpeed = 1.0f;
 	bCountUp = true;
-
-	//setting capture camp variables
-	//***If capture progress gets to 0 then Cyber captures camp, if captureprogress gets to captureThreshold Diesel captures camp
-	//targetCaptureTime = 5.0f;		
-	//captureTime = targetCaptureTime;
-	//captureTimeMultiplier = 1.5f;
-	//dieselCaptureProgress = 0.0f;
-	//cyberCaptureProgress = 0.0f;
-	//bCyberIsCapturing = false;
-	//bDieselIsCapturing = false; 
-
-	//creepCount = 3;
-	//creepSpawnTimer = creepSpawnTimerTarget;
 }
 
 // Called when the game starts or when spawned
@@ -67,8 +59,7 @@ void ACreepCamp::BeginPlay()
 	sphereTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACreepCamp::OnOverlapBegin);
 	sphereTrigger->OnComponentEndOverlap.AddDynamic(this, &ACreepCamp::OnOverlapEnd);
 	
-	//EVENTUALLY IMPLEMENT 1 SPAWN LOCATION + ANIMATION.... i.e. creep is created (Animation Plays) and then creep moves to the front of the camp and begins a patrolling camp Behavior
-	//set locations
+	//set locations for initial spawning 
 	creep1SpawnLocation = FVector(this->GetActorLocation().X + 500, this->GetActorLocation().Y, this->GetActorLocation().Z + 50);
 	creep2SpawnLocation = FVector(this->GetActorLocation().X - 500, this->GetActorLocation().Y, this->GetActorLocation().Z + 50);
 	creep3SpawnLocation = FVector(this->GetActorLocation().X, this->GetActorLocation().Y + 500, this->GetActorLocation().Z + 50);
@@ -150,11 +141,24 @@ void ACreepCamp::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	//Debug Messages to print to screen
+	//Could probably make an entire struct to handle this 
+	GEngine->ClearOnScreenDebugMessages();
+	static const FString MCreepCount(TEXT("\n\nCreep Count: "));
+	static const FString MSpawnTimer(TEXT("\n\nSpawn Timer: "));
+	static const FString MCaptureTimer(TEXT("\n\nCampCaptureTimer: "));
+
+	print(MCreepCount + FString::FromInt(spawningVariables.creepCount)
+		  + MSpawnTimer + FString::FromInt((int)spawningVariables.creepSpawnTimer)
+		  + MCaptureTimer + FString::FromInt((int)captureVariables.captureTime));
+	
+
 	//Rotate the ring every frame
 	ringRotation.Yaw += DeltaTime * ringRotationSpeed;
 	ringMesh->SetRelativeRotation(ringRotation);
 
-	if (campType != ECampType::CT_Diesel && !captureVariables.bDieselIsCapturing && !captureVariables.bCyberIsCapturing)
+	//if cyber is capturing
+	if (campType != ECampType::CT_Cyber && !captureVariables.bDieselIsCapturing && captureVariables.bCyberIsCapturing)
 	{
 		//Note: Make this better
 		if (ringMaterialAlpha >= 1)
@@ -170,7 +174,7 @@ void ACreepCamp::Tick( float DeltaTime )
 		{
 			ringMaterialAlpha += DeltaTime * ringMaterialAlphaSpeed;
 		}
-		else if (!bCountUp)
+		else if (!bCountUp	)
 		{
 			ringMaterialAlpha -= DeltaTime * ringMaterialAlphaSpeed;
 		}
@@ -178,23 +182,24 @@ void ACreepCamp::Tick( float DeltaTime )
 		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), ringMaterialAlpha);
 
 		//check capture progress
-		if (captureVariables.cyberCaptureProgress >= 0)
+		if (captureVariables.dieselCaptureProgress >= 0)
 		{
-			captureVariables.cyberCaptureProgress -= DeltaTime;
+			captureVariables.dieselCaptureProgress -= DeltaTime;
 		}
 		
-		if (captureVariables.cyberCaptureProgress <= 0)
+		if (captureVariables.dieselCaptureProgress <= 0)
 		{
-			captureVariables.dieselCaptureProgress += DeltaTime;
+			captureVariables.cyberCaptureProgress += DeltaTime;
 		}
 
-		if (captureVariables.dieselCaptureProgress >= captureVariables.captureTime)
+		if (captureVariables.cyberCaptureProgress >= captureVariables.captureTime)
 		{
-			SetToDieselCamp();
+			SetToCyberCamp();
 			DestroyAllCreeps();
 		}
 	}
-	else if (campType != ECampType::CT_Cyber && !captureVariables.bDieselIsCapturing && captureVariables.bCyberIsCapturing)
+	//is Diesel capturing?
+	else if (campType != ECampType::CT_Diesel && !captureVariables.bCyberIsCapturing && captureVariables.bDieselIsCapturing)
 	{
 		if (ringMaterialAlpha >= 1)
 		{
@@ -217,25 +222,133 @@ void ACreepCamp::Tick( float DeltaTime )
 		//set ring material to fade in and out
 		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), FMath::Sin(ringMaterialAlpha));
 
-		if (captureVariables.dieselCaptureProgress >= 0)
+		if (captureVariables.cyberCaptureProgress >= 0)
 		{
-			captureVariables.dieselCaptureProgress -= DeltaTime;
+			captureVariables.cyberCaptureProgress -= DeltaTime;
 		}
 
-		if (captureVariables.dieselCaptureProgress <= 0)
+		if (captureVariables.cyberCaptureProgress <= 0)
 		{
-			captureVariables.cyberCaptureProgress += DeltaTime;
+			captureVariables.dieselCaptureProgress += DeltaTime;
 		}
 
-		if (captureVariables.cyberCaptureProgress >= captureVariables.captureTime)
+		if (captureVariables.dieselCaptureProgress >= captureVariables.captureTime)
 		{
-			SetToCyberCamp();
+			SetToDieselCamp();
 			DestroyAllCreeps();
 		}
 	}
 
+	//Note - Brendon: Do we want to keep spawning creeps at neutral camps or have a cap???
 	//spawning creeps
-}
+	//if neutral camp
+	if (campType == ECampType::CT_Neutral)
+	{
+		if (spawningVariables.creepCount < spawningVariables.neutralCreepLimit)
+		{
+			spawningVariables.creepSpawnTimer -= DeltaTime;
+
+			if (spawningVariables.creepSpawnTimer <= 0)
+			{
+				FActorSpawnParameters spawnParameters;
+				spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+				//NOTE - Brendon:: Change this to play creep creation animation(camp) and spawn it in the middle of the camp
+				//Then creep behavior should change to patrolling camp 
+				int random = FMath::RandRange(0, 2);
+				ANeutralCreep* neutralCreep = (ANeutralCreep*)GetWorld()->SpawnActor<ANeutralCreep>
+					(neutralCreepRef,
+						creepSpawnArray[random],
+						FRotator::ZeroRotator,
+						spawnParameters);
+
+				if (neutralCreep->IsValidLowLevel())
+				{
+					neutralCreep->SetCreepCampHome(this);
+					creepArray.Add(neutralCreep);
+					spawningVariables.creepCount++;
+				}
+
+				spawningVariables.creepSpawnTimer = spawningVariables.creepSpawnTimerTarget;
+			}
+		}
+	}
+	else
+	{
+		spawningVariables.creepSpawnTimer -= DeltaTime;
+
+		if (spawningVariables.creepSpawnTimer <= 0)
+		{
+			if (campType == ECampType::CT_Cyber)
+			{
+				FActorSpawnParameters spawnParameters;
+				spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+				//NOTE - Brendon:: Change this to play creep creation animation(camp) and spawn it in the middle of the camp
+				//Then creep behavior should change to patrolling camp 
+				int random = FMath::RandRange(0, 2);
+				ACyberCreep* cyberCreep = (ACyberCreep*)GetWorld()->SpawnActor<ACyberCreep>
+					(cyberCreepRef,
+						creepSpawnArray[random],
+						FRotator::ZeroRotator,
+						spawnParameters);
+
+				if (cyberCreep->IsValidLowLevel())
+				{
+					cyberCreep->SetCreepCampHome(this);
+					creepArray.Add(cyberCreep);
+					spawningVariables.creepCount++;
+				}
+			}
+			else
+			{
+				FActorSpawnParameters spawnParameters;
+				spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+				//NOTE - Brendon:: Change this to play creep creation animation(camp) and spawn it in the middle of the camp
+				//Then creep behavior should change to patrolling camp 
+				int random = FMath::RandRange(0, 2);
+				ADieselCreep* dieselCreep = (ADieselCreep*)GetWorld()->SpawnActor<ADieselCreep>
+					(dieselCreepRef,
+						creepSpawnArray[random],
+						FRotator::ZeroRotator,
+						spawnParameters);
+
+				if (dieselCreep->IsValidLowLevel())
+				{
+					dieselCreep->SetCreepCampHome(this);
+					creepArray.Add(dieselCreep);
+					spawningVariables.creepCount++;
+				}
+			}
+
+			//NOTE - BRENDON: Can change multiplier and target timer in Blueprints, have to balance this 
+			/*														 @ 3 Creeps
+			(5 seconds		    +						   (3   *   1.5)) = 9 seconds
+			@ 4 Creeps
+			(5 seconds			+						(4		*	 1.5)) = 11 seconds */
+			spawningVariables.creepSpawnTimer = spawningVariables.creepSpawnTimerTarget + (spawningVariables.creepCount * spawningVariables.creepSpawnTimerMultiplier);
+		}
+	}
+
+	//update the capture target depending on how many creeps are in the camp
+	if (campType != ECampType::CT_Neutral && spawningVariables.creepCount > 3)
+	{	
+		/*                              @3 Creeps:              */
+		captureVariables.captureTime = captureVariables.targetCaptureTime + (spawningVariables.creepCount * captureVariables.captureTimeMultiplier);
+
+		//update capture progress bar for whoever owns the camp
+		if (!captureVariables.bCyberIsCapturing && !captureVariables.bDieselIsCapturing)
+		{
+			if (campType == ECampType::CT_Cyber)
+			{
+				captureVariables.cyberCaptureProgress = captureVariables.captureTime;
+			}
+			else
+			{
+				captureVariables.dieselCaptureProgress = captureVariables.captureTime;
+			}
+		}
+	}
+
+}//end of tick
 
 //On Trigger Function 
 void ACreepCamp::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
@@ -304,6 +417,7 @@ void ACreepCamp::SetToDieselCamp()
 	//set color and transparency of ring
 	ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0, 0, 0));
 	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
+	captureVariables.bDieselIsCapturing = false;
 
 	campType = ECampType::CT_Diesel;
 }
@@ -314,6 +428,7 @@ void ACreepCamp::SetToCyberCamp()
 	//set color and transparency of ring 
 	ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0.0, 0.0f, 1.0f));
 	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
+	captureVariables.bCyberIsCapturing = false; 
 
 	campType = ECampType::CT_Cyber;
 }
