@@ -55,11 +55,12 @@ struct FSpawningVariables
 
 	FSpawningVariables()
 	{
-		creepCount = 3;
 		creepSpawnTimerTarget = 5.0f;
 		creepSpawnTimer = creepSpawnTimerTarget;
 		creepSpawnTimerMultiplier = 1.5f;
 		neutralCreepLimit = 3;
+		startCreepAmount = 3;
+		creepCount = 0;
 	}
 
 	/*Spawn rate for creeps is based on how many are currently at the camp... 
@@ -68,6 +69,8 @@ struct FSpawningVariables
 	int creepCount; 
 	UPROPERTY(EditAnywhere, Category = CampVariables)
 	int neutralCreepLimit;
+	UPROPERTY(EditAnywhere, Category = CampVariables)
+	int startCreepAmount;
 	
 	UPROPERTY(EditAnywhere, Category = CampVariables)
 	float creepSpawnTimerTarget;

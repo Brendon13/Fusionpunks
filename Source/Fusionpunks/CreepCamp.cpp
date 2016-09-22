@@ -71,13 +71,12 @@ void ACreepCamp::BeginPlay()
 	{
 		FActorSpawnParameters spawnParameters;
 		spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		spawnParameters.Owner = this;
 
-		for (int i = 0; i < creepSpawnArray.Num(); i++)
+		for (int i = 0; i < spawningVariables.startCreepAmount; i++)
 		{
 			ACyberCreep* cyberCreep = (ACyberCreep*)GetWorld()->SpawnActor<ACyberCreep>
 				(cyberCreepRef,
-					creepSpawnArray[i],
+					creepSpawnArray[i % creepSpawnArray.Num()],
 					FRotator::ZeroRotator,
 					spawnParameters);
 
@@ -85,6 +84,7 @@ void ACreepCamp::BeginPlay()
 			{
 				cyberCreep->SetCreepCampHome(this);
 				creepArray.Add(cyberCreep);
+				spawningVariables.creepCount++;
 			}
 		}
 		captureVariables.cyberCaptureProgress = captureVariables.captureTime;
@@ -94,13 +94,12 @@ void ACreepCamp::BeginPlay()
 	{
 		FActorSpawnParameters spawnParameters;
 		spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		spawnParameters.Owner = this;
 
-		for (int i = 0; i < creepSpawnArray.Num(); i++)
+		for (int i = 0; i < spawningVariables.startCreepAmount; i++)
 		{
 			ADieselCreep* dieselCreep = (ADieselCreep*)GetWorld()->SpawnActor<ADieselCreep>
 				(dieselCreepRef,
-					creepSpawnArray[i],
+					creepSpawnArray[i % creepSpawnArray.Num()],
 					FRotator::ZeroRotator,
 					spawnParameters);
 
@@ -108,6 +107,7 @@ void ACreepCamp::BeginPlay()
 			{
 				dieselCreep->SetCreepCampHome(this);
 				creepArray.Add(dieselCreep);
+				spawningVariables.creepCount++;
 			}
 		}
 		captureVariables.dieselCaptureProgress = captureVariables.captureTime;
@@ -117,13 +117,12 @@ void ACreepCamp::BeginPlay()
 	{
 		FActorSpawnParameters spawnParameters;
 		spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		spawnParameters.Owner = this;
 
-		for (int i = 0; i < creepSpawnArray.Num(); i++)
+		for (int i = 0; i < spawningVariables.startCreepAmount; i++)
 		{
 			ANeutralCreep* neutralCreep = (ANeutralCreep*)GetWorld()->SpawnActor<ANeutralCreep>
 				(neutralCreepRef,
-					creepSpawnArray[i],
+					creepSpawnArray[i % creepSpawnArray.Num()],
 					FRotator::ZeroRotator,
 					spawnParameters);
 
@@ -131,6 +130,7 @@ void ACreepCamp::BeginPlay()
 			{
 				neutralCreep->SetCreepCampHome(this);
 				creepArray.Add(neutralCreep);
+				spawningVariables.creepCount++;
 			}
 		}
 	}
@@ -414,32 +414,31 @@ float ACreepCamp::GetDieselCapturePercentage()
 
 void ACreepCamp::SetToDieselCamp()
 {
+	captureVariables.bDieselIsCapturing = false;
+	campType = ECampType::CT_Diesel;
 	//set color and transparency of ring
 	ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0, 0, 0));
 	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
-	captureVariables.bDieselIsCapturing = false;
-
-	campType = ECampType::CT_Diesel;
 }
 
 //change camp functionality to cyber function
 void ACreepCamp::SetToCyberCamp()
 {
+	captureVariables.bCyberIsCapturing = false;
+	campType = ECampType::CT_Cyber;
+
 	//set color and transparency of ring 
 	ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0.0, 0.0f, 1.0f));
 	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
-	captureVariables.bCyberIsCapturing = false; 
-
-	campType = ECampType::CT_Cyber;
 }
 
 void ACreepCamp::SetToNeutralCamp()
 {
+	campType = ECampType::CT_Neutral;
+
 	//set color and transparency of ring
 	ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(1.0f, 1.0f, 1.0f));
 	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
-
-	campType = ECampType::CT_Neutral;
 }
 
 void ACreepCamp::MinusOneFromCreepCamp()
@@ -461,7 +460,10 @@ void ACreepCamp::DestroyAllCreeps()
 {
 	for (int i = 0; i < creepArray.Num(); i++)
 	{
-		creepArray[i]->Destroy();
-		spawningVariables.creepCount = 0;
+		if (!creepArray[i]->IsActorBeingDestroyed())
+		{
+			creepArray[i]->Destroy();
+			spawningVariables.creepCount = 0;
+		}
 	}
 }
