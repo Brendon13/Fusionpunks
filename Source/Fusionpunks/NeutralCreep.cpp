@@ -4,5 +4,8 @@
 #include "NeutralCreep.h"
 
 
-
+ANeutralCreep::ANeutralCreep()
+{
+	Tags.Add(TEXT("Neutral"));
+}
 

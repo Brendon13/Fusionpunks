@@ -186,7 +186,12 @@ void AHeroBase::StartAttack()
 			}
 
 		}
-		Attack(closestEnemy);
+		//check if they are on the same team as us or not
+		if (!closestEnemy->ActorHasTag(team))
+		{
+			Attack(closestEnemy);
+		}
+		
 	}
 }
 

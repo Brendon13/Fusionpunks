@@ -13,6 +13,8 @@ ACyberHeroCharacter::ACyberHeroCharacter()
 {
 	maxHealth = 250;
 	currentHealth = maxHealth;
+
+	team = FName::FName(TEXT("Cyber"));
 }
 
 //////////////////////////////////////////////////////////////////////////

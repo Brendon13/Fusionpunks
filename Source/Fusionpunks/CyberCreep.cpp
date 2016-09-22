@@ -3,6 +3,9 @@
 #include "Fusionpunks.h"
 #include "CyberCreep.h"
 
-
+ACyberCreep::ACyberCreep()
+{
+	Tags.Add(TEXT("Cyber"));
+}
 
 

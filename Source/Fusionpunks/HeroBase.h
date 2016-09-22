@@ -116,5 +116,9 @@ private:
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+protected:
+	FName team;
+public:
+	FName GetTeam() const { return team; }
 	
 };

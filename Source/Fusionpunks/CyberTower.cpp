@@ -8,6 +8,8 @@ ACyberTower::ACyberTower()
 {
 	beam = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Beam Particle"));	
 	beam->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
+	Tags.Add(TEXT("Cyber"));
 }
 
 void ACyberTower::BeginPlay()

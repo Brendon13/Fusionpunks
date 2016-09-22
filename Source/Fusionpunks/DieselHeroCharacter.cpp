@@ -27,6 +27,8 @@ ADieselHeroCharacter::ADieselHeroCharacter()
 	dashTimer = dashMaxTime;
 	bIsDashing = false;
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ADieselHeroCharacter::OnHit);
+
+	team = FName::FName(TEXT("Diesel"));
 }
 
 void ADieselHeroCharacter::BeginPlay()

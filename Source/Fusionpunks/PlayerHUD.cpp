@@ -32,15 +32,22 @@ APlayerHUD::APlayerHUD()
 
 void APlayerHUD::BeginPlay()
 {
-	playerHealthBarWidget = CreateWidget<UPlayerHealthBarWidget>(GetOwningPlayerController(), playerHealthBarWidgetClass);
-	playerHealthBarWidget->AddToViewport();
+	if (GetWorld()->GetFirstPlayerController()->GetCharacter() != nullptr)
+	{
+		playerHealthBarWidget = CreateWidget<UPlayerHealthBarWidget>(GetOwningPlayerController(), playerHealthBarWidgetClass);
+		playerHealthBarWidget->AddToViewport();
 
-	campProgressWidget = CreateWidget<UCampProgressWidget>(GetOwningPlayerController(), campProgressWidgetClass);
-	campProgressWidget->AddToViewport();
-	campProgressWidget->SetVisibility(ESlateVisibility::Hidden);
+		campProgressWidget = CreateWidget<UCampProgressWidget>(GetOwningPlayerController(), campProgressWidgetClass);
+		campProgressWidget->AddToViewport();
+		campProgressWidget->SetVisibility(ESlateVisibility::Hidden);
 
-	gameTimerWidget = CreateWidget<UGameTimerWidget>(GetOwningPlayerController(), gameTimerWidgetClass);
-	gameTimerWidget->AddToViewport();
+		gameTimerWidget = CreateWidget<UGameTimerWidget>(GetOwningPlayerController(), gameTimerWidgetClass);
+		gameTimerWidget->AddToViewport();
+	}
+	/*if (GetWorld()->GetName() == "MechanicsTesting")
+	{
+		
+	}*/
 }
 
 void APlayerHUD::DrawHUD()

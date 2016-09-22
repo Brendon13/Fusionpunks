@@ -4,5 +4,8 @@
 #include "DieselCreep.h"
 
 
-
+ADieselCreep::ADieselCreep()
+{
+	Tags.Add(TEXT("Diesel"));
+}
 
