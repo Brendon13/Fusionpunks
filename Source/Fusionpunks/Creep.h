@@ -3,6 +3,8 @@
 #pragma once
 
 #include "GameFramework/Pawn.h"
+#include "CreepHealthbarWidget.h"
+#include "WidgetComponent.h"
 #include "Creep.generated.h"
 
 class ACreepCamp;
@@ -13,71 +15,67 @@ class FUSIONPUNKS_API ACreep : public APawn
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
 	ACreep();
 
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Stats")
-		const float GetHealthAsDecimal() const
-	{
-		return currentHealth / maxHealth;
-	}
+	UFUNCTION(BlueprintCallable, Category = Stats)
+		const float GetHealthAsDecimal() const  { return currentHealth / maxHealth; }
 
-	UFUNCTION(BlueprintCallable, category = "Stats")
-	void LevelUp()
-	{
-		if (currentLevel + 1 <= maxLevel)
-		{
-			currentLevel++;
-			maxHealth += healthIncreasePerLevel;
-			damage += damageIncreasePerLevel;
-		}
-	}
+	UFUNCTION(BlueprintCallable, Category = Stats)
+		void LevelUp();
 
+//editable stats 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float maxHealth;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		int maxLevel;
 
-	UPROPERTY(EditAnywhere, Category = "Stats")
+	UPROPERTY(EditAnywhere, Category = Stats)
 		float movementSpeed;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float damage;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float healthIncreasePerLevel;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float damageIncreasePerLevel;
 
-private:
 	float currentHealth;
 	int currentLevel;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = Appearance)
-	UStaticMeshComponent* creepMesh;
-	
+	UPROPERTY(EditDefaultsOnly, Category = Appearance)
+		USkeletalMeshComponent* creepSkeletalMeshComp;
 
+
+//Creep Camp stuff
 public:
-	//function to set home creep camp
-	void SetCreepCampHome(ACreepCamp* home)
-	{
-		creepCampHome = home;
-	}
-
-private:
+	void SetCreepCampHome(ACreepCamp* home, bool BelongsToCamp = true);
+	bool bBelongsToCamp; //false means the creep belongs to a player (i.e. is apart of a player army)
+protected:
 	ACreepCamp* creepCampHome;
 	
+
+//health bar widget stuff
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = Widgets)
+	UWidgetComponent* widgetComponent;
+
+	TSubclassOf<UCreepHealthbarWidget> CreepHealthBarWidgetClass;
+
+	FRotator widgetCompRotation;
+	AActor* localPlayer;
+
+//Damage stuff
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	TSubclassOf<class UFloatingDamageWidget> FloatingDamageWidgetClass; 
+	//UWidgetComponent* floatingDamageWidget;
 };

@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
+#include "FloatingDamageWidget.h"
 #include "TowerBase.h"
 
 
@@ -18,6 +19,14 @@ ATowerBase::ATowerBase()
 	radius->bGenerateOverlapEvents = true;
 	radius->OnComponentBeginOverlap.AddDynamic(this, &ATowerBase::TriggerEnter);
 	radius->OnComponentEndOverlap.AddDynamic(this, &ATowerBase::TriggerExit);
+
+	const ConstructorHelpers::FObjectFinder<UBlueprint>
+		FloatingDamageWidgetFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widgets/FloatingDamageWidget_BP.FloatingDamageWidget_BP'"));
+
+	if (FloatingDamageWidgetFinder.Object != nullptr)
+	{
+		FloatingDamageWidgetClass = Cast<UClass>(FloatingDamageWidgetFinder.Object->GeneratedClass);
+	}
 
 	//static ConstructorHelpers::FObjectFinder<UParticleSystem> ps(TEXT("ParticleSystem'/Game/BluePrints/LaserBeam.LaserBeam'"));
 	//beam = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Beam Particle"));
@@ -50,8 +59,14 @@ float ATowerBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dam
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	currHP -= DamageAmount;
+
+	UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
+	floatingDamageWidget->SetIncDamage(DamageAmount);
+	floatingDamageWidget->AddToViewport();
+
 	UE_LOG(LogTemp, Log, TEXT("Tower took %f damage."), DamageAmount);
-	if (currHP <= 0) {
+	if (currHP <= 0) 
+	{
 		Destroy();
 	}
 	return DamageAmount;

@@ -3,6 +3,7 @@
 #include "Fusionpunks.h"
 #include "TestCreep.h"
 #include "ChainLightning.h"
+#include "FusionpunksGameState.h"
 #include "CyberHeroCharacter.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -10,11 +11,8 @@
 
 ACyberHeroCharacter::ACyberHeroCharacter()
 {
-	
 	maxHealth = 250;
 	currentHealth = maxHealth;
-
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -26,11 +24,8 @@ void ACyberHeroCharacter::SetupPlayerInputComponent(class UInputComponent* Input
 	Super::SetupPlayerInputComponent(InputComponent);
 	check(InputComponent);
 	
-
 	InputComponent->BindAction("Basic Attack", IE_Pressed, this, &ACyberHeroCharacter::DetermineClickEvent);
 	InputComponent->BindAction("Skill1", IE_Pressed, this, &ACyberHeroCharacter::OnSkillPressed);
-
-	
 }
 
 
@@ -53,23 +48,20 @@ void ACyberHeroCharacter::DetermineClickEvent()
 }
 
 
-void ACyberHeroCharacter::BeginPlay(){
+void ACyberHeroCharacter::BeginPlay()
+{
 	Super::BeginPlay();
-	
-
 }
 
 void ACyberHeroCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 	if (skillSelected) 
 	{
 		UpdateTarget();
 	}
 }
-
-
-
 
 
 AActor* ACyberHeroCharacter::UpdateTarget()
@@ -79,11 +71,13 @@ AActor* ACyberHeroCharacter::UpdateTarget()
 	{
 		UnHighlightAll(oldTargetResults);
 	}
+
 	AActor *closestEnemy;
 	FCollisionObjectQueryParams obejctQP;
 	obejctQP.AddObjectTypesToQuery(Creeps);
 	//obejctQP.AddObjectTypesToQuery()
 	//Overlap multi by channel as a sphere (for pick ups?)
+
 	FCollisionQueryParams QueryParameters;
 	QueryParameters.AddIgnoredActor(this);
 	QueryParameters.OwnerTag = TEXT("Player");	
@@ -94,7 +88,9 @@ AActor* ACyberHeroCharacter::UpdateTarget()
 		FCollisionShape::MakeSphere(300.f),
 		QueryParameters);
 	oldTargetResults = skillTargetResults;
-	if (skillTargetResults.Num() == 0) {
+	
+	if (skillTargetResults.Num() == 0)
+	{
 		UE_LOG(LogTemp, Display, TEXT("No Enemies Nearby"));
 		return NULL;
 	}
@@ -102,15 +98,15 @@ AActor* ACyberHeroCharacter::UpdateTarget()
 	{
 		UE_LOG(LogTemp, Display, TEXT("Enemy Found"));
 		closestEnemy = skillTargetResults[0].GetActor();
+
 		for (int i = 0; i < skillTargetResults.Num(); i++)
 		{
-
 			if (GetDistanceTo(skillTargetResults[i].GetActor()) <= GetDistanceTo(closestEnemy))
 			{
 				closestEnemy = skillTargetResults[i].GetActor();
 			}
-
 		}
+
 		HighlightTarget(closestEnemy, skillTargetResults);
 		return closestEnemy;
 	}
@@ -126,13 +122,12 @@ void ACyberHeroCharacter::OnSkillPressed()
 	{
 		skillSelected = false;
 		AActor* currentTarget = UpdateTarget();
+
 		if (currentTarget != NULL)
 		{
 			UnHighlightTarget(currentTarget);
 		}
-		
 	}
-
 }
 
 void ACyberHeroCharacter::UseSkill(AActor* enemy)
@@ -152,14 +147,13 @@ void ACyberHeroCharacter::UseSkill(AActor* enemy)
 	lightning->SetBeamPoints(Cast<AActor>(this),enemy);	
 	lightning->Use();
 
-	
-
 }
 
 void ACyberHeroCharacter::AddAffectedActor(AActor* enemy)
 {
 	affectedActors.Add(enemy);
 }
+
 bool ACyberHeroCharacter::IsAffected(AActor* enemy)
 {
 	return affectedActors.Contains(enemy);
@@ -170,9 +164,7 @@ void ACyberHeroCharacter::UnHighlightTarget(AActor* enemy)
 	if (enemy->IsA(ATestCreep::StaticClass()))
 	{
 		Cast<ATestCreep>(enemy)->GetMesh()->SetRenderCustomDepth(false);
-		
 	}
-
 }
 
 void ACyberHeroCharacter::HighlightTarget(AActor* enemy, TArray<FOverlapResult> enemies)
@@ -202,8 +194,21 @@ void ACyberHeroCharacter::UnHighlightAll(TArray<FOverlapResult> enemies)
 		{
 			Cast<ATestCreep>(enemies[i].GetActor())->GetMesh()->SetRenderCustomDepth(false);
 		}
-
 	}
+}
 
+void ACyberHeroCharacter::LevelUp()
+{
+	if (currentLevel < maxLevel)
+	{
+		Super::LevelUp();
+
+		//notify GameState we leveled up
+		if (GetWorld())
+		{
+			AFusionpunksGameState* gameState = Cast<AFusionpunksGameState>(GetWorld()->GetGameState());
+			gameState->CyberLevelUp();
+		}
+	}
 }
 

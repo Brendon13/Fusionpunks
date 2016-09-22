@@ -13,11 +13,8 @@ class FUSIONPUNKS_API ATowerBase : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ATowerBase();
 	
-public:
-	// Sets default values for this actor's properties
 	virtual float TakeDamage
 	(
 		float DamageAmount,
@@ -30,11 +27,11 @@ public:
 
 protected:
 
+	TSubclassOf<class UFloatingDamageWidget> FloatingDamageWidgetClass;
+	
 	FVector myLocation;
 
 	float spawnTimer;
-
-
 	bool bHasSpawed = false;
 
 	//UPROPERTY(EditDefaultsOnly)
@@ -66,6 +63,4 @@ protected:
 
 	//AActor* playerChar;
 
-	
-	
 };

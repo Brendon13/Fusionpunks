@@ -27,7 +27,7 @@ void UGameTimerWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 
 FText UGameTimerWidget::GetGameTimeAsText() const
 {
-	return FText::Format(LOCTEXT("GameTimeFormat", "{0} : {1}"), FText::AsNumber((int)(gameTimer / 60)), FText::AsNumber((int)((int)gameTimer % 60)));
+	return FText::Format(LOCTEXT("GameTimeFormat", "{0} : {1}"), FText::AsNumber((int)(gameTimer / 60)), FText::AsNumber(((int)gameTimer % 60)));
 }
 
 #undef LOCTEXT_NAMESPACE

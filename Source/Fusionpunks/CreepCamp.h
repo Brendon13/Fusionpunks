@@ -3,7 +3,79 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "Creep.h"
 #include "CreepCamp.generated.h"
+
+UENUM(BlueprintType)
+enum class ECampType : uint8
+{
+	CT_Neutral    UMETA(DisplayName = "Neutral"),
+	CT_Cyber      UMETA(DisplayName = "Cyber"),
+	CT_Diesel	  UMETA(DisplayName = "Diesel")
+};
+
+USTRUCT(BlueprintType)
+struct FCaptureVariables
+{
+	GENERATED_BODY()
+	
+	FCaptureVariables()
+	{
+		//Default unless set in blueprint 
+		targetCaptureTime = 5.0f;
+		captureTimeMultiplier = 1.5f;
+		captureTime = targetCaptureTime;
+		cyberCaptureProgress = 0;
+		dieselCaptureProgress = 0;
+		bDieselIsCapturing = false;
+		bCyberIsCapturing = false;
+	}
+	/*The more creeps that are in the camp the higher the capture time should be
+	When a camp is captured all the creeps associated with it should die */
+	UPROPERTY(EditAnywhere, Category = CampVariables)
+	float targetCaptureTime;
+	UPROPERTY(EditAnywhere, Category = CampVariables)
+	float captureTimeMultiplier;
+	UPROPERTY()
+	float captureTime;
+	UPROPERTY()
+	float cyberCaptureProgress;
+	UPROPERTY()
+	float dieselCaptureProgress;
+	UPROPERTY()
+	bool bCyberIsCapturing;
+	UPROPERTY()
+	bool bDieselIsCapturing;
+};
+
+USTRUCT(BlueprintType)
+struct FSpawningVariables
+{
+	GENERATED_BODY()
+
+	FSpawningVariables()
+	{
+		creepCount = 3;
+		creepSpawnTimerTarget = 5.0f;
+		creepSpawnTimer = creepSpawnTimerTarget;
+		creepSpawnTimerMultiplier = 1.5f;
+		neutralCreepLimit = 3;
+	}
+
+	/*Spawn rate for creeps is based on how many are currently at the camp... 
+	Less = faster spawn rate, More = slower spawn rate*/
+	UPROPERTY()
+	int creepCount; 
+	UPROPERTY(EditAnywhere, Category = CampVariables)
+	int neutralCreepLimit;
+	
+	UPROPERTY(EditAnywhere, Category = CampVariables)
+	float creepSpawnTimerTarget;
+	UPROPERTY(EditAnywhere, Category = CampVariables)
+	float creepSpawnTimerMultiplier;
+	UPROPERTY()
+	float creepSpawnTimer;
+};
 
 UCLASS()
 class FUSIONPUNKS_API ACreepCamp : public AActor
@@ -11,29 +83,43 @@ class FUSIONPUNKS_API ACreepCamp : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ACreepCamp();
-
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+//enum, captureStruct, variablesStruct 
 private:
-	FString status;
+	UPROPERTY(EditAnywhere, Category = Stats)
+		ECampType campType;
+
+	UPROPERTY(EditAnywhere, Category = Stats)
+		FCaptureVariables captureVariables;
+	UPROPERTY(EditAnywhere, Category = Stats)
+		FSpawningVariables spawningVariables;
+
+
+//creep class references
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Creeps")
+		 TSubclassOf<class ANeutralCreep> neutralCreepRef;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Creeps")
+		TSubclassOf<class ACyberCreep> cyberCreepRef;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Creeps")
+		TSubclassOf<class ADieselCreep> dieselCreepRef;
 
 
 //Meshes and triggers 
 protected:
-	UPROPERTY(EditDefaultsonly, Category = Appearance)
+	UPROPERTY(EditDefaultsOnly, Category = Appearance)
 		UStaticMeshComponent* campMesh; 
 
-	UPROPERTY(EditDefaultsonly, Category = CollisionComponents)
+	UPROPERTY(EditDefaultsOnly, Category = CollisionComponents)
 		USphereComponent* sphereTrigger;
 
 	//mesh for the ring around the camp
-	UPROPERTY(EditDefaultsonly, Category = Appearance)
+	UPROPERTY(EditDefaultsOnly, Category = Appearance)
 		UStaticMeshComponent* ringMesh;
 
 
@@ -43,7 +129,7 @@ protected:
 	float ringRotationSpeed;
 
 	UPROPERTY(EditAnywhere, Category = CampVariables)
-		float ringMaterialAlphaSpeed;
+	float ringMaterialAlphaSpeed;
 
 	FRotator ringRotation;
 	float ringMaterialAlpha;
@@ -60,25 +146,29 @@ protected:
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-//Capture Camp stuff
-protected:
-	UPROPERTY(EditAnywhere, Category = CampVariables)
-		float captureTime;
 public:
+						//Brendon - Note: Move these to structs????
+//Camp Capture Functions
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		float GetCyberCapturePercentage();
 
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		float GetDieselCapturePercentage();
-private:
-	float cyberCaptureProgress;
-	float dieselCaptureProgress;
-	bool bCyberIsCapturing;
-	bool bDieselIsCapturing;
+
+
+//Creep Spawning Functions
+public:
+	UFUNCTION(BlueprintCallable, Category = CampFunctions)
+		void MinusOneFromCreepCamp();
+
+	void RemoveCreep(ACreep* CreepInCamp);
+	void DestroyAllCreeps();
 
 
 //Creep Spawn Locations
 protected:
+	TArray<ACreep*> creepArray;
+
 	UPROPERTY(EditAnywhere, Category = SpawnLocation)
 		FVector creep1SpawnLocation;
 
@@ -89,6 +179,7 @@ protected:
 		FVector creep3SpawnLocation;
 
 	TArray<FVector> creepSpawnArray;
+
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
