@@ -23,7 +23,13 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
-
+	virtual float TakeDamage
+	(
+		float DamageAmount,
+		struct FDamageEvent const & DamageEvent,
+		class AController * EventInstigator,
+		AActor * DamageCauser
+	) override;
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseTurnRate;
