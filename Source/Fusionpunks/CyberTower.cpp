@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
+#include "TowerDamage.h"
 #include "CyberTower.h"
 
 
@@ -19,6 +20,7 @@ void ACyberTower::BeginPlay()
 	beam->SecondsBeforeInactive = 0;
 	sourceLocation = GetActorLocation();
 	sourceLocation.Z = 200;
+	towerDMG = GetWorld()->SpawnActor<ATowerDamage>(towerDMGPrefab, FVector::ZeroVector, FRotator::ZeroRotator);
 
 }
 
@@ -31,7 +33,7 @@ void ACyberTower::Tick(float DeltaTime)
 		if (enemyUnits[0]->IsA(ACharacter::StaticClass()))
 		{
 			//UE_LOG(YourLog, Log, TEXT("Attacking Player!"));
-			
+
 			if (!beam->bWasActive) {
 				beam->Activate();
 				beam->SetVisibility(true);
@@ -41,7 +43,11 @@ void ACyberTower::Tick(float DeltaTime)
 			}
 			beam->SetBeamSourcePoint(0, sourceLocation, 0);
 			beam->SetBeamTargetPoint(0, enemyUnits[0]->GetActorLocation(), 0);
-
+			if (!bIsDealingDMG)
+			{
+				towerDMG->ApplyEffect(0.1f, enemyUnits[0]);
+				bIsDealingDMG = true;
+			}
 		}
 	}
 
@@ -54,6 +60,12 @@ void ACyberTower::Tick(float DeltaTime)
 			beam->bWasDeactivated = true;
 			beam->bWasActive = false;
 			UE_LOG(LogTemp, Log, TEXT("DEActivating Laser Beam!"));
+		}
+
+		if (bIsDealingDMG)
+		{
+			towerDMG->StopTimer();
+			bIsDealingDMG = false;
 		}
 	}
 }

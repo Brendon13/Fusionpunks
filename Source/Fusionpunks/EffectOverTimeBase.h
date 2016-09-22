@@ -5,7 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "EffectOverTimeBase.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class FUSIONPUNKS_API AEffectOverTimeBase : public AActor
 {
 	GENERATED_BODY()
@@ -17,14 +17,20 @@ public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	
+	virtual void EndPlay
+	(
+		const EEndPlayReason::Type EndPlayReason
+	) override;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly)
 		float effectTickTime;
 	FTimerHandle applyEffectHandle;
 
-protected:
-	virtual void ApplyEffect();
+public:
+	UFUNCTION()
+		virtual void ApplyEffect(float time, AActor* Target) { check(0 && "You must override this") };
 	
+	 bool IsRunning();
+	 void StopTimer();
 };
