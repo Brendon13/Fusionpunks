@@ -29,6 +29,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		void SetCurrentCreepCamp(ACreepCamp* newCreepCamp);
+
+
 	
 protected:
 	ACreepCamp* CurrentCamp;

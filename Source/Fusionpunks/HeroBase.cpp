@@ -247,3 +247,16 @@ void AHeroBase::LevelUp()
 	basicAttackDamage += damageIncreasePerLevel;
 }
 
+float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, class AController * EventInstigator, AActor * DamageCauser) 
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	currentHealth -= DamageAmount;
+
+	UE_LOG(LogTemp, Log, TEXT("Tower took %f damage."), DamageAmount);
+	if (currentHealth <= 0)
+	{
+		Destroy();
+	}
+	return DamageAmount;
+
+}

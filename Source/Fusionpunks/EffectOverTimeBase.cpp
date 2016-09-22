@@ -16,25 +16,33 @@ AEffectOverTimeBase::AEffectOverTimeBase()
 void AEffectOverTimeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	/*GetWorld()->GetTimerManager().SetTimer(applyEffectHandle,
-		this,
-		&AEffectOverTimeBase::ApplyEffect,
-		true);*/
+	
 	
 }
 
-/*void AEffectOverTimeBase::BeginDestroy()
+void AEffectOverTimeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	Super::BeginDestroy();
-	GetWorld()->GetTimerManager().ClearTimer(applyEffectHandle);
+	Super::EndPlay(EndPlayReason);
+	if (applyEffectHandle.IsValid())
+		GetWorld()->GetTimerManager().ClearTimer(applyEffectHandle);
 
-
-}*/
-
-void AEffectOverTimeBase::ApplyEffect() 
-{
 
 }
+
+bool AEffectOverTimeBase::IsRunning() 
+{
+
+	return applyEffectHandle.IsValid();
+
+}
+
+void AEffectOverTimeBase::StopTimer() 
+{
+	if (applyEffectHandle.IsValid())
+		GetWorld()->GetTimerManager().ClearTimer(applyEffectHandle);
+
+}
+
 
 
 
