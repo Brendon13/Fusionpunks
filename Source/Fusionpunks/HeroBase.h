@@ -109,10 +109,26 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = UIFunctions)
 		void HideCampProgress();
+
+	void ResetHealth();
+
+	FVector startingLocation;
+
+	bool bIsRespawning = false;
 protected:
 	class ACreepCamp* CurrentCreepCamp;
 
+	UPROPERTY(EditDefaultsOnly, Category = Respawn)
+		TSubclassOf<class ARespawnOverTime> respawnClass;
 
+	class ARespawnOverTime* respawnEffect;
+
+	
+
+	UPROPERTY(EditDefaultsOnly, Category = Respawn)
+		float respawnTime;
+
+	
 private:
 	//function for Trigger Events
 	UFUNCTION()

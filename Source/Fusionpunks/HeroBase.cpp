@@ -3,13 +3,14 @@
 #include "Fusionpunks.h"
 #include "CreepCamp.h"
 #include "PlayerHud.h"
+#include "RespawnOverTime.h"
 #include "HeroBase.h"
 
 
 // Sets default values
 AHeroBase::AHeroBase()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -43,7 +44,7 @@ AHeroBase::AHeroBase()
 	//defaults unless set in blueprint
 	currentLevel = 1;
 	basicAttackDamage = 10.0f;
-
+	respawnTime = 1.0f;
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
@@ -60,7 +61,8 @@ void AHeroBase::BeginPlay()
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHeroBase::OnOverlapEnd);
 	
 	GetWorld()->GetAuthGameMode()->Children.Add(this);
-	
+	respawnEffect = GetWorld()->SpawnActor<ARespawnOverTime>(respawnClass, FVector::ZeroVector, FRotator::ZeroRotator);
+	startingLocation = GetActorLocation();
 }
 
 // Called every frame
@@ -189,7 +191,10 @@ void AHeroBase::StartAttack()
 		Attack(closestEnemy);
 	}
 }
-
+void AHeroBase::ResetHealth()
+{
+	currentHealth = maxHealth;
+}
 void AHeroBase::Attack(AActor* enemy)
 {
 	FDamageEvent DamageEvent;
@@ -253,9 +258,15 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 	currentHealth -= DamageAmount;
 
 	UE_LOG(LogTemp, Log, TEXT("Tower took %f damage."), DamageAmount);
-	if (currentHealth <= 0)
+	if (currentHealth <= 0 && !bIsRespawning)
 	{
-		Destroy();
+		currentHealth = 0;
+		GetController()->DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		GetMesh()->SetVisibility(false);
+		SetActorEnableCollision(false);
+		bIsRespawning = true;
+		respawnEffect->StartTimer(respawnTime, this);
+		
 	}
 	return DamageAmount;
 

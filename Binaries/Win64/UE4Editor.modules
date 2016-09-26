@@ -1,8 +1,8 @@
 {
 	"Changelist" : 3039270,
-	"BuildId" : "3f0c629e-5eff-4095-bc9f-d4d6895d646c",
+	"BuildId" : "8cfb1f8f-0d5d-4b7a-bbdb-251ae4661b49",
 	"Modules" : 
 	{
-		"Fusionpunks" : "UE4Editor-Fusionpunks-8309.dll"
+		"Fusionpunks" : "UE4Editor-Fusionpunks-7063.dll"
 	}
 }

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
-#include "TowerDamage.h"
+#include "LightningTowerDamage.h"
 #include "CyberTower.h"
 
 
@@ -9,6 +9,8 @@ ACyberTower::ACyberTower()
 {
 	beam = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Beam Particle"));	
 	beam->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	damage = 2.0f;
+	damageEverySeconds = 0.1f;
 }
 
 void ACyberTower::BeginPlay()
@@ -18,7 +20,10 @@ void ACyberTower::BeginPlay()
 	beam->SecondsBeforeInactive = 0;
 	sourceLocation = GetActorLocation();
 	sourceLocation.Z = 200;
-	towerDMG = GetWorld()->SpawnActor<ATowerDamage>(towerDMGPrefab, FVector::ZeroVector, FRotator::ZeroRotator);
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = Instigator;
+	towerDMG = GetWorld()->SpawnActor<ALightningTowerDamage>(towerDMGPrefab, FVector::ZeroVector, FRotator::ZeroRotator,SpawnParams);
 
 }
 
@@ -43,7 +48,7 @@ void ACyberTower::Tick(float DeltaTime)
 			beam->SetBeamTargetPoint(0, enemyUnits[0]->GetActorLocation(), 0);
 			if (!bIsDealingDMG)
 			{
-				towerDMG->ApplyEffect(0.1f, enemyUnits[0]);
+				towerDMG->StartTimer(damageEverySeconds, enemyUnits[0]);
 				bIsDealingDMG = true;
 			}
 		}
