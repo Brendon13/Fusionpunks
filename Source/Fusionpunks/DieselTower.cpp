@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
-#include "ProjectileTowerDamage.h"
 #include "DieselTower.h"
 
 
@@ -10,8 +9,6 @@ ADieselTower::ADieselTower()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	damage = 20.0f;
-	damageEverySeconds = 1.0f;
 
 	Tags.Add(TEXT("Diesel"));
 }
@@ -20,10 +17,6 @@ ADieselTower::ADieselTower()
 void ADieselTower::BeginPlay()
 {
 	Super::BeginPlay();
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = Instigator;
-	towerDMG = GetWorld()->SpawnActor<AProjectileTowerDamage>(towerDMGPrefab, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 	
 }
 
@@ -37,35 +30,22 @@ void ADieselTower::Tick( float DeltaTime )
 	}
 
 	spawnTimer += DeltaTime;
-	if (enemyUnits.Num() > 0)
+	if (enemyUnits.Num() > 0 && !bHasSpawed && spawnTimer >= 1)
 	{
 		if (enemyUnits[0]->IsA(ACharacter::StaticClass()))
 		{
 			UE_LOG(LogTemp, Log, TEXT("Attacking Player!"));
-			if (!bIsDealingDMG)
+			SpawnProjectile();
+
+			if (currProjectile)
 			{
-				towerDMG->StartTimer(damageEverySeconds, enemyUnits[0]);
-				bIsDealingDMG = true;
+				currProjectile->SetTarget(enemyUnits[0]);
 			}
 		}
 	}
-<<<<<<< HEAD
-	else 
-	{
-		if (bIsDealingDMG)
-		{
-			towerDMG->StopTimer();
-			bIsDealingDMG = false;
-		}
-	}
-
-		
-
-=======
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 }
 
-AProjectile* ADieselTower::SpawnProjectile()
+void ADieselTower::SpawnProjectile()
 {
 	if (whatToSpawn != NULL)
 	{
@@ -83,12 +63,7 @@ AProjectile* ADieselTower::SpawnProjectile()
 			currProjectile = world->SpawnActor<AProjectile>(whatToSpawn, spawnLocation, FRotator(0, 0, 0), SpawnParams);
 			bHasSpawned = true;
 			spawnTimer = 0;
-
-			return currProjectile;
 		}
-		return NULL;
 	}
-
-	return NULL;
 }
 

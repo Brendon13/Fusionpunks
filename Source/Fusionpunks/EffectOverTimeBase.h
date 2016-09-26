@@ -27,17 +27,10 @@ protected:
 		float effectTickTime;
 	FTimerHandle applyEffectHandle;
 
-	AActor* effectTarget;
-
 public:
+	UFUNCTION()
+		virtual void ApplyEffect(float time, AActor* Target) { check(0 && "You must override this") };
 	
-		virtual void StartTimer(float time, AActor* Target) { check(0 && "You must override this") };
-
-		bool IsRunning();
-		void StopTimer();
-protected:
-		UFUNCTION()
-			virtual void ApplyEffect() { check(0 && "You must override this") };
-	
-	
+	 bool IsRunning();
+	 void StopTimer();
 };
