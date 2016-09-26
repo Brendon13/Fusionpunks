@@ -9,8 +9,13 @@ ACyberTower::ACyberTower()
 {
 	beam = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Beam Particle"));	
 	beam->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+<<<<<<< HEAD
 	damage = 2.0f;
 	damageEverySeconds = 0.1f;
+=======
+
+	Tags.Add(TEXT("Cyber"));
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 }
 
 void ACyberTower::BeginPlay()

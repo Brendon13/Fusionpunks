@@ -12,8 +12,8 @@ UCLASS()
 class FUSIONPUNKS_API ANeutralCreep : public ACreep
 {
 	GENERATED_BODY()
-	
-	
+public:
+	ANeutralCreep();
 	
 	
 };

@@ -12,6 +12,9 @@ UCLASS()
 class FUSIONPUNKS_API ACyberCreep : public ACreep
 {
 	GENERATED_BODY()
+
+public:
+	ACyberCreep();
 	
 	
 	

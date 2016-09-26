@@ -13,6 +13,7 @@ ADieselTower::ADieselTower()
 	damage = 20.0f;
 	damageEverySeconds = 1.0f;
 
+	Tags.Add(TEXT("Diesel"));
 }
 
 // Called when the game starts or when spawned
@@ -48,6 +49,7 @@ void ADieselTower::Tick( float DeltaTime )
 			}
 		}
 	}
+<<<<<<< HEAD
 	else 
 	{
 		if (bIsDealingDMG)
@@ -59,6 +61,8 @@ void ADieselTower::Tick( float DeltaTime )
 
 		
 
+=======
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 }
 
 AProjectile* ADieselTower::SpawnProjectile()
