@@ -7,5 +7,15 @@ ACyberCreep::ACyberCreep()
 {
 	Tags.Add(TEXT("Cyber"));
 }
+//
+//void ACyberCreep::BeginPlay()
+//{
+//	Super::BeginPlay();
+//}
+//
+//void ACyberCreep::Tick(float DeltaSeconds)
+//{
+//	Super::Tick(DeltaSeconds);
+//}
 
 

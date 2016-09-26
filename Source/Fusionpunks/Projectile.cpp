@@ -1,9 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
-#include "HeroBase.h"
 #include "Projectile.h"
-
+#include "CyberHeroCharacter.h"
 
 
 // Sets default values
@@ -19,7 +18,9 @@ AProjectile::AProjectile()
 	sphereShape->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::TriggerEnter);
 	
 	
-	
+	//sphereShape->bGenerateOverlapEvents = true;
+	//sphereShape->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::TriggerEnter);
+
 }
 
 // Called when the game starts or when spawned
@@ -27,11 +28,6 @@ void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-void AProjectile::SetDamage(float amount) 
-{
-	damage = amount;
 }
 
 // Called every frame
@@ -56,12 +52,9 @@ void AProjectile::SetTarget(class AActor* OtherActor)
 
 void AProjectile::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-	if (OtherActor->IsA(AHeroBase::StaticClass()))
+	if (OtherActor->IsA(ACharacter::StaticClass()))
 	{
-		FDamageEvent DamageEvent;
-
-		float damageTaken = OtherActor->TakeDamage(damage, DamageEvent, NULL, this);
-		
+		//OtherActor->TakeDamage(25.0f);
 		Destroy();
 		
 	}

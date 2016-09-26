@@ -6,6 +6,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Perception/PawnSensingComponent.h"
 #include "CreepAIController.generated.h"
 
 /**
@@ -19,6 +20,15 @@ class FUSIONPUNKS_API ACreepAIController : public AAIController
 public:
 	ACreepAIController();
 	virtual void Possess(APawn* Pawn) override;
+	virtual void Tick(float DeltaTime) override;
+	virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn) override; 
+
+
+	UFUNCTION(BlueprintCallable, Category = Components)
+	UBlackboardComponent* GetBlackboardComponent();
+
+	UFUNCTION(BlueprintCallable, Category = AI)
+	virtual void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result) override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
@@ -30,4 +40,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 		UBlackboardComponent* BlackboardComponent;
 
+	UPROPERTY(EditDefaultsOnly)
+		UPawnSensingComponent* PawnSensingComponent;
 };

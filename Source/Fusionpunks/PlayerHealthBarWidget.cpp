@@ -10,7 +10,7 @@ float UPlayerHealthBarWidget::GetPlayerHealthPercentage() const
 {
 	AHeroBase* MyCharacter = Cast<AHeroBase>(GetOwningPlayerPawn());
 
-	return MyCharacter->GetPlayerHealthPercentage();
+	return MyCharacter->GetCurrentHealth() / MyCharacter->GetMaxHealth() * 100;
 }
 
 FText UPlayerHealthBarWidget::GetPlayerHealthText() const
