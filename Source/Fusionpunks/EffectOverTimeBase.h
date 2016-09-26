@@ -9,8 +9,8 @@ UCLASS(Abstract)
 class FUSIONPUNKS_API AEffectOverTimeBase : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AEffectOverTimeBase();
 
@@ -21,16 +21,23 @@ public:
 	(
 		const EEndPlayReason::Type EndPlayReason
 	) override;
-	
+
 protected:
 	UPROPERTY(EditDefaultsOnly)
 		float effectTickTime;
 	FTimerHandle applyEffectHandle;
 
+	AActor* effectTarget;
+
 public:
+
+	virtual void StartTimer(float time, AActor* Target) { check(0 && "You must override this") };
+
+	bool IsRunning();
+	void StopTimer();
+protected:
 	UFUNCTION()
-		virtual void ApplyEffect(float time, AActor* Target) { check(0 && "You must override this") };
-	
-	 bool IsRunning();
-	 void StopTimer();
+		virtual void ApplyEffect() { check(0 && "You must override this") };
+
+
 };
