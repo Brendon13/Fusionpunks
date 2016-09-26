@@ -21,15 +21,15 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	class AProjectile* SpawnProjectile();
-private:
 	
+private:
+	void SpawnProjectile();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
 		TSubclassOf<class AProjectile> whatToSpawn;
 
 	AProjectile* currProjectile;
-	class AProjectileTowerDamage* towerDMG;
+
 	bool bHasSpawned;
 };
 
