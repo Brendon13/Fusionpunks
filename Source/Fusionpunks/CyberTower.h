@@ -28,10 +28,6 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 		UParticleSystemComponent* beam;
 
-	UPROPERTY(EditDefaultsOnly)
-		TSubclassOf<class ATowerDamage> towerDMGPrefab;
-
-	class ATowerDamage* towerDMG;
-	bool bIsDealingDMG = false;
+	class ALightningTowerDamage* towerDMG;
 	FVector sourceLocation;
 };

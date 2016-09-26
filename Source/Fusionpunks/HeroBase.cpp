@@ -3,13 +3,14 @@
 #include "Fusionpunks.h"
 #include "CreepCamp.h"
 #include "PlayerHud.h"
+#include "RespawnOverTime.h"
 #include "HeroBase.h"
 
 
 // Sets default values
 AHeroBase::AHeroBase()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -40,10 +41,10 @@ AHeroBase::AHeroBase()
 	FollowCamera->AttachToComponent(CameraBoom, FAttachmentTransformRules::KeepRelativeTransform); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	//defaults unless set in blueprint
+												   //defaults unless set in blueprint
 	currentLevel = 1;
 	basicAttackDamage = 10.0f;
-
+	respawnTime = 1.0f;
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
@@ -58,15 +59,16 @@ void AHeroBase::BeginPlay()
 	Super::BeginPlay();
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHeroBase::OnOverlapBegin);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHeroBase::OnOverlapEnd);
-	
+
 	GetWorld()->GetAuthGameMode()->Children.Add(this);
-	
+	respawnEffect = GetWorld()->SpawnActor<ARespawnOverTime>(respawnClass, FVector::ZeroVector, FRotator::ZeroRotator);
+	startingLocation = GetActorLocation();
 }
 
 // Called every frame
-void AHeroBase::Tick( float DeltaTime )
+void AHeroBase::Tick(float DeltaTime)
 {
-	Super::Tick( DeltaTime );
+	Super::Tick(DeltaTime);
 
 }
 
@@ -191,10 +193,13 @@ void AHeroBase::StartAttack()
 		{
 			Attack(closestEnemy);
 		}
-		
+
 	}
 }
-
+void AHeroBase::ResetHealth()
+{
+	currentHealth = maxHealth;
+}
 void AHeroBase::Attack(AActor* enemy)
 {
 	FDamageEvent DamageEvent;
@@ -204,15 +209,15 @@ void AHeroBase::Attack(AActor* enemy)
 
 void AHeroBase::AdjustCameraZoom(float Value)
 {
-	
+
 	if (Value < 0 && FollowCamera->FieldOfView >= 90)
 	{
-		//UE_LOG(LogTemp, Display, TEXT("Zooming Camera Down"));
+		UE_LOG(LogTemp, Display, TEXT("Zooming Camera Down"));
 		GetCameraBoom()->TargetArmLength += Value * 10.0f;
 	}
 	else if (Value> 0 && FollowCamera->FieldOfView <= 120)
 	{
-		//UE_LOG(LogTemp, Display, TEXT("Zooming Camera UP"));
+		UE_LOG(LogTemp, Display, TEXT("Zooming Camera UP"));
 		GetCameraBoom()->TargetArmLength += Value * 10.0f;
 	}
 }
@@ -252,15 +257,21 @@ void AHeroBase::LevelUp()
 	basicAttackDamage += damageIncreasePerLevel;
 }
 
-float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, class AController * EventInstigator, AActor * DamageCauser) 
+float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, class AController * EventInstigator, AActor * DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	currentHealth -= DamageAmount;
 
 	UE_LOG(LogTemp, Log, TEXT("Tower took %f damage."), DamageAmount);
-	if (currentHealth <= 0)
+	if (currentHealth <= 0 && !bIsRespawning)
 	{
-		Destroy();
+		currentHealth = 0;
+		GetController()->DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		GetMesh()->SetVisibility(false);
+		SetActorEnableCollision(false);
+		bIsRespawning = true;
+		respawnEffect->StartTimer(respawnTime, this);
+
 	}
 	return DamageAmount;
 
