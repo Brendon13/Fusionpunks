@@ -25,8 +25,6 @@ public:
 
 	float GetHpPercent();
 
-	UPROPERTY(EditDefaultsOnly, Category = Damage)
-		float damage;
 protected:
 
 	TSubclassOf<class UFloatingDamageWidget> FloatingDamageWidgetClass;
@@ -61,17 +59,6 @@ protected:
 
 	float currHP;
 
-
-	UPROPERTY(EditDefaultsOnly)
-		TSubclassOf<class AEffectOverTimeBase> towerDMGPrefab;
-
-	
-	
-	UPROPERTY(EditDefaultsOnly, Category = Damage)
-		float damageEverySeconds;
-
-
-	bool bIsDealingDMG = false;
 	//APlayerController* playerCam;
 
 	//AActor* playerChar;
