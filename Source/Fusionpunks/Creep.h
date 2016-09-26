@@ -5,7 +5,6 @@
 #include "GameFramework/Pawn.h"
 #include "CreepHealthbarWidget.h"
 #include "WidgetComponent.h"
-#include "CreepAIController.h"
 #include "Creep.generated.h"
 
 class ACreepCamp;
@@ -58,7 +57,7 @@ protected:
 
 //Creep Camp stuff
 public:
-	void SetCreepCampHome(ACreepCamp* home, bool BelongsToCamp);
+	void SetCreepCampHome(ACreepCamp* home, bool BelongsToCamp = true);
 	bool bBelongsToCamp; //false means the creep belongs to a player (i.e. is apart of a player army)
 protected:
 	ACreepCamp* creepCampHome;
@@ -79,21 +78,4 @@ protected:
 
 	TSubclassOf<class UFloatingDamageWidget> FloatingDamageWidgetClass; 
 	//UWidgetComponent* floatingDamageWidget;
-
-//AISTUFF
-	UPROPERTY(EditDefaultsOnly)
-		ACreepAIController* AiController; 
-
-	UPROPERTY(EditDefaultsOnly, Category = AIVariables)
-		float patrolRadius;
-
-	UPROPERTY(EditDefaultsOnly)
-	UFloatingPawnMovement* movementComponent;
-
-public:
-	UFUNCTION(BlueprintCallable, Category = CampVariables)
-		float GetPatrolRadius();
-
-	UFUNCTION(BlueprintCallable, Category = CampVariables)
-		ACreepCamp* GetCreepCampHome() const; 
 };
