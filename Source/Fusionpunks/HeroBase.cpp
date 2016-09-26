@@ -207,12 +207,12 @@ void AHeroBase::AdjustCameraZoom(float Value)
 	
 	if (Value < 0 && FollowCamera->FieldOfView >= 90)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Zooming Camera Down"));
+		//UE_LOG(LogTemp, Display, TEXT("Zooming Camera Down"));
 		GetCameraBoom()->TargetArmLength += Value * 10.0f;
 	}
 	else if (Value> 0 && FollowCamera->FieldOfView <= 120)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Zooming Camera UP"));
+		//UE_LOG(LogTemp, Display, TEXT("Zooming Camera UP"));
 		GetCameraBoom()->TargetArmLength += Value * 10.0f;
 	}
 }
