@@ -9,8 +9,6 @@
 #include "Runtime/UMG/Public/Slate/SObjectWidget.h"
 #include "Runtime/UMG/Public/IUMGModule.h"
 #include "Runtime/UMG/Public/Blueprint/UserWidget.h"
-#include "Runtime/AIModule/Public/AIModule.h"
-#include "Runtime/GameplayTasks/Public/GameplayTasksModule.h"
 
 #define STENCIL_ENEMY_OUTLINE 254;
 #define ECC_Attack			   ECC_GameTraceChannel1

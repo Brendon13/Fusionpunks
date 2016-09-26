@@ -15,9 +15,6 @@ class FUSIONPUNKS_API ACyberCreep : public ACreep
 
 public:
 	ACyberCreep();
-
-	//virtual void BeginPlay() override;
-	//virtual void Tick(float DeltaSeconds) override;
 	
 	
 	

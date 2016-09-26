@@ -79,10 +79,10 @@ void ACreepCamp::BeginPlay()
 					creepSpawnArray[i % creepSpawnArray.Num()],
 					FRotator::ZeroRotator,
 					spawnParameters);
-		
+
 			if (cyberCreep->IsValidLowLevel())
 			{
-				cyberCreep->SetCreepCampHome(this, true);
+				cyberCreep->SetCreepCampHome(this);
 				creepArray.Add(cyberCreep);
 				spawningVariables.creepCount++;
 			}
@@ -105,7 +105,7 @@ void ACreepCamp::BeginPlay()
 
 			if (dieselCreep->IsValidLowLevel())
 			{
-				dieselCreep->SetCreepCampHome(this, true);
+				dieselCreep->SetCreepCampHome(this);
 				creepArray.Add(dieselCreep);
 				spawningVariables.creepCount++;
 			}
@@ -128,7 +128,7 @@ void ACreepCamp::BeginPlay()
 
 			if (neutralCreep->IsValidLowLevel())
 			{
-				neutralCreep->SetCreepCampHome(this, true);
+				neutralCreep->SetCreepCampHome(this);
 				creepArray.Add(neutralCreep);
 				spawningVariables.creepCount++;
 			}
@@ -354,7 +354,7 @@ void ACreepCamp::Tick( float DeltaTime )
 void ACreepCamp::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
 								int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Something Entered Camp Trigger"));
+	UE_LOG(LogTemp, Warning, TEXT("Player Entered Camp Trigger"));
 
 	if (OtherActor->Tags.Contains("CyberPlayer") || OtherActor->Tags.Contains("DieselPlayer"))
 	{
@@ -379,7 +379,7 @@ void ACreepCamp::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActo
 
 void ACreepCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Something Exited Camp Trigger"));
+	UE_LOG(LogTemp, Warning, TEXT("Player Exited Camp Trigger"));
 
 	if (OtherActor->Tags.Contains("CyberPlayer") || OtherActor->Tags.Contains("DieselPlayer"))
 	{
