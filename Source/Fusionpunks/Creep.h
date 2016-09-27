@@ -11,7 +11,7 @@
 class ACreepCamp;
 
 UCLASS(abstract)
-class FUSIONPUNKS_API ACreep : public APawn
+class FUSIONPUNKS_API ACreep : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -50,10 +50,12 @@ protected:
 
 	float currentHealth;
 	int currentLevel;
+public:
+	float GetDamage() const { return damage; }
 
-protected:
-	UPROPERTY(EditDefaultsOnly, Category = Appearance)
-		USkeletalMeshComponent* creepSkeletalMeshComp;
+//protected:
+//	UPROPERTY(EditDefaultsOnly, Category = Appearance)
+//		USkeletalMeshComponent* creepSkeletalMeshComp;
 
 
 //Creep Camp stuff
@@ -84,11 +86,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 		ACreepAIController* AiController; 
 
-	UPROPERTY(EditDefaultsOnly, Category = AIVariables)
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float patrolRadius;
 
-	UPROPERTY(EditDefaultsOnly)
-	UFloatingPawnMovement* movementComponent;
+	/*UPROPERTY(EditDefaultsOnly)
+	UFloatingPawnMovement* movementComponent;*/
 
 public:
 	UFUNCTION(BlueprintCallable, Category = CampVariables)
@@ -96,4 +98,26 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = CampVariables)
 		ACreepCamp* GetCreepCampHome() const; 
+
+//stuff for Character Movement
+protected:
+	/** Called for forwards/backward input */
+	void MoveForward(float Value);
+	/** Called for side to side input */
+	void MoveRight(float Value);
+	/**
+	* Called via input to turn at a given rate.
+	* @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
+	*/
+	void TurnAtRate(float Rate);
+	/**
+	* Called via input to turn look up/down at a given rate.
+	* @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
+	*/
+	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+		float BaseTurnRate;
+
+protected:
+
 };
