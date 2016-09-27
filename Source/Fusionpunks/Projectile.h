@@ -9,27 +9,26 @@ UCLASS()
 class FUSIONPUNKS_API AProjectile : public AActor
 {
 	GENERATED_BODY()
-
-public:
+	
+public:	
 	// Sets default values for this actor's properties
 	AProjectile();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
 	// Called every frame
-	virtual void Tick(float DeltaSeconds) override;
+	virtual void Tick( float DeltaSeconds ) override;
 
 	UFUNCTION()
 		void SetTarget(class AActor* OtherActor);
 
-	void SetDamage(float amount);
 protected:
 	FVector target;
-
+	
 	class AActor* enemyPlayer;
 
-	float damage;
+	
 
 	UPROPERTY(EditAnywhere)
 		UShapeComponent* sphereShape;

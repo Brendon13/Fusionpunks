@@ -1,15 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
-#include "HeroBase.h"
 #include "Projectile.h"
-
+#include "CyberHeroCharacter.h"
 
 
 // Sets default values
 AProjectile::AProjectile()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	sphereShape = CreateDefaultSubobject<USphereComponent>(TEXT("Root"));
 	RootComponent = sphereShape;
@@ -17,8 +16,10 @@ AProjectile::AProjectile()
 	sphereDisplay->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	sphereShape->bGenerateOverlapEvents = true;
 	sphereShape->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::TriggerEnter);
-
-
+	
+	
+	//sphereShape->bGenerateOverlapEvents = true;
+	//sphereShape->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::TriggerEnter);
 
 }
 
@@ -26,26 +27,21 @@ AProjectile::AProjectile()
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-
-}
-
-void AProjectile::SetDamage(float amount)
-{
-	damage = amount;
+	
 }
 
 // Called every frame
-void AProjectile::Tick(float DeltaTime)
+void AProjectile::Tick( float DeltaTime )
 {
-	Super::Tick(DeltaTime);
-	if (enemyPlayer)
+	Super::Tick( DeltaTime );
+	if (enemyPlayer) 
 	{
-		FVector direction = (enemyPlayer->GetActorLocation() - GetActorLocation()).GetSafeNormal();
-		FVector newPos = GetActorLocation() + (direction * DeltaTime * 750);
+		FVector direction = (enemyPlayer->GetActorLocation() - GetActorLocation() ).GetSafeNormal();
+		FVector newPos = GetActorLocation() + (direction * DeltaTime*750);
 		SetActorLocation(newPos);
 	}
 
-
+	
 
 }
 
@@ -56,14 +52,11 @@ void AProjectile::SetTarget(class AActor* OtherActor)
 
 void AProjectile::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-	if (OtherActor->IsA(AHeroBase::StaticClass()))
+	if (OtherActor->IsA(ACharacter::StaticClass()))
 	{
-		FDamageEvent DamageEvent;
-
-		float damageTaken = OtherActor->TakeDamage(damage, DamageEvent, NULL, this);
-
+		//OtherActor->TakeDamage(25.0f);
 		Destroy();
-
+		
 	}
 }
 

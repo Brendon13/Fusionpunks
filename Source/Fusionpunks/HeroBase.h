@@ -10,8 +10,8 @@ class FUSIONPUNKS_API AHeroBase : public ACharacter
 {
 	GENERATED_BODY()
 
-		/** Camera boom positioning the camera behind the character */
-		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	/** Camera boom positioning the camera behind the character */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class USpringArmComponent* CameraBoom;
 
 	/** Follow camera */
@@ -101,7 +101,7 @@ protected:
 
 	UFUNCTION(BlueprintCallable, category = Stats)
 		virtual void LevelUp();
-
+	
 
 public:
 	UFUNCTION(BlueprintCallable, Category = UIFunctions)
@@ -109,24 +109,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = UIFunctions)
 		void HideCampProgress();
-
-	void ResetHealth();
-
-	FVector startingLocation;
-
-	bool bIsRespawning = false;
 protected:
 	class ACreepCamp* CurrentCreepCamp;
-
-	UPROPERTY(EditDefaultsOnly, Category = Respawn)
-		TSubclassOf<class ARespawnOverTime> respawnClass;
-
-	class ARespawnOverTime* respawnEffect;
-
-
-
-	UPROPERTY(EditDefaultsOnly, Category = Respawn)
-		float respawnTime;
 
 
 private:
@@ -142,5 +126,5 @@ protected:
 	FName team;
 public:
 	FName GetTeam() const { return team; }
-
+	
 };

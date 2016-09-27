@@ -193,4 +193,6 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		void SetToNeutralCamp();
+
+		
 };

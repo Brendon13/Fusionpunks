@@ -7,7 +7,7 @@
 // Sets default values
 AEffectOverTimeBase::AEffectOverTimeBase()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
@@ -16,8 +16,8 @@ AEffectOverTimeBase::AEffectOverTimeBase()
 void AEffectOverTimeBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-
+	
+	
 }
 
 void AEffectOverTimeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -29,14 +29,14 @@ void AEffectOverTimeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 }
 
-bool AEffectOverTimeBase::IsRunning()
+bool AEffectOverTimeBase::IsRunning() 
 {
 
 	return applyEffectHandle.IsValid();
 
 }
 
-void AEffectOverTimeBase::StopTimer()
+void AEffectOverTimeBase::StopTimer() 
 {
 	if (applyEffectHandle.IsValid())
 		GetWorld()->GetTimerManager().ClearTimer(applyEffectHandle);

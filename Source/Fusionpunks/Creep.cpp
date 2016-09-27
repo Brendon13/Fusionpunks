@@ -13,12 +13,13 @@ ACreep::ACreep()
 	PrimaryActorTick.bCanEverTick = true;
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	creepSkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
+	/*creepSkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
 	creepSkeletalMeshComp->SetSimulatePhysics(false);
 	creepSkeletalMeshComp->bGenerateOverlapEvents = true; 
-	RootComponent = creepSkeletalMeshComp;
+	RootComponent = creepSkeletalMeshComp;*/
 
-	movementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
+	//movementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
+	bUseControllerRotationYaw = true;
 
 	const ConstructorHelpers::FObjectFinder<UBlueprint>
 		CreepHealthBarFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widgets/CreepHealthBarWidget_BP.CreepHealthBarWidget_BP'"));
@@ -29,7 +30,7 @@ ACreep::ACreep()
 		widgetComponent->SetWidgetClass(CreepHealthBarWidgetClass);
 		widgetComponent->SetSimulatePhysics(false);
 		widgetComponent->bGenerateOverlapEvents = false;
-		widgetComponent->AttachToComponent(creepSkeletalMeshComp, FAttachmentTransformRules::KeepRelativeTransform);
+		widgetComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	}
 
 	const ConstructorHelpers::FObjectFinder<UBlueprint>
@@ -52,7 +53,11 @@ ACreep::ACreep()
 	maxLevel = 10;
 	maxHealth = 10;
 
-	patrolRadius = 1000.0f;
+	patrolRadius = 2000.0f;
+	GetCharacterMovement()->MaxWalkSpeed = 150.0f;
+
+	//movementComponent->MaxSpeed = 150.0f;
+	BaseTurnRate = 45.f;
 
 	bBelongsToCamp = false;
 	Tags.Add(TEXT("Creep"));
@@ -103,12 +108,32 @@ void ACreep::Tick( float DeltaTime )
 		widgetComponent->SetWorldRotation(widgetCompRotation);
 	}
 
-	
+	//FVector pos = AiController->GetBlackboardComponent()->GetValueAsVector("PatrolPosition");
+	//FRotator rot = pos.Rotation();
+	//FaceRotation(rot);
+
+	//rot.Yaw = FRotator::ClampAxis(rot.Yaw);
+
+	//FaceRotation(rot, DeltaTime);
+
 }
 
 void ACreep::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
 	Super::SetupPlayerInputComponent(InputComponent);
+
+	// Set up gameplay key bindings
+	check(InputComponent);
+
+	InputComponent->BindAxis("MoveForward", this, &ACreep::MoveForward);
+	InputComponent->BindAxis("MoveRight", this, &ACreep::MoveRight);
+
+	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
+	// "turn" handles devices that provide an absolute delta, such as a mouse.
+	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
+	InputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	InputComponent->BindAxis("TurnRate", this, &ACreep::TurnAtRate);
+
 }
 
 float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -164,6 +189,41 @@ ACreepCamp* ACreep::GetCreepCampHome() const
 	else
 	{
 		return nullptr;
+	}
+}
+
+void ACreep::TurnAtRate(float Rate)
+{
+	// calculate delta for this frame from the rate information
+	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+}
+
+void ACreep::MoveForward(float Value)
+{
+	if ((Controller != NULL) && (Value != 0.0f))
+	{
+		// find out which way is forward
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		// get forward vector
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		AddMovementInput(Direction, Value);
+	}
+}
+
+void ACreep::MoveRight(float Value)
+{
+	if ((Controller != NULL) && (Value != 0.0f))
+	{
+		// find out which way is right
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		// get right vector 
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		// add movement in that direction
+		AddMovementInput(Direction, Value);
 	}
 }
 
