@@ -20,7 +20,7 @@ public:
 	
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
-
+	
 	class AProjectile* SpawnProjectile();
 private:
 	
@@ -31,6 +31,12 @@ private:
 	AProjectile* currProjectile;
 	class AProjectileTowerDamage* towerDMG;
 	bool bHasSpawned;
+
+protected:
+	virtual void CleanUp() override;
+
+	UFUNCTION()
+		virtual void TriggerExit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 };
 
 
