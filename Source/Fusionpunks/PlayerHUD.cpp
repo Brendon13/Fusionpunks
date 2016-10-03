@@ -6,7 +6,7 @@
 APlayerHUD::APlayerHUD()
 {
 	static ConstructorHelpers::FObjectFinder<UBlueprint>
-		healthWidgetFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widgets/PlayerHealthWidget_BP.PlayerHealthWidget_BP'"));
+		healthWidgetFinder(TEXT("WidgetBlueprint'/Game/UI/PlayerHealthWidget_BP.PlayerHealthWidget_BP'"));
 
 	if (healthWidgetFinder.Object != nullptr)
 	{
@@ -14,14 +14,14 @@ APlayerHUD::APlayerHUD()
 	}
 
 	static ConstructorHelpers::FObjectFinder<UBlueprint>
-		campPWFinder (TEXT("WidgetBlueprint'/Game/Blueprints/Widgets/CampProgressWidget_BP.CampProgressWidget_BP'"));
+		campPWFinder (TEXT("WidgetBlueprint'/Game/UI/CampProgressWidget_BP.CampProgressWidget_BP'"));
 
 	if (campPWFinder.Object != nullptr)
 	{
 		campProgressWidgetClass = Cast<UClass>(campPWFinder.Object->GeneratedClass);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> gameTWFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widgets/GameTimerWidget_BP.GameTimerWidget_BP'"));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> gameTWFinder(TEXT("WidgetBlueprint'/Game/UI/GameTimerWidget_BP.GameTimerWidget_BP'"));
 
 	if (gameTWFinder.Object != nullptr)
 	{

@@ -23,12 +23,13 @@ public:
 	UFUNCTION()
 		void SetTarget(class AActor* OtherActor);
 
+	void SetDamage(float amount);
 protected:
 	FVector target;
 	
 	class AActor* enemyPlayer;
 
-	
+	float damage;
 
 	UPROPERTY(EditAnywhere)
 		UShapeComponent* sphereShape;

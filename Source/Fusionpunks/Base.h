@@ -5,7 +5,6 @@
 #include "HealthBarWidgetComponent.h"
 #include "GameFramework/Actor.h"
 #include <Classes/Kismet/KismetMathLibrary.h>
-#include "BaseHealthBar.h"
 #include "Base.generated.h"
 
 UCLASS()

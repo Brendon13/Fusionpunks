@@ -22,7 +22,7 @@ ACreep::ACreep()
 	bUseControllerRotationYaw = true;
 
 	const ConstructorHelpers::FObjectFinder<UBlueprint>
-		CreepHealthBarFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widgets/CreepHealthBarWidget_BP.CreepHealthBarWidget_BP'"));
+		CreepHealthBarFinder(TEXT("WidgetBlueprint'/Game/UI/CreepHealthBarWidget_BP.CreepHealthBarWidget_BP'"));
 	if (CreepHealthBarFinder.Object != nullptr)
 	{
 		CreepHealthBarWidgetClass = Cast<UClass>(CreepHealthBarFinder.Object->GeneratedClass);
@@ -34,7 +34,7 @@ ACreep::ACreep()
 	}
 
 	const ConstructorHelpers::FObjectFinder<UBlueprint>
-		FloatingDamageWidgetFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widgets/FloatingDamageWidget_BP.FloatingDamageWidget_BP'"));
+		FloatingDamageWidgetFinder(TEXT("WidgetBlueprint'/Game/UI/FloatingDamageWidget_BP.FloatingDamageWidget_BP'"));
 	if (FloatingDamageWidgetFinder.Object != nullptr)
 	{
 		FloatingDamageWidgetClass = Cast<UClass>(FloatingDamageWidgetFinder.Object->GeneratedClass);
@@ -170,7 +170,13 @@ void ACreep::SetCreepCampHome(ACreepCamp* home, bool BelongsToCamp = false)
 {
 	creepCampHome = home;
 	bBelongsToCamp = BelongsToCamp;
-	//AiController->GetBlackboardComponent()->SetValueAsBool(TEXT("belongsToCamp"), BelongsToCamp);
+
+	if (IsValid(AiController))
+	{
+		AiController->GetBlackboardComponent()->SetValueAsBool(TEXT("belongsToCamp"), bBelongsToCamp);
+		AiController->GetBlackboardComponent()->SetValueAsObject(TEXT("CreepCampHome"), creepCampHome);
+	}
+	
 }
 
 UFUNCTION()
