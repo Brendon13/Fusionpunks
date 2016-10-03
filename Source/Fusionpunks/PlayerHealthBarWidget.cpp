@@ -17,9 +17,14 @@ FText UPlayerHealthBarWidget::GetPlayerHealthText() const
 {
 	AHeroBase* MyCharacter = Cast<AHeroBase>(GetOwningPlayerPawn());
 
-	return FText::Format(LOCTEXT("HealthFormat", "Health: {0} / {1}"),
-		FText::AsNumber(MyCharacter->GetCurrentHealth()),
-		FText::AsNumber(MyCharacter->GetMaxHealth()));
+	if (IsValid(MyCharacter))
+	{
+		return FText::Format(LOCTEXT("HealthFormat", "Health: {0} / {1}"),
+			FText::AsNumber(MyCharacter->GetCurrentHealth()),
+			FText::AsNumber(MyCharacter->GetMaxHealth()));
+	}
+	return FText::AsNumber(0);
+
 }
 
 #undef LOCTEXT_NAMESPACE

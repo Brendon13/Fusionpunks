@@ -49,13 +49,17 @@ EBTNodeResult::Type USetCurrentPatrolLocation::ExecuteTask(UBehaviorTreeComponen
 
 		AActor* myCC = Cast<AActor>(BlackboardComponent->GetValueAsObject("CreepCampHome"));
 
-		const bool bFound = NavSys->GetRandomPointInRadius(myCC->GetActorLocation(), SearchRadius, RandomPt);
-		if (bFound)
+		if (myCC != nullptr)
 		{
-			BlackboardComponent->SetValueAsVector("PatrolPosition", RandomPt.Location);
-			BlackboardComponent->SetValueAsBool("AtTargetPosition", false);
-			return EBTNodeResult::Succeeded;
+			const bool bFound = NavSys->GetRandomReachablePointInRadius(myCC->GetActorLocation(), SearchRadius, RandomPt);
+			if (bFound)
+			{
+				BlackboardComponent->SetValueAsVector("PatrolPosition", RandomPt.Location);
+				BlackboardComponent->SetValueAsBool("AtTargetPosition", false);
+				return EBTNodeResult::Succeeded;
+			}
 		}
+		
 	}
 
 	return EBTNodeResult::Failed;

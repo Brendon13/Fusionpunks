@@ -8,7 +8,7 @@
 // Sets default values
 ATowerBase::ATowerBase()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	rootCldr = CreateDefaultSubobject<UBoxComponent>(TEXT("Root"));
 	RootComponent = rootCldr;
@@ -21,7 +21,7 @@ ATowerBase::ATowerBase()
 	radius->OnComponentEndOverlap.AddDynamic(this, &ATowerBase::TriggerExit);
 
 	const ConstructorHelpers::FObjectFinder<UBlueprint>
-		FloatingDamageWidgetFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widgets/FloatingDamageWidget_BP.FloatingDamageWidget_BP'"));
+		FloatingDamageWidgetFinder(TEXT("WidgetBlueprint'/Game/UI/FloatingDamageWidget_BP.FloatingDamageWidget_BP'"));
 
 	if (FloatingDamageWidgetFinder.Object != nullptr)
 	{

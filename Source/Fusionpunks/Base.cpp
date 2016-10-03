@@ -19,7 +19,7 @@ ABase::ABase()
 	healthBar->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
 	const ConstructorHelpers::FObjectFinder<UBlueprint>
-		FloatingDamageWidgetFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widgets/FloatingDamageWidget_BP.FloatingDamageWidget_BP'"));
+		FloatingDamageWidgetFinder(TEXT("WidgetBlueprint'/Game/UI/FloatingDamageWidget_BP.FloatingDamageWidget_BP'"));
 
 	if (FloatingDamageWidgetFinder.Object != nullptr)
 	{
@@ -36,17 +36,8 @@ void ABase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	playerCam = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	playerChar = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-
-	if (Cast<UBaseHealthBar>(healthBar->GetUserWidgetObject()))
-	{
-		UBaseHealthBar* hb = Cast<UBaseHealthBar>(healthBar->GetUserWidgetObject());
-		hb->SetOwningActor(this);
-		UE_LOG(LogTemp, Log, TEXT("NOT NULL"));
-	}
-	
-   
+	//playerCam = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	//playerChar = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 }
 
 // Called every frame
