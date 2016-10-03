@@ -41,10 +41,12 @@ ATowerBase::ATowerBase()
 	//healthBar->AttachTo(RootComponent);
 }
 
+
 void ATowerBase::TriggerExit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	
 	enemyUnits.Remove(OtherActor);
+	
 }
 
 void ATowerBase::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
@@ -67,6 +69,7 @@ float ATowerBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dam
 	UE_LOG(LogTemp, Log, TEXT("Tower took %f damage."), DamageAmount);
 	if (currHP <= 0) 
 	{
+		CleanUp();
 		Destroy();
 	}
 	return DamageAmount;

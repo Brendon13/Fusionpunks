@@ -22,12 +22,16 @@ public:
 		class AController * EventInstigator,
 		AActor * DamageCauser
 	) override;
+	
 
 	float GetHpPercent();
 
 	UPROPERTY(EditDefaultsOnly, Category = Damage)
 		float damage;
 protected:
+
+
+	virtual void CleanUp() { check(0 && "You must override this") };
 
 	TSubclassOf<class UFloatingDamageWidget> FloatingDamageWidgetClass;
 	
@@ -51,7 +55,7 @@ protected:
 	UFUNCTION()
 		void TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
 	UFUNCTION()
-		void TriggerExit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+		virtual void TriggerExit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 
 	TArray<AActor*> enemyUnits;

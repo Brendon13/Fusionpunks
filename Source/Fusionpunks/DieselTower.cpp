@@ -27,6 +27,20 @@ void ADieselTower::BeginPlay()
 	
 }
 
+void ADieselTower::TriggerExit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	Super::TriggerExit(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
+	if (enemyUnits.Num() == 0)
+	{
+		towerDMG->StopTimer();
+		bIsDealingDMG = false;
+	}
+}
+void ADieselTower::CleanUp() 
+{
+	towerDMG->Destroy();
+}
+
 // Called every frame
 void ADieselTower::Tick( float DeltaTime )
 {

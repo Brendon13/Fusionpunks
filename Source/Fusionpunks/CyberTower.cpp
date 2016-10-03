@@ -29,6 +29,20 @@ void ACyberTower::BeginPlay()
 
 }
 
+void ACyberTower::TriggerExit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	Super::TriggerExit(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
+	if (enemyUnits.Num() == 0)
+	{
+		towerDMG->StopTimer();
+		bIsDealingDMG = false;
+	}
+}
+
+void ACyberTower::CleanUp() 
+{
+	towerDMG->Destroy();
+}
 // Called every frame
 void ACyberTower::Tick(float DeltaTime)
 {
