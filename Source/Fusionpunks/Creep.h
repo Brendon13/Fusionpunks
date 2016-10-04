@@ -53,11 +53,6 @@ protected:
 public:
 	float GetDamage() const { return damage; }
 
-//protected:
-//	UPROPERTY(EditDefaultsOnly, Category = Appearance)
-//		USkeletalMeshComponent* creepSkeletalMeshComp;
-
-
 //Creep Camp stuff
 public:
 	void SetCreepCampHome(ACreepCamp* home, bool BelongsToCamp);
@@ -68,19 +63,22 @@ protected:
 
 //health bar widget stuff
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = Widgets)
+	UPROPERTY(EditDefaultsOnly)
 	UWidgetComponent* widgetComponent;
 
+	UPROPERTY(EditDefaultsOnly, Category = Widgets)
 	TSubclassOf<UCreepHealthbarWidget> CreepHealthBarWidgetClass;
 
 	FRotator widgetCompRotation;
 	AActor* localPlayer;
 
+
 //Damage stuff
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	UPROPERTY(EditDefaultsOnly, Category = Widgets)
 	TSubclassOf<class UFloatingDamageWidget> FloatingDamageWidgetClass; 
-	//UWidgetComponent* floatingDamageWidget;
+
 
 //AISTUFF
 	UPROPERTY(EditDefaultsOnly)
@@ -88,16 +86,13 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float patrolRadius;
-
-	/*UPROPERTY(EditDefaultsOnly)
-	UFloatingPawnMovement* movementComponent;*/
-
 public:
 	UFUNCTION(BlueprintCallable, Category = CampVariables)
 		float GetPatrolRadius();
 
 	UFUNCTION(BlueprintCallable, Category = CampVariables)
 		ACreepCamp* GetCreepCampHome() const; 
+
 
 //stuff for Character Movement
 protected:
@@ -117,7 +112,5 @@ protected:
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseTurnRate;
-
-protected:
 
 };

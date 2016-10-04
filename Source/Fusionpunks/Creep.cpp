@@ -13,19 +13,13 @@ ACreep::ACreep()
 	PrimaryActorTick.bCanEverTick = true;
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	/*creepSkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
-	creepSkeletalMeshComp->SetSimulatePhysics(false);
-	creepSkeletalMeshComp->bGenerateOverlapEvents = true; 
-	RootComponent = creepSkeletalMeshComp;*/
-
-	//movementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
 	bUseControllerRotationYaw = true;
 
-	const ConstructorHelpers::FObjectFinder<UBlueprint>
-		CreepHealthBarFinder(TEXT("WidgetBlueprint'/Game/UI/CreepHealthBarWidget_BP.CreepHealthBarWidget_BP'"));
-	if (CreepHealthBarFinder.Object != nullptr)
+	const ConstructorHelpers::FObjectFinder<UClass>
+		CreepHealthBarFinder(TEXT("/Game/UI/CreepHealthBarWidget_BP.CreepHealthBarWidget_BP_C"));
+	if (CreepHealthBarFinder.Object != NULL)
 	{
-		CreepHealthBarWidgetClass = Cast<UClass>(CreepHealthBarFinder.Object->GeneratedClass);
+		CreepHealthBarWidgetClass = Cast<UClass>(CreepHealthBarFinder.Object);
 		widgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
 		widgetComponent->SetWidgetClass(CreepHealthBarWidgetClass);
 		widgetComponent->SetSimulatePhysics(false);
@@ -33,11 +27,11 @@ ACreep::ACreep()
 		widgetComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	}
 
-	const ConstructorHelpers::FObjectFinder<UBlueprint>
-		FloatingDamageWidgetFinder(TEXT("WidgetBlueprint'/Game/UI/FloatingDamageWidget_BP.FloatingDamageWidget_BP'"));
-	if (FloatingDamageWidgetFinder.Object != nullptr)
+	const ConstructorHelpers::FObjectFinder<UClass>
+		FloatingDamageWidgetFinder(TEXT("/Game/UI/FloatingDamageWidget_BP.FloatingDamageWidget_BP_C"));
+	if (FloatingDamageWidgetFinder.Object != NULL)
 	{
-		FloatingDamageWidgetClass = Cast<UClass>(FloatingDamageWidgetFinder.Object->GeneratedClass);
+		FloatingDamageWidgetClass = Cast<UClass>(FloatingDamageWidgetFinder.Object);
 	}
 
 	const ConstructorHelpers::FClassFinder<ACreepAIController> AIContFinder(TEXT("Class'/Script/Fusionpunks.CreepAIController'"));
@@ -45,7 +39,6 @@ ACreep::ACreep()
 	{
 		AIControllerClass = AIContFinder.Class;
 	}
-	//bUseControllerRotationYaw = false; 
 
 	//NOTE::BRENDON - Will have to change current level based on players level when spawned from a controlled camp 
 	//i.e. Diesel hero is level 9 -> creep should also be level 9 
@@ -55,8 +48,6 @@ ACreep::ACreep()
 
 	patrolRadius = 2000.0f;
 	GetCharacterMovement()->MaxWalkSpeed = 150.0f;
-
-	//movementComponent->MaxSpeed = 150.0f;
 	BaseTurnRate = 45.f;
 
 	bBelongsToCamp = false;
@@ -115,7 +106,6 @@ void ACreep::Tick( float DeltaTime )
 	//rot.Yaw = FRotator::ClampAxis(rot.Yaw);
 
 	//FaceRotation(rot, DeltaTime);
-
 }
 
 void ACreep::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -140,9 +130,13 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 {
 	currentHealth -= Damage;
 
-	UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
-	floatingDamageWidget->SetIncDamage(Damage);
-	floatingDamageWidget->AddToViewport();
+	if (FloatingDamageWidgetClass)
+	{
+		UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
+		floatingDamageWidget->SetIncDamage(Damage);
+		floatingDamageWidget->AddToViewport();
+	}
+	
 
 	if (currentHealth <= 0)
 	{
@@ -176,7 +170,6 @@ void ACreep::SetCreepCampHome(ACreepCamp* home, bool BelongsToCamp = false)
 		AiController->GetBlackboardComponent()->SetValueAsBool(TEXT("belongsToCamp"), bBelongsToCamp);
 		AiController->GetBlackboardComponent()->SetValueAsObject(TEXT("CreepCampHome"), creepCampHome);
 	}
-	
 }
 
 UFUNCTION()

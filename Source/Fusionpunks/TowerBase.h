@@ -30,9 +30,9 @@ public:
 		float damage;
 protected:
 
-
 	virtual void CleanUp() { check(0 && "You must override this") };
 
+	UPROPERTY(EditDefaultsOnly, Category = Widgets)
 	TSubclassOf<class UFloatingDamageWidget> FloatingDamageWidgetClass;
 	
 	FVector myLocation;

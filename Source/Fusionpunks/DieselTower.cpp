@@ -32,7 +32,11 @@ void ADieselTower::TriggerExit(UPrimitiveComponent* OverlappedComponent, AActor*
 	Super::TriggerExit(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
 	if (enemyUnits.Num() == 0)
 	{
-		towerDMG->StopTimer();
+		if (IsValid(towerDMG))
+		{
+			towerDMG->StopTimer();
+		}
+		
 		bIsDealingDMG = false;
 	}
 }

@@ -45,6 +45,7 @@ public:
 							class AController * EventInstigator,
 							AActor * DamageCauser) override;
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = Widgets)
 	TSubclassOf<class UFloatingDamageWidget> FloatingDamageWidgetClass;
 	
 	

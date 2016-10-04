@@ -18,13 +18,13 @@ ABase::ABase()
 	healthBar = CreateDefaultSubobject<UHealthBarWidgetComponent>(TEXT("HealthBar"));
 	healthBar->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
-	const ConstructorHelpers::FObjectFinder<UBlueprint>
+	/*const ConstructorHelpers::FObjectFinder<UBlueprint>
 		FloatingDamageWidgetFinder(TEXT("WidgetBlueprint'/Game/UI/FloatingDamageWidget_BP.FloatingDamageWidget_BP'"));
 
 	if (FloatingDamageWidgetFinder.Object != nullptr)
 	{
 		FloatingDamageWidgetClass = Cast<UClass>(FloatingDamageWidgetFinder.Object->GeneratedClass);
-	}
+	}*/
 
 	bCanBeDamaged = true;
 	currHP = maxHP;
@@ -54,10 +54,13 @@ float ABase::TakeDamage(float DamageAmount,struct FDamageEvent const & DamageEve
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	currHP -= DamageAmount;
 
-	UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
-	floatingDamageWidget->SetIncDamage(DamageAmount);
-	floatingDamageWidget->AddToViewport();
-
+	if(FloatingDamageWidgetClass)
+	{
+		UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
+		floatingDamageWidget->SetIncDamage(DamageAmount);
+		floatingDamageWidget->AddToViewport();
+	}
+	
 	UE_LOG(LogTemp, Log, TEXT("Base took %f damage."), DamageAmount);
     
 	if (currHP <= 0)
