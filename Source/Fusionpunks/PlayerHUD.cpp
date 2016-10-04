@@ -5,27 +5,27 @@
 
 APlayerHUD::APlayerHUD()
 {
-	static ConstructorHelpers::FObjectFinder<UBlueprint>
-		healthWidgetFinder(TEXT("WidgetBlueprint'/Game/UI/PlayerHealthWidget_BP.PlayerHealthWidget_BP'"));
+	static ConstructorHelpers::FObjectFinder<UClass>
+		healthWidgetFinder(TEXT("/Game/UI/PlayerHealthWidget_BP.PlayerHealthWidget_BP_C"));
 
-	if (healthWidgetFinder.Object != nullptr)
+	if (healthWidgetFinder.Object != NULL)
 	{
-		playerHealthBarWidgetClass = Cast<UClass>(healthWidgetFinder.Object->GeneratedClass);
+		playerHealthBarWidgetClass = Cast<UClass>(healthWidgetFinder.Object);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint>
-		campPWFinder (TEXT("WidgetBlueprint'/Game/UI/CampProgressWidget_BP.CampProgressWidget_BP'"));
+	static ConstructorHelpers::FObjectFinder<UClass>
+		campPWFinder (TEXT("/Game/UI/CampProgressWidget_BP.CampProgressWidget_BP_C"));
 
-	if (campPWFinder.Object != nullptr)
+	if (campPWFinder.Object != NULL)
 	{
-		campProgressWidgetClass = Cast<UClass>(campPWFinder.Object->GeneratedClass);
+		campProgressWidgetClass = Cast<UClass>(campPWFinder.Object);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> gameTWFinder(TEXT("WidgetBlueprint'/Game/UI/GameTimerWidget_BP.GameTimerWidget_BP'"));
+	static ConstructorHelpers::FObjectFinder<UClass> gameTWFinder(TEXT("/Game/UI/GameTimerWidget_BP.GameTimerWidget_BP_C"));
 
-	if (gameTWFinder.Object != nullptr)
+	if (gameTWFinder.Object != NULL)
 	{
-		gameTimerWidgetClass = Cast<UClass>(gameTWFinder.Object->GeneratedClass);
+		gameTimerWidgetClass = Cast<UClass>(gameTWFinder.Object);
 	}
 
 }

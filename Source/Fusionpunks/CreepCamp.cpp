@@ -143,16 +143,18 @@ void ACreepCamp::Tick( float DeltaTime )
 
 	//Debug Messages to print to screen
 	//Could probably make an entire struct to handle this 
-	GEngine->ClearOnScreenDebugMessages();
-	static const FString MCreepCount(TEXT("\n\nCreep Count: "));
-	static const FString MSpawnTimer(TEXT("\n\nSpawn Timer: "));
-	static const FString MCaptureTimer(TEXT("\n\nCampCaptureTimer: "));
 
-	print(MCreepCount + FString::FromInt(spawningVariables.creepCount)
-		  + MSpawnTimer + FString::FromInt((int)spawningVariables.creepSpawnTimer)
-		  + MCaptureTimer + FString::FromInt((int)captureVariables.captureTime));
-	
+	if (GetWorld()->GetName() == "MechanicTesting")
+	{
+		GEngine->ClearOnScreenDebugMessages();
+		static const FString MCreepCount(TEXT("\n\nCreep Count: "));
+		static const FString MSpawnTimer(TEXT("\n\nSpawn Timer: "));
+		static const FString MCaptureTimer(TEXT("\n\nCampCaptureTimer: "));
 
+		print(MCreepCount + FString::FromInt(spawningVariables.creepCount)
+			+ MSpawnTimer + FString::FromInt((int)spawningVariables.creepSpawnTimer)
+			+ MCaptureTimer + FString::FromInt((int)captureVariables.captureTime));
+	}
 	//Rotate the ring every frame
 	ringRotation.Yaw += DeltaTime * ringRotationSpeed;
 	ringMesh->SetRelativeRotation(ringRotation);

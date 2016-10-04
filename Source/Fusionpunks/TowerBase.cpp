@@ -20,13 +20,13 @@ ATowerBase::ATowerBase()
 	radius->OnComponentBeginOverlap.AddDynamic(this, &ATowerBase::TriggerEnter);
 	radius->OnComponentEndOverlap.AddDynamic(this, &ATowerBase::TriggerExit);
 
-	const ConstructorHelpers::FObjectFinder<UBlueprint>
+	/*const ConstructorHelpers::FObjectFinder<UBlueprint>
 		FloatingDamageWidgetFinder(TEXT("WidgetBlueprint'/Game/UI/FloatingDamageWidget_BP.FloatingDamageWidget_BP'"));
 
 	if (FloatingDamageWidgetFinder.Object != nullptr)
 	{
 		FloatingDamageWidgetClass = Cast<UClass>(FloatingDamageWidgetFinder.Object->GeneratedClass);
-	}
+	}*/
 
 	//static ConstructorHelpers::FObjectFinder<UParticleSystem> ps(TEXT("ParticleSystem'/Game/BluePrints/LaserBeam.LaserBeam'"));
 	//beam = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Beam Particle"));
