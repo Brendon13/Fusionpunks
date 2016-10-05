@@ -19,6 +19,8 @@ class FUSIONPUNKS_API AHeroBase : public ACharacter
 		class UCameraComponent* FollowCamera;
 public:
 	AHeroBase();
+	UPROPERTY(EditAnywhere)
+		AActor* AICam;
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -75,7 +77,7 @@ protected:
 	void StartAttack();
 	void Attack(AActor* enemy);
 	void AdjustCameraZoom(float Value);
-
+	void SwapAICamera();
 	//editable stats in blueprint
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = Stats)

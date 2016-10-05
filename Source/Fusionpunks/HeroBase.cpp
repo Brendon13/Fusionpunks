@@ -59,10 +59,11 @@ void AHeroBase::BeginPlay()
 	Super::BeginPlay();
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHeroBase::OnOverlapBegin);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHeroBase::OnOverlapEnd);
-	
+
 	GetWorld()->GetAuthGameMode()->Children.Add(this);
 	respawnEffect = GetWorld()->SpawnActor<ARespawnOverTime>(respawnClass, FVector::ZeroVector, FRotator::ZeroRotator);
 	startingLocation = GetActorLocation();
+			
 }
 
 // Called every frame
@@ -87,6 +88,7 @@ void AHeroBase::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 
 	//Attack
 	InputComponent->BindAction("BasicAttack", IE_Pressed, this, &AHeroBase::StartAttack);
+	InputComponent->BindAction("AICamera", IE_Pressed, this, &AHeroBase::SwapAICamera);
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
@@ -94,7 +96,7 @@ void AHeroBase::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 	InputComponent->BindAxis("TurnRate", this, &AHeroBase::TurnAtRate);
 	InputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	InputComponent->BindAxis("LookUpRate", this, &AHeroBase::LookUpAtRate);
-
+	
 	InputComponent->BindAxis("CameraZoom", this, &AHeroBase::AdjustCameraZoom);
 }
 void AHeroBase::TurnAtRate(float Rate)
@@ -275,4 +277,18 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 	}
 	return DamageAmount;
 
+}
+void AHeroBase::SwapAICamera()
+{
+	APlayerController* OurPlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
+	if (OurPlayerController->GetViewTarget() == this)
+	{
+		if(AICam != nullptr)
+			OurPlayerController->SetViewTargetWithBlend(AICam);
+	}
+	else 
+	{
+		OurPlayerController->SetViewTargetWithBlend(this);
+	}
 }

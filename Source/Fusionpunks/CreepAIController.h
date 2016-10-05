@@ -42,4 +42,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 		UPawnSensingComponent* PawnSensingComponent;
+
+	
 };

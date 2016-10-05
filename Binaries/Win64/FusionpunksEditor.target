@@ -2,7 +2,7 @@
 	"TargetName" : "FusionpunksEditor",
 	"Platform" : "Win64",
 	"Configuration" : "Development",
-	"BuildId" : "cea06f36-8ab3-4b4e-aac5-7601b712e232",
+	"BuildId" : "8eb92b7d-4133-4b43-8112-8e68dd54b613",
 	"Version" : 
 	{
 		"MajorVersion" : 4,
@@ -83,6 +83,10 @@
 		},
 		{
 			"Path" : "$(EngineDir)/Plugins/Experimental/HTML5Networking/HTML5Networking.uplugin",
+			"Type" : "UFS"
+		},
+		{
+			"Path" : "$(EngineDir)/Plugins/Marketplace/Substance/Substance.uplugin",
 			"Type" : "UFS"
 		},
 		{
