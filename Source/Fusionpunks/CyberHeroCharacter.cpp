@@ -14,6 +14,7 @@ ACyberHeroCharacter::ACyberHeroCharacter()
 	maxHealth = 250;
 	currentHealth = maxHealth;
 
+	Tags.Add(TEXT("Cyber"));
 	team = FName::FName(TEXT("Cyber"));
 }
 

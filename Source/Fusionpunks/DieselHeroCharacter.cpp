@@ -28,6 +28,7 @@ ADieselHeroCharacter::ADieselHeroCharacter()
 	bIsDashing = false;
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ADieselHeroCharacter::OnHit);
 
+	Tags.Add(TEXT("Diesel"));
 	team = FName::FName(TEXT("Diesel"));
 }
 

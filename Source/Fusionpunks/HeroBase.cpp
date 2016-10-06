@@ -1,10 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Fusionpunks.h"
 #include "CreepCamp.h"
 #include "PlayerHud.h"
 #include "Creep.h"
-#include "HeroStats.h"
 #include "RespawnOverTime.h"
 #include "PlayerCompassWidget.h"
 #include "HeroBase.h"
@@ -77,8 +75,7 @@ AHeroBase::AHeroBase()
 		widgetComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	}
 
-	
-	
+	creepFormationComp = CreateDefaultSubobject<UCreepFormation>(TEXT("CreepFormationComponent"));
 	
 }
 
@@ -99,9 +96,6 @@ void AHeroBase::BeginPlay()
 		UPlayerCompassWidget* thisPlayerCompassWidget = Cast<UPlayerCompassWidget>(widgetComponent->GetUserWidgetObject());
 		thisPlayerCompassWidget->SetOwningHero(this);
 	}
-	heroStats = new HeroStats(this);
-	heroStats->DisplayStats();
-	LinkToCreepCamps();
 }
 
 // Called every frame
@@ -371,44 +365,8 @@ void AHeroBase::SwapAICamera()
 		OurPlayerController->SetViewTargetWithBlend(this);
 	}
 }
-void AHeroBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+
+TArray<ACreep*> AHeroBase::GetCreepArmyArray()
 {
-	Super::EndPlay(EndPlayReason);
-	delete heroStats;
-}
-
-void AHeroBase::LinkToCreepCamps() 
-{
-	TArray<AActor*> actorList;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), creepCampClass, actorList);
-	TArray<ACreepCamp*> creepCamps;
-	for (int32 i = 0; i < actorList.Num(); i++)
-	{
-		creepCamps.Add(Cast<ACreepCamp>(actorList[i]));
-		creepCamps[i]->LinkToHeroes(this);
-	}
-
-}
-
-void AHeroBase::AddToCapturedCamps(ACreepCamp* camp) 
-{
-	if (!capturedCamps.Contains(camp)) 
-	{
-		capturedCamps.Add(camp);
-	}
-}
-
-void AHeroBase::RemoveFromCapturedCamps(ACreepCamp* camp) 
-{
-	if (capturedCamps.Contains(camp))
-	{
-		capturedCamps.Remove(camp);
-	}
-}
-
-void AHeroBase::UpdateHeroStats() 
-{
-	heroStats->UpdateStats();
-	heroStats->DisplayStats();
-
+	return CreepArmy;
 }

@@ -252,7 +252,7 @@ UFUNCTION()
 void ACreep::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	//if we are a neutral creep
-	if(bBelongsToCamp && EnemyTarget == nullptr && team == TEXT("Neutral") && OtherActor->Tags.Contains(team) == false)
+	if(bBelongsToCamp && EnemyTarget == nullptr && OtherActor->Tags.Contains(team) == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Creep Entered Player Trigger!"));
 		EnemyTarget = OtherActor;
@@ -302,12 +302,19 @@ float ACreep::MeleeAttack()
 
 void ACreep::SetToRun()
 {
-	GetCharacterMovement()->MaxWalkSpeed = runSpeed;
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = runSpeed;
+	}
+	
 }
 
 void ACreep::SetToWalk()
 {
-	GetCharacterMovement()->MaxWalkSpeed = patrolMovementSpeed;
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = patrolMovementSpeed;
+	}
 }
 
 void ACreep::JoinPlayerArmy(AActor* PlayerToFollow)
@@ -315,7 +322,16 @@ void ACreep::JoinPlayerArmy(AActor* PlayerToFollow)
 	//NOTE::Brendon - Might not need reference to player to follow in class
 	playerToFollow = PlayerToFollow;
 	bBelongsToCamp = false; 
-	SetToRun();
+
+	try
+	{
+		GetCharacterMovement()->MaxWalkSpeed = runSpeed;
+	}
+	catch (const std::exception&)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Error setting creep movement speed to run in JoinPlayerArmy"));
+	}
+	
 
 	ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
 	if (AiController)
