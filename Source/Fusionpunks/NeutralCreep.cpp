@@ -7,5 +7,6 @@
 ANeutralCreep::ANeutralCreep()
 {
 	Tags.Add(TEXT("Neutral"));
+	team = FName::FName(TEXT("Neutral"));
 }
 

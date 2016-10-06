@@ -265,7 +265,7 @@ void ACreepCamp::Tick( float DeltaTime )
 
 				if (neutralCreep->IsValidLowLevel())
 				{
-					neutralCreep->SetCreepCampHome(this);
+					neutralCreep->SetCreepCampHome(this, true);
 					creepArray.Add(neutralCreep);
 					spawningVariables.creepCount++;
 				}
@@ -295,7 +295,7 @@ void ACreepCamp::Tick( float DeltaTime )
 
 				if (cyberCreep->IsValidLowLevel())
 				{
-					cyberCreep->SetCreepCampHome(this);
+					cyberCreep->SetCreepCampHome(this, true);
 					creepArray.Add(cyberCreep);
 					spawningVariables.creepCount++;
 				}
@@ -315,7 +315,7 @@ void ACreepCamp::Tick( float DeltaTime )
 
 				if (dieselCreep->IsValidLowLevel())
 				{
-					dieselCreep->SetCreepCampHome(this);
+					dieselCreep->SetCreepCampHome(this, true);
 					creepArray.Add(dieselCreep);
 					spawningVariables.creepCount++;
 				}
@@ -470,16 +470,15 @@ void ACreepCamp::DestroyAllCreeps()
 	}
 }
 
-
-float ACreepCamp::GetDistanceValue() const {
-	return distanceValue;
-}
-
-void ACreepCamp::SetDistanceValue(float value) {
-	distanceValue = value;
-}
-
-ECampType ACreepCamp::GetCampType() 
+ACreep* ACreepCamp::SendCreepToPlayer(AHeroBase* Player)
 {
-	return campType;
+	if (creepArray.Num() > 0)
+	{
+		creepArray[0]->JoinPlayerArmy(Player);
+		return creepArray.Pop();
+	}
+	else
+	{
+		return nullptr;
+	}
 }
