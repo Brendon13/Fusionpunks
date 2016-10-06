@@ -79,11 +79,7 @@ void AChainLightning::TriggerEnter(class UPrimitiveComponent* ThisComp, class AA
 			CheckForNearbyEnemies();
 			hasBeenTriggered = true;
 		}
-	}
-
-	
-	
-	
+	}	
 }
 void AChainLightning::CheckForNearbyEnemies()
 {

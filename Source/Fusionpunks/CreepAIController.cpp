@@ -58,3 +58,8 @@ void ACreepAIController::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingR
 		BlackboardComponent->SetValueAsBool("hasWaited", false);
 	}
 }
+
+void ACreepAIController::RestartBehaviorTree()
+{
+	BehaviorTreeComponent->RestartTree();
+}

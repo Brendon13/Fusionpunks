@@ -23,7 +23,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn) override; 
 
-
 	UFUNCTION(BlueprintCallable, Category = Components)
 	UBlackboardComponent* GetBlackboardComponent();
 
@@ -43,5 +42,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 		UPawnSensingComponent* PawnSensingComponent;
 
-	
+public:
+	void RestartBehaviorTree();
+
+private:
+
 };

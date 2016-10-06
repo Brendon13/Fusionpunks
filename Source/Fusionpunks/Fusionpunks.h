@@ -15,5 +15,7 @@
 #define STENCIL_ENEMY_OUTLINE 254;
 #define ECC_Attack			   ECC_GameTraceChannel1
 #define Creeps                 ECC_GameTraceChannel1
+#define CreepCampTrigger	   ECC_GameTraceChannel3
+#define PlayerAgroRadius	   ECC_GameTraceChannel4
 #define DamageableStructures   ECC_GameTraceChannel2
 #endif

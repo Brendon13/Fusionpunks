@@ -7,5 +7,6 @@
 ADieselCreep::ADieselCreep()
 {
 	Tags.Add(TEXT("Diesel"));
+	team = FName::FName(TEXT("Diesel"));
 }
 

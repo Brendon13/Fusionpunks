@@ -3,7 +3,9 @@
 #include "Fusionpunks.h"
 #include "CreepCamp.h"
 #include "PlayerHud.h"
+#include "Creep.h"
 #include "RespawnOverTime.h"
+#include "PlayerCompassWidget.h"
 #include "HeroBase.h"
 
 
@@ -36,7 +38,7 @@ AHeroBase::AHeroBase()
 	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
-												// Create a follow camera
+	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->AttachToComponent(CameraBoom, FAttachmentTransformRules::KeepRelativeTransform); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
@@ -45,25 +47,54 @@ AHeroBase::AHeroBase()
 	currentLevel = 1;
 	basicAttackDamage = 10.0f;
 	respawnTime = 1.0f;
+
+	agroRadius = 800.0f;
+
+	currentArmySize = 0;
+	
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
 	//dust particle system class 
 	//static ConstructorHelpers::FObjectFinder<AActor> dustPS(TEXT("ParticleSystem'/Game/ParticleEffects/Stomp_Smoke.Stomp_Smoke'"));
 
+	//create & Set sphere trigger for capturing the camp
+	sphereTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("TriggerCollider"));
+	sphereTrigger->SetSphereRadius(agroRadius, true);
+	sphereTrigger->bGenerateOverlapEvents = true;
+	sphereTrigger->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
+	const ConstructorHelpers::FObjectFinder<UClass>
+		compassWidgetFinder(TEXT("/Game/UI/PlayerCompassWidget_BP.PlayerCompassWidget_BP_C"));
+	if (compassWidgetFinder.Object != NULL)
+	{
+		CompassWidgetClass = compassWidgetFinder.Object;
+		widgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
+		widgetComponent->SetWidgetClass(CompassWidgetClass);
+		widgetComponent->SetSimulatePhysics(false);
+		widgetComponent->bGenerateOverlapEvents = false;
+		widgetComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	}
+	
 }
 
 // Called when the game starts or when spawned
 void AHeroBase::BeginPlay()
 {
 	Super::BeginPlay();
+
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHeroBase::OnOverlapBegin);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHeroBase::OnOverlapEnd);
-
+	
 	GetWorld()->GetAuthGameMode()->Children.Add(this);
 	respawnEffect = GetWorld()->SpawnActor<ARespawnOverTime>(respawnClass, FVector::ZeroVector, FRotator::ZeroRotator);
 	startingLocation = GetActorLocation();
-			
+
+	if (Cast<UPlayerCompassWidget>(widgetComponent->GetUserWidgetObject()))
+	{
+		UPlayerCompassWidget* thisPlayerCompassWidget = Cast<UPlayerCompassWidget>(widgetComponent->GetUserWidgetObject());
+		thisPlayerCompassWidget->SetOwningHero(this);
+	}
 }
 
 // Called every frame
@@ -88,7 +119,6 @@ void AHeroBase::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 
 	//Attack
 	InputComponent->BindAction("BasicAttack", IE_Pressed, this, &AHeroBase::StartAttack);
-	InputComponent->BindAction("AICamera", IE_Pressed, this, &AHeroBase::SwapAICamera);
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
@@ -96,8 +126,10 @@ void AHeroBase::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 	InputComponent->BindAxis("TurnRate", this, &AHeroBase::TurnAtRate);
 	InputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	InputComponent->BindAxis("LookUpRate", this, &AHeroBase::LookUpAtRate);
-	
+
 	InputComponent->BindAxis("CameraZoom", this, &AHeroBase::AdjustCameraZoom);
+
+	InputComponent->BindAction("RecruitCreep", IE_Pressed, this, &AHeroBase::RecruitCreep);
 }
 void AHeroBase::TurnAtRate(float Rate)
 {
@@ -226,12 +258,18 @@ void AHeroBase::AdjustCameraZoom(float Value)
 
 void AHeroBase::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-
+	if (Cast<ACreepCamp>(OtherActor))
+	{
+		visitingCamp = Cast<ACreepCamp>(OtherActor);
+	}
 }
 
 void AHeroBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-
+	if (Cast<ACreepCamp>(OtherActor))
+	{
+		visitingCamp = nullptr;
+	}
 }
 
 float AHeroBase::GetPlayerHealthPercentage()
@@ -278,17 +316,34 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 	return DamageAmount;
 
 }
-void AHeroBase::SwapAICamera()
-{
-	APlayerController* OurPlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
-	if (OurPlayerController->GetViewTarget() == this)
+void AHeroBase::RecruitCreep()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Recruit Creep!"));
+	if (visitingCamp)
 	{
-		if(AICam != nullptr)
-			OurPlayerController->SetViewTargetWithBlend(AICam);
+		UE_LOG(LogTemp, Warning, TEXT("At Camp!"));
+		if (currentArmySize < maxArmySize)
+		{
+			ACreep* creep = visitingCamp->SendCreepToPlayer(this);
+			if (creep)
+			{
+				//IMPLEMENT SOUND TO PLAY!
+				currentArmySize++;
+				CreepArmy.Add(creep);
+				creep->JoinPlayerArmy(this);
+				UE_LOG(LogTemp, Warning, TEXT("Creep successfully recruited!"));
+			}
+		}
+		else
+		{
+		    //DISPLAY MESSAGE TO PLAYER THAT HE IS AT HIS MAX CREEP ARMY SIZE!
+			UE_LOG(LogTemp, Warning, TEXT("At max creep army size!"));
+		}
 	}
-	else 
+	else
 	{
-		OurPlayerController->SetViewTargetWithBlend(this);
+		UE_LOG(LogTemp, Warning, TEXT("Not near a camp to recruit a creep!"));
 	}
+	
 }

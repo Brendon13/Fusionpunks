@@ -80,6 +80,8 @@ struct FSpawningVariables
 	float creepSpawnTimer;
 };
 
+class AHeroBase;
+
 UCLASS()
 class FUSIONPUNKS_API ACreepCamp : public AActor
 {
@@ -89,7 +91,7 @@ public:
 	ACreepCamp();
 	virtual void BeginPlay() override;
 	virtual void Tick( float DeltaSeconds ) override;
-	
+
 //enum, captureStruct, variablesStruct 
 private:
 	UPROPERTY(EditAnywhere, Category = Stats)
@@ -166,16 +168,12 @@ public:
 
 	void RemoveCreep(ACreep* CreepInCamp);
 	void DestroyAllCreeps();
-	
-	float GetDistanceValue() const;
-	void  SetDistanceValue(float value);
 
-	ECampType GetCampType();
 
 //Creep Spawn Locations
 protected:
 	TArray<ACreep*> creepArray;
-	
+
 	UPROPERTY(EditAnywhere, Category = SpawnLocation)
 		FVector creep1SpawnLocation;
 
@@ -187,7 +185,7 @@ protected:
 
 	TArray<FVector> creepSpawnArray;
 
-	float distanceValue;
+
 protected:
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		void SetToDieselCamp();
@@ -198,5 +196,6 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		void SetToNeutralCamp();
 
-		
+public:
+	ACreep* SendCreepToPlayer(AHeroBase* Player);
 };
