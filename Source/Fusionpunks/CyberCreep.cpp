@@ -6,6 +6,7 @@
 ACyberCreep::ACyberCreep()
 {
 	Tags.Add(TEXT("Cyber"));
+	team = FName::FName(TEXT("Cyber"));
 }
 
 

@@ -3,9 +3,7 @@
 #pragma once
 
 #include "GameFramework/Pawn.h"
-#include "CreepHealthbarWidget.h"
 #include "WidgetComponent.h"
-#include "CreepAIController.h"
 #include "Creep.generated.h"
 
 class ACreepCamp;
@@ -33,25 +31,47 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float maxHealth;
 
+	float currentHealth;
+
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		int maxLevel;
 
+	int currentLevel;
+
 	UPROPERTY(EditAnywhere, Category = Stats)
-		float movementSpeed;
+		float patrolMovementSpeed;
+
+	UPROPERTY(EditAnywhere, Category = Stats)
+		float runSpeed;
 	
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
-		float damage;
+		float attackPower;
 
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float healthIncreasePerLevel;
 
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
-		float damageIncreasePerLevel;
+		float attackPowerIncreasePerLevel;
 
-	float currentHealth;
-	int currentLevel;
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		float meleeAttackRange;
+
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		float meleeAttackCooldown;
+
+	float meleeAttackCooldownTimer;
+	bool bCanMeleeAttack;
+
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		float chaseDistance;
+
+	FName team;
+
 public:
-	float GetDamage() const { return damage; }
+	FName GetTeam() const { return team; }
+	float GetAttackPower() const { return attackPower; }
+
+	void ClearEnemyTarget();
 
 //Creep Camp stuff
 public:
@@ -59,7 +79,6 @@ public:
 	bool bBelongsToCamp; //false means the creep belongs to a player (i.e. is apart of a player army)
 protected:
 	ACreepCamp* creepCampHome;
-	
 
 //health bar widget stuff
 protected:
@@ -67,7 +86,7 @@ protected:
 	UWidgetComponent* widgetComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category = Widgets)
-	TSubclassOf<UCreepHealthbarWidget> CreepHealthBarWidgetClass;
+	TSubclassOf<class UCreepHealthbarWidget> CreepHealthBarWidgetClass;
 
 	FRotator widgetCompRotation;
 	AActor* localPlayer;
@@ -79,20 +98,27 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Widgets)
 	TSubclassOf<class UFloatingDamageWidget> FloatingDamageWidgetClass; 
 
+public:
+	virtual float MeleeAttack();
 
+protected:
 //AISTUFF
-	UPROPERTY(EditDefaultsOnly)
-		ACreepAIController* AiController; 
+	/*UPROPERTY(EditDefaultsOnly)
+		class ACreepAIController* AiController; */
 
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float patrolRadius;
+
+	AActor* EnemyTarget;
 public:
 	UFUNCTION(BlueprintCallable, Category = CampVariables)
 		float GetPatrolRadius();
 
 	UFUNCTION(BlueprintCallable, Category = CampVariables)
-		ACreepCamp* GetCreepCampHome() const; 
+		ACreepCamp* GetCreepCampHome() const;
 
+	void SetToRun();
+	void SetToWalk();
 
 //stuff for Character Movement
 protected:
@@ -113,4 +139,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseTurnRate;
 
+protected:
+	//function for Trigger Events
+	UFUNCTION()
+		void OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
+
+	//function for Trigger Exit Events
+	UFUNCTION()
+		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+public:
+	void JoinPlayerArmy(AActor* PlayerToFollow);
+private:
+	AActor* playerToFollow;
 };

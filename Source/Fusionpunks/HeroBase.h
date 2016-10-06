@@ -19,8 +19,6 @@ class FUSIONPUNKS_API AHeroBase : public ACharacter
 		class UCameraComponent* FollowCamera;
 public:
 	AHeroBase();
-	UPROPERTY(EditAnywhere)
-		AActor* AICam;
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -77,7 +75,7 @@ protected:
 	void StartAttack();
 	void Attack(AActor* enemy);
 	void AdjustCameraZoom(float Value);
-	void SwapAICamera();
+
 	//editable stats in blueprint
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
@@ -103,6 +101,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable, category = Stats)
 		virtual void LevelUp();
+
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		float agroRadius;
 	
 
 public:
@@ -125,11 +126,8 @@ protected:
 
 	class ARespawnOverTime* respawnEffect;
 
-	
-
 	UPROPERTY(EditDefaultsOnly, Category = Respawn)
 		float respawnTime;
-
 	
 private:
 	//function for Trigger Events
@@ -140,9 +138,27 @@ private:
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UPROPERTY(EditDefaultsOnly, Category = CollisionComponents)
+		USphereComponent* sphereTrigger;
+
 protected:
 	FName team;
 public:
 	FName GetTeam() const { return team; }
-	
+
+	UPROPERTY(EditDefaultsOnly)
+		UWidgetComponent* widgetComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = Widgets)
+		TSubclassOf<class UPlayerCompassWidget> CompassWidgetClass;
+
+//AI Stuff
+protected:
+	virtual void RecruitCreep();
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		int maxArmySize;
+private:
+	int currentArmySize;
+	ACreepCamp* visitingCamp;
+	TArray<class ACreep*> CreepArmy;
 };

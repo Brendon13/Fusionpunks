@@ -2,8 +2,10 @@
 
 #include "Fusionpunks.h"
 #include "CreepCamp.h"
+#include "CreepHealthbarWidget.h"
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 #include "FloatingDamageWidget.h"
+#include "CreepAIController.h"
 #include "Creep.h"
 
 
@@ -34,22 +36,22 @@ ACreep::ACreep()
 		FloatingDamageWidgetClass = Cast<UClass>(FloatingDamageWidgetFinder.Object);
 	}
 
-	const ConstructorHelpers::FClassFinder<ACreepAIController> AIContFinder(TEXT("Class'/Script/Fusionpunks.CreepAIController'"));
-	if (IsValid(AIContFinder.Class))
-	{
-		AIControllerClass = AIContFinder.Class;
-	}
+	AIControllerClass = ACreepAIController::StaticClass();
 
 	//NOTE::BRENDON - Will have to change current level based on players level when spawned from a controlled camp 
 	//i.e. Diesel hero is level 9 -> creep should also be level 9 
 	currentLevel = 1;
 	maxLevel = 10;
 	maxHealth = 10;
+	meleeAttackRange = 200.0f;
 
 	patrolRadius = 2000.0f;
 	GetCharacterMovement()->MaxWalkSpeed = 150.0f;
 	BaseTurnRate = 45.f;
 
+	meleeAttackCooldown = 2.0f;
+	meleeAttackCooldownTimer = -0.1f;
+	bCanMeleeAttack = true; 
 	bBelongsToCamp = false;
 	Tags.Add(TEXT("Creep"));
 }
@@ -60,14 +62,21 @@ void ACreep::BeginPlay()
 
 	currentHealth = maxHealth;
 
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ACreep::OnOverlapBegin);
+	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &ACreep::OnOverlapEnd);
+
 	if (GetWorld())
 	{
-		AiController = Cast<ACreepAIController>(GetWorld()->SpawnActor<ACreepAIController>(AIControllerClass));
-		AiController->Possess(this);
-		AiController->GetBlackboardComponent()->SetValueAsObject(TEXT("SelfPawn"), this);
-		AiController->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
-		AiController->GetBlackboardComponent()->SetValueAsBool(TEXT("belongsToCamp"), bBelongsToCamp);
-
+		ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
+		if (AiController)
+		{
+			//AiController = Cast<ACreepAIController>(GetWorld()->SpawnActor<ACreepAIController>(AIControllerClass));
+			//AiController->Possess(this);
+			AiController->GetBlackboardComponent()->SetValueAsObject(TEXT("SelfPawn"), this);
+			AiController->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+			AiController->GetBlackboardComponent()->SetValueAsBool(TEXT("belongsToCamp"), bBelongsToCamp);
+		}
+		
 		if (creepCampHome != nullptr)
 		{
 			AiController->GetBlackboardComponent()->SetValueAsObject(TEXT("CreepCampHome"), creepCampHome);
@@ -99,13 +108,24 @@ void ACreep::Tick( float DeltaTime )
 		widgetComponent->SetWorldRotation(widgetCompRotation);
 	}
 
-	//FVector pos = AiController->GetBlackboardComponent()->GetValueAsVector("PatrolPosition");
-	//FRotator rot = pos.Rotation();
-	//FaceRotation(rot);
+	if (meleeAttackCooldownTimer >= 0)
+	{
+		meleeAttackCooldownTimer -= DeltaTime;
+		bCanMeleeAttack = meleeAttackCooldownTimer <= 0;
+	}
+	float distance = 0;
+	if (creepCampHome)
+	{
+		distance = (GetActorLocation() - creepCampHome->GetActorLocation()).Size();
+	}
 
-	//rot.Yaw = FRotator::ClampAxis(rot.Yaw);
-
-	//FaceRotation(rot, DeltaTime);
+	if (distance > chaseDistance)
+	{
+		EnemyTarget = nullptr;
+		ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
+		AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", nullptr);
+		SetToWalk();	
+	}
 }
 
 void ACreep::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -156,7 +176,7 @@ void ACreep::LevelUp()
 	{
 		currentLevel++;
 		maxHealth += healthIncreasePerLevel;
-		damage += damageIncreasePerLevel;
+		attackPower += attackPowerIncreasePerLevel;
 	}
 }
 
@@ -165,6 +185,7 @@ void ACreep::SetCreepCampHome(ACreepCamp* home, bool BelongsToCamp = false)
 	creepCampHome = home;
 	bBelongsToCamp = BelongsToCamp;
 
+	ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
 	if (IsValid(AiController))
 	{
 		AiController->GetBlackboardComponent()->SetValueAsBool(TEXT("belongsToCamp"), bBelongsToCamp);
@@ -226,3 +247,82 @@ void ACreep::MoveRight(float Value)
 	}
 }
 
+//function for Trigger Events
+UFUNCTION()
+void ACreep::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+{
+	//if we are a neutral creep
+	if(bBelongsToCamp && EnemyTarget == nullptr && team == TEXT("Neutral") && OtherActor->Tags.Contains(team) == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Creep Entered Player Trigger!"));
+		EnemyTarget = OtherActor;
+		SetToRun();
+		ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
+		if (AiController)
+		{
+			AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", EnemyTarget);
+			AiController->GetBlackboardComponent()->SetValueAsBool("AtTargetPosition", false);
+			AiController->GetBlackboardComponent()->SetValueAsBool("hasWaited", true);
+			AiController->GetBlackboardComponent()->SetValueAsObject("SelfActor", this);
+			AiController->RestartBehaviorTree();
+		}
+		
+	}
+}
+
+//function for Trigger Exit Events
+UFUNCTION()
+void ACreep::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("Creep Exited Trigger!"));
+}
+
+void ACreep::ClearEnemyTarget()
+{
+	EnemyTarget = nullptr;
+}
+
+float ACreep::MeleeAttack()
+{
+	//if creep hasn't attacked yet
+	//NOTE::IMPLEMENT ATTACK ANIMATION PLAYING FOR EACH CREEP TYPE
+	if (bCanMeleeAttack)
+	{
+		meleeAttackCooldownTimer = meleeAttackCooldown;
+		bCanMeleeAttack = false; 
+		UE_LOG(LogTemp, Warning, TEXT("Creep Attacked for: %f"), attackPower);
+		return attackPower;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Creep Attacked for: %f"), 0);
+		return 0;
+	}
+}
+
+void ACreep::SetToRun()
+{
+	GetCharacterMovement()->MaxWalkSpeed = runSpeed;
+}
+
+void ACreep::SetToWalk()
+{
+	GetCharacterMovement()->MaxWalkSpeed = patrolMovementSpeed;
+}
+
+void ACreep::JoinPlayerArmy(AActor* PlayerToFollow)
+{
+	//NOTE::Brendon - Might not need reference to player to follow in class
+	playerToFollow = PlayerToFollow;
+	bBelongsToCamp = false; 
+	SetToRun();
+
+	ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
+	if (AiController)
+	{
+		AiController->GetBlackboardComponent()->SetValueAsObject("HeroToFollow", playerToFollow);
+		AiController->GetBlackboardComponent()->SetValueAsBool("belongsToCamp", false);
+		AiController->RestartBehaviorTree();
+		creepCampHome = nullptr;
+	}
+}
