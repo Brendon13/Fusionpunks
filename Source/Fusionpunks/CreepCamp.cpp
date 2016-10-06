@@ -421,6 +421,12 @@ void ACreepCamp::SetToDieselCamp()
 	//set color and transparency of ring
 	ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0, 0, 0));
 	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
+	dieselHero->AddToCapturedCamps(this);
+	cyberHero->RemoveFromCapturedCamps(this);
+
+	//for now
+	cyberHero->UpdateHeroStats();
+	dieselHero->UpdateHeroStats();
 }
 
 //change camp functionality to cyber function
@@ -432,6 +438,12 @@ void ACreepCamp::SetToCyberCamp()
 	//set color and transparency of ring 
 	ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0.0, 0.0f, 1.0f));
 	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
+	cyberHero->AddToCapturedCamps(this);
+	dieselHero->RemoveFromCapturedCamps(this);
+
+	//for now
+	cyberHero->UpdateHeroStats();
+	dieselHero->UpdateHeroStats();
 }
 
 void ACreepCamp::SetToNeutralCamp()
@@ -441,6 +453,12 @@ void ACreepCamp::SetToNeutralCamp()
 	//set color and transparency of ring
 	ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(1.0f, 1.0f, 1.0f));
 	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
+	dieselHero->RemoveFromCapturedCamps(this);
+	cyberHero->RemoveFromCapturedCamps(this);
+
+	//for now
+	cyberHero->UpdateHeroStats();
+	dieselHero->UpdateHeroStats();
 }
 
 void ACreepCamp::MinusOneFromCreepCamp()
@@ -494,4 +512,18 @@ void ACreepCamp::SetDistanceValue(float value) {
 ECampType ACreepCamp::GetCampType()
 {
 	return campType;
+}
+
+void ACreepCamp::LinkToHeroes(AHeroBase* hero)
+{
+	if (hero->GetTeam().Compare(FName::FName(TEXT("Cyber"))) == 0)
+	{
+		cyberHero = hero;
+		UE_LOG(LogTemp, Log, TEXT("Found Cyber Hero."));
+	}
+	else
+	{
+		dieselHero = hero;
+		UE_LOG(LogTemp, Log, TEXT("Found Diesel Hero."));
+	}
 }
