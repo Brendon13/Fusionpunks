@@ -130,6 +130,8 @@ void AHeroBase::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 	InputComponent->BindAxis("CameraZoom", this, &AHeroBase::AdjustCameraZoom);
 
 	InputComponent->BindAction("RecruitCreep", IE_Pressed, this, &AHeroBase::RecruitCreep);
+
+	InputComponent->BindAction("AICamera", IE_Pressed, this, &AHeroBase::SwapAICamera);
 }
 void AHeroBase::TurnAtRate(float Rate)
 {
@@ -346,4 +348,19 @@ void AHeroBase::RecruitCreep()
 		UE_LOG(LogTemp, Warning, TEXT("Not near a camp to recruit a creep!"));
 	}
 	
+}
+
+void AHeroBase::SwapAICamera()
+{
+	APlayerController* OurPlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
+	if (OurPlayerController->GetViewTarget() == this)
+	{
+		if (AICam != nullptr)
+			OurPlayerController->SetViewTargetWithBlend(AICam);
+	}
+	else
+	{
+		OurPlayerController->SetViewTargetWithBlend(this);
+	}
 }

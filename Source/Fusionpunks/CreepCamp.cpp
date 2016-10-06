@@ -482,3 +482,16 @@ ACreep* ACreepCamp::SendCreepToPlayer(AHeroBase* Player)
 		return nullptr;
 	}
 }
+
+float ACreepCamp::GetDistanceValue() const {
+	return distanceValue;
+}
+
+void ACreepCamp::SetDistanceValue(float value) {
+	distanceValue = value;
+}
+
+ECampType ACreepCamp::GetCampType()
+{
+	return campType;
+}
