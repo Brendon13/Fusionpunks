@@ -26,6 +26,7 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	virtual float TakeDamage
 	(
@@ -94,6 +95,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float basicAttackDamage;
+	
 
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float healthIncreasePerLevel;
@@ -102,7 +104,10 @@ protected:
 		float damageIncreasePerLevel;
 
 	float currentHealth;
-	int currentLevel;
+	
+	int32 currentLevel;
+	
+
 
 	UFUNCTION(BlueprintCallable, category = Stats)
 		virtual void LevelUp();
@@ -123,6 +128,15 @@ public:
 	FVector startingLocation;
 
 	bool bIsRespawning = false;
+
+	FORCEINLINE int32 GetArmySize() const { return currentArmySize; }
+	FORCEINLINE float GetRespawnTime() const { return respawnTime; }
+	FORCEINLINE  int32 GetLevel() const { return currentLevel; }
+	FORCEINLINE  float GetAttackDamage() const { return basicAttackDamage; }
+	FORCEINLINE TArray<class ACreepCamp*> GetCapturedCamps() const { return capturedCamps; }
+	void AddToCapturedCamps(class ACreepCamp* camp);
+	void RemoveFromCapturedCamps(class ACreepCamp* camp);
+	void UpdateHeroStats();
 protected:
 	class ACreepCamp* CurrentCreepCamp;
 
@@ -133,6 +147,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Respawn)
 		float respawnTime;
+	
+	class HeroStats* heroStats;
+
+	TArray<class ACreepCamp*> capturedCamps;
 	
 private:
 	//function for Trigger Events
@@ -146,10 +164,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = CollisionComponents)
 		USphereComponent* sphereTrigger;
 
+	void LinkToCreepCamps();
+
 protected:
-	FName team;
+	 FName team;
+	 UPROPERTY(EditDefaultsOnly)
+		 TSubclassOf<ACreepCamp> creepCampClass;
 public:
-	FName GetTeam() const { return team; }
+	FORCEINLINE FName GetTeam() const { return team; }
 
 	UPROPERTY(EditDefaultsOnly)
 		UWidgetComponent* widgetComponent;
@@ -161,9 +183,10 @@ public:
 protected:
 	virtual void RecruitCreep();
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
-		int maxArmySize;
+		int32 maxArmySize;
 private:
-	int currentArmySize;
+	int32 currentArmySize;
+	
 	ACreepCamp* visitingCamp;
 	TArray<class ACreep*> CreepArmy;
 };

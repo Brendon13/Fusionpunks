@@ -91,7 +91,7 @@ public:
 	ACreepCamp();
 	virtual void BeginPlay() override;
 	virtual void Tick( float DeltaSeconds ) override;
-
+	void LinkToHeroes(class AHeroBase* hero);
 //enum, captureStruct, variablesStruct 
 private:
 	UPROPERTY(EditAnywhere, Category = Stats)
@@ -101,6 +101,9 @@ private:
 		FCaptureVariables captureVariables;
 	UPROPERTY(EditAnywhere, Category = Stats)
 		FSpawningVariables spawningVariables;
+
+	class AHeroBase* dieselHero;
+	class AHeroBase* cyberHero;
 
 
 //creep class references

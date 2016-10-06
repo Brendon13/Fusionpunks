@@ -45,6 +45,7 @@ void AHeroAIController::BeginPlay()
 	campPriorityList.GeneratePriorityList(creepCamps, GetPawn());
 	campPriorityList.DisplayDistances();
 	
+	
 }
 
 
