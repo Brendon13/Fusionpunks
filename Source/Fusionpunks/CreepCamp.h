@@ -169,6 +169,11 @@ public:
 	void RemoveCreep(ACreep* CreepInCamp);
 	void DestroyAllCreeps();
 
+	float GetDistanceValue() const;
+	void  SetDistanceValue(float value);
+
+	ECampType GetCampType();
+
 
 //Creep Spawn Locations
 protected:
@@ -184,7 +189,7 @@ protected:
 		FVector creep3SpawnLocation;
 
 	TArray<FVector> creepSpawnArray;
-
+	float distanceValue;
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)

@@ -17,6 +17,10 @@ class FUSIONPUNKS_API AHeroBase : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* FollowCamera;
+
+	UPROPERTY(EditAnywhere)
+		AActor* AICam;
+
 public:
 	AHeroBase();
 
@@ -75,6 +79,7 @@ protected:
 	void StartAttack();
 	void Attack(AActor* enemy);
 	void AdjustCameraZoom(float Value);
+	void SwapAICamera();
 
 	//editable stats in blueprint
 protected:
