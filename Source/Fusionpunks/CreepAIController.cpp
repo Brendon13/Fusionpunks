@@ -10,7 +10,7 @@ ACreepAIController::ACreepAIController()
 	BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnsensingComponent"));
 
-	const ConstructorHelpers::FObjectFinder<UBehaviorTree> BTFinder(TEXT("BehaviorTree'/Game/AIStuff/Creeps/CreepBehaviorTree.CreepBehaviorTree'"));
+	const ConstructorHelpers::FObjectFinder<UBehaviorTree> BTFinder(TEXT("BehaviorTree'/Game/Creeps/AI/CreepBehaviorTree.CreepBehaviorTree'"));
 
 	if (IsValid(BTFinder.Object))
 	{

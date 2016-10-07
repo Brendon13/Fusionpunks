@@ -189,4 +189,9 @@ private:
 	
 	ACreepCamp* visitingCamp;
 	TArray<class ACreep*> CreepArmy;
+
+public:
+	TArray<ACreep*> AHeroBase::GetCreepArmyArray();
+	UPROPERTY(EditDefaultsOnly)
+	class UCreepFormation* creepFormationComp;
 };
