@@ -17,16 +17,16 @@ ACreepCamp::ACreepCamp()
 
 	//Create and Set the Static Mesh Component
 	campMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CampMesh"));
-	const ConstructorHelpers::FObjectFinder<UStaticMesh>campStaticMesh(TEXT("StaticMesh'/Game/CreepCamp/Models/mk6_goerge.mk6_goerge'"));
-	campMesh->SetStaticMesh(campStaticMesh.Object);
+	//const ConstructorHelpers::FObjectFinder<UStaticMesh>campStaticMesh(TEXT("StaticMesh'/Game/CreepCamp/Models/mk6_goerge.mk6_goerge'"));
+	//campMesh->SetStaticMesh(campStaticMesh.Object);
 	campMesh->bGenerateOverlapEvents = false;
 	campMesh->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
 	RootComponent = campMesh;
 
 	//Create our ring around the camp
 	ringMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CaptureRing"));
-	const ConstructorHelpers::FObjectFinder<UStaticMesh> ringStaticMesh(TEXT("StaticMesh'/Game/CreepCamp/Models/CreepCampCircle.CreepCampCircle'"));
-	ringMesh->SetStaticMesh(ringStaticMesh.Object);
+	//const ConstructorHelpers::FObjectFinder<UStaticMesh> ringStaticMesh(TEXT("StaticMesh'/Game/CreepCamp/Models/CreepCampCircle.CreepCampCircle'"));
+	//ringMesh->SetStaticMesh(ringStaticMesh.Object);
 	ringMesh->SetRelativeScale3D(FVector(4.0f, 4.0f, 3.25f));
 	ringMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 5.5f));
 	ringMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
