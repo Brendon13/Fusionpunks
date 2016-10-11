@@ -192,6 +192,83 @@ void AHeroBase::HideCampProgress()
 	APlayerHUD* playerHUD = Cast<APlayerHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHUD());
 	playerHUD->HideCampProgress();
 }
+
+
+bool AHeroBase::CheckForNearbyEnemyCreeps() 
+{
+
+	
+	FCollisionObjectQueryParams obejctQP;
+
+	obejctQP.AddObjectTypesToQuery(Creeps);
+	
+	//Overlap multi by channel as a sphere (for pick ups?)
+	FCollisionQueryParams QueryParameters;
+	QueryParameters.AddIgnoredActor(this);
+	QueryParameters.OwnerTag = TEXT("Player");
+
+
+	TArray<FOverlapResult> Results;
+	GetWorld()->OverlapMultiByObjectType(Results,
+		GetActorLocation(),
+		FQuat(),
+		obejctQP,
+		FCollisionShape::MakeSphere(600.f),
+		QueryParameters);
+
+
+	nearbyEnemyCreeps.Empty();
+	if (Results.Num() > 0)
+	{
+		
+		for (int32 i = 0; i < Results.Num(); i++) 
+		{
+			nearbyEnemyCreeps.Add(Cast<ACreep>(Results[i].GetActor()));
+		}
+
+	}
+	return Results.Num() > 0;
+	
+		
+}
+bool AHeroBase::CheckForNearbyEnemyHero()
+{
+	
+	FCollisionObjectQueryParams obejctQP;
+
+	obejctQP.AddObjectTypesToQuery(AIHero);
+
+	//Overlap multi by channel as a sphere (for pick ups?)
+	FCollisionQueryParams QueryParameters;
+	QueryParameters.AddIgnoredActor(this);
+	QueryParameters.OwnerTag = TEXT("Player");
+
+
+	TArray<FOverlapResult> Results;
+	GetWorld()->OverlapMultiByObjectType(Results,
+		GetActorLocation(),
+		FQuat(),
+		obejctQP,
+		FCollisionShape::MakeSphere(300.f),
+		QueryParameters);
+
+
+
+	if (Results.Num() == 1)
+	{
+		nearbyEnemyHero = Cast<AHeroBase>(Results[0].GetActor());
+
+	}
+	return Results.Num() > 0;
+}
+
+
+
+
+
+
+
+
 void AHeroBase::StartAttack()
 {
 	UE_LOG(LogTemp, Display, TEXT("Basic Attack PRESSED"));
@@ -199,7 +276,7 @@ void AHeroBase::StartAttack()
 	AActor *closestEnemy;
 
 	FCollisionObjectQueryParams obejctQP;
-
+	obejctQP.AddObjectTypesToQuery(AIHero);
 	obejctQP.AddObjectTypesToQuery(Creeps);
 	obejctQP.AddObjectTypesToQuery(DamageableStructures);
 	//Overlap multi by channel as a sphere (for pick ups?)
@@ -311,7 +388,7 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	currentHealth -= DamageAmount;
 
-	UE_LOG(LogTemp, Log, TEXT("Tower took %f damage."), DamageAmount);
+	UE_LOG(LogTemp, Log, TEXT("Hero took %f damage."), DamageAmount);
 	if (currentHealth <= 0 && !bIsRespawning)
 	{
 		currentHealth = 0;

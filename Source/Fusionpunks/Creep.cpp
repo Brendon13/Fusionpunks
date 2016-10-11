@@ -148,8 +148,9 @@ void ACreep::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 
 float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	currentHealth -= Damage;
-
+	UE_LOG(LogTemp, Error, TEXT("Creep Took %f damage"), Damage);
 	if (FloatingDamageWidgetClass)
 	{
 		UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);

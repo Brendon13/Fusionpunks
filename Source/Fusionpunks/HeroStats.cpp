@@ -9,6 +9,7 @@ HeroStats::HeroStats(AHeroBase* Hero)
 {
 	hero = Hero;
 	currentHealth = hero->GetCurrentHealth();
+	healthPercent = hero->GetPlayerHealthPercentage();
 	respawnTime = hero->GetRespawnTime();
 	attackDamage = hero->GetAttackDamage();
 	level = hero->GetLevel();
@@ -16,6 +17,7 @@ HeroStats::HeroStats(AHeroBase* Hero)
 	team = hero->GetTeam();
 	capturedCamps = hero->GetCapturedCamps();
 	numCampsCaptured = capturedCamps.Num();
+	
 }
 
 HeroStats::~HeroStats()
@@ -25,6 +27,7 @@ HeroStats::~HeroStats()
 void HeroStats::UpdateStats()
 {
 	currentHealth = hero->GetCurrentHealth();
+	healthPercent = hero->GetPlayerHealthPercentage();
 	respawnTime = hero->GetRespawnTime();
 	attackDamage = hero->GetAttackDamage();
 	level = hero->GetLevel();
