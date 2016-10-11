@@ -22,6 +22,7 @@ EBTNodeResult::Type UBTTask_AttackCreeps::ExecuteTask(UBehaviorTreeComponent& Ow
 			bNotifyTick = true;
 			return EBTNodeResult::InProgress;
 		}
+		UE_LOG(LogTemp, Error, TEXT("Cant Find Creep To Attack"));
 		return EBTNodeResult::Failed;
 
 	}

@@ -54,8 +54,8 @@ ACreepCamp::ACreepCamp()
 void ACreepCamp::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ringRotation = ringMesh->GetComponentRotation();
+	if(ringMesh!= nullptr)
+		ringRotation = ringMesh->GetComponentRotation();
 	sphereTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACreepCamp::OnOverlapBegin);
 	sphereTrigger->OnComponentEndOverlap.AddDynamic(this, &ACreepCamp::OnOverlapEnd);
 	
@@ -162,6 +162,7 @@ void ACreepCamp::Tick( float DeltaTime )
 	}
 	//Rotate the ring every frame
 	ringRotation.Yaw += DeltaTime * ringRotationSpeed;
+	if (ringMesh != nullptr)
 	ringMesh->SetRelativeRotation(ringRotation);
 
 	//if cyber is capturing
@@ -186,7 +187,8 @@ void ACreepCamp::Tick( float DeltaTime )
 			ringMaterialAlpha -= DeltaTime * ringMaterialAlphaSpeed;
 		}
 		//set ring material to fade in and out
-		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), ringMaterialAlpha);
+		if (ringMesh != nullptr)
+			ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), ringMaterialAlpha);
 
 		//check capture progress
 		if (captureVariables.dieselCaptureProgress >= 0)
@@ -227,7 +229,8 @@ void ACreepCamp::Tick( float DeltaTime )
 		}
 
 		//set ring material to fade in and out
-		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), FMath::Sin(ringMaterialAlpha));
+		if (ringMesh != nullptr)
+			ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), FMath::Sin(ringMaterialAlpha));
 
 		if (captureVariables.cyberCaptureProgress >= 0)
 		{
@@ -405,7 +408,8 @@ void ACreepCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 		{
 			captureVariables.bDieselIsCapturing = false;
 		}
-		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
+		if (ringMesh != nullptr)
+			ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
 	}
 }
 
@@ -416,8 +420,10 @@ void ACreepCamp::SetToDieselCamp()
 	captureVariables.bDieselIsCapturing = false;
 	campType = ECampType::CT_Diesel;
 	//set color and transparency of ring
-	ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0, 0, 0));
-	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
+	if (ringMesh != nullptr) {
+		ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0, 0, 0));
+		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
+	}
 	dieselHero->AddToCapturedCamps(this);
 	cyberHero->RemoveFromCapturedCamps(this);
 
@@ -434,8 +440,11 @@ void ACreepCamp::SetToCyberCamp()
 	campType = ECampType::CT_Cyber;
 
 	//set color and transparency of ring 
-	ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0.0, 0.0f, 1.0f));
-	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
+	if (ringMesh != nullptr)
+	{
+		ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0.0, 0.0f, 1.0f));
+		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
+	}
 	cyberHero->AddToCapturedCamps(this);
 	dieselHero->RemoveFromCapturedCamps(this);
 
@@ -450,8 +459,11 @@ void ACreepCamp::SetToNeutralCamp()
 	campType = ECampType::CT_Neutral;
 
 	//set color and transparency of ring
-	ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(1.0f, 1.0f, 1.0f));
-	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
+	if (ringMesh != nullptr)
+	{
+		ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(1.0f, 1.0f, 1.0f));
+		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
+	}
 	dieselHero->RemoveFromCapturedCamps(this);
 	cyberHero->RemoveFromCapturedCamps(this);
 

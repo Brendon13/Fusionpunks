@@ -142,6 +142,7 @@ public:
 	FORCEINLINE  float GetAttackDamage() const { return basicAttackDamage; }
 	FORCEINLINE TArray<class ACreepCamp*> GetCapturedCamps() const { return capturedCamps; }
 	FORCEINLINE class HeroStats* GetHeroStats() const { return heroStats; }
+	
 	void AddToCapturedCamps(class ACreepCamp* camp);
 	void RemoveFromCapturedCamps(class ACreepCamp* camp);
 	void UpdateHeroStats();
@@ -159,6 +160,10 @@ protected:
 	class HeroStats* heroStats;
 
 	TArray<class ACreepCamp*> capturedCamps;
+
+	
+
+	
 	
 protected:
 	//function for Trigger Events

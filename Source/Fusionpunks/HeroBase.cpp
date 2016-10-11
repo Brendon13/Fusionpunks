@@ -5,6 +5,7 @@
 #include "PlayerHud.h"
 #include "Creep.h"
 #include "HeroStats.h"
+#include "Base.h"
 #include "RespawnOverTime.h"
 #include "PlayerCompassWidget.h"
 #include "CreepFormation.h"
@@ -93,8 +94,9 @@ void AHeroBase::BeginPlay()
 	
 	GetWorld()->GetAuthGameMode()->Children.Add(this);
 	respawnEffect = GetWorld()->SpawnActor<ARespawnOverTime>(respawnClass, FVector::ZeroVector, FRotator::ZeroRotator);
-	startingLocation = GetActorLocation();
 
+	startingLocation = GetActorLocation();
+	
 	if (Cast<UPlayerCompassWidget>(widgetComponent->GetUserWidgetObject()))
 	{
 		UPlayerCompassWidget* thisPlayerCompassWidget = Cast<UPlayerCompassWidget>(widgetComponent->GetUserWidgetObject());
@@ -103,6 +105,11 @@ void AHeroBase::BeginPlay()
 	heroStats = new HeroStats(this);
 	heroStats->DisplayStats();
 	LinkToCreepCamps();
+
+	
+		
+	
+	
 }
 
 // Called every frame
