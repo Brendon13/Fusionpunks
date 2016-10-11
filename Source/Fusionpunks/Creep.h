@@ -21,7 +21,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 	UFUNCTION(BlueprintCallable, Category = Stats)
-		const float GetHealthAsDecimal() const  { return currentHealth / maxHealth; }
+	FORCEINLINE float GetHealthAsDecimal() const  { return currentHealth / maxHealth; }
 
 	UFUNCTION(BlueprintCallable, Category = Stats)
 		void LevelUp();
@@ -112,12 +112,13 @@ protected:
 	AActor* EnemyTarget;
 public:
 	UFUNCTION(BlueprintCallable, Category = CampVariables)
-		float GetPatrolRadius();
+		FORCEINLINE float GetPatrolRadius() const { return patrolRadius; }
+
 
 	UFUNCTION(BlueprintCallable, Category = CampVariables)
-		ACreepCamp* GetCreepCampHome() const;
+		FORCEINLINE ACreepCamp* GetCreepCampHome() const { return (creepCampHome ? creepCampHome : nullptr);}
 
-	void SetToRun();
+	void SetToRun(); 
 	void SetToWalk();
 
 //stuff for Character Movement
@@ -149,7 +150,10 @@ protected:
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 public:
-	void JoinPlayerArmy(AActor* PlayerToFollow);
+	void JoinPlayerArmy(class AHeroBase* PlayerToFollow, int SlotAssignment);
+	int slotAssignment;
+	void SetPlayerToFollow(class AHeroBase* Hero) { playerToFollow = Hero; }
 private:
-	AActor* playerToFollow;
+	class AHeroBase* playerToFollow;
+	float distanceFromCamp;
 };

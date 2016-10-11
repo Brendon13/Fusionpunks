@@ -68,14 +68,18 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = HeroFunctions)
-		float GetPlayerHealthPercentage();
+		FORCEINLINE float GetPlayerHealthAsDecimal() const { return currentHealth / maxHealth; }
 
 	UFUNCTION(BlueprintCallable, Category = HeroFunctions)
-		float GetCurrentHealth();
+		FORCEINLINE float GetCurrentHealth() const { return currentHealth; }
 
 	UFUNCTION(BlueprintCallable, Category = HeroFunctions)
+<<<<<<< HEAD
 		float GetMaxHealth();
 	void Attack(AActor* enemy);
+=======
+		FORCEINLINE float GetMaxHealth() const { return maxHealth; }
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 
 protected:
 	void StartAttack();
@@ -157,7 +161,7 @@ protected:
 
 	TArray<class ACreepCamp*> capturedCamps;
 	
-private:
+protected:
 	//function for Trigger Events
 	UFUNCTION()
 		void OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
@@ -190,6 +194,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		int32 maxArmySize;
 
+<<<<<<< HEAD
 public:
 	
 	//AI HERO FUNCTIONS
@@ -203,10 +208,12 @@ public:
 	
 
 private:
+=======
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 	int32 currentArmySize;
-	
-	ACreepCamp* visitingCamp;
+
 	TArray<class ACreep*> CreepArmy;
+<<<<<<< HEAD
 
 
 	//AIHERO
@@ -219,4 +226,19 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UCreepFormation* creepFormationComp;
 
+=======
+	void UpdateCreepArmy();
+
+	ACreepCamp* visitingCamp;
+
+public:
+	FORCEINLINE TArray<ACreep*> GetCreepArmyArray() const { return CreepArmy;  }
+	void RemoveCreepFromArmy(class ACreep* creep);
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	class UCreepFormation* creepFormationComp;
+public:
+	FVector GetSlotPosition(int SlotNumber);
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 };

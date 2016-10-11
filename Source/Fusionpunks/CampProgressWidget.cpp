@@ -6,55 +6,35 @@
 
 #define LOCTEXT_NAMESPACE "MyNamespace"
 
-float UCampProgressWidget::GetCyberCaptureProgress() const
+FORCEINLINE float UCampProgressWidget::GetCyberCaptureProgress() const
 {
-	if (CurrentCamp != nullptr)
-	{
-		return CurrentCamp->GetCyberCapturePercentage();
-	}
-	else
-	{
-		return 0;
-	}
+	return (CurrentCamp != nullptr ? CurrentCamp->GetCyberCapturePercentage() : 0);
 }
 
-float UCampProgressWidget::GetDieselCaptureProgress() const
+FORCEINLINE float UCampProgressWidget::GetDieselCaptureProgress() const
 {
-	if (CurrentCamp != nullptr)
-	{
-		return CurrentCamp->GetDieselCapturePercentage();
-	}
-	else
-	{
-		return 0;
-	}
+	return (CurrentCamp != nullptr ? CurrentCamp->GetDieselCapturePercentage() : 0);
 }
 
-FText UCampProgressWidget::GetCyberProgressText() const
+FORCEINLINE FText UCampProgressWidget::GetCyberProgressText() const
 {
 	if (CurrentCamp != nullptr)
 	{
 		return FText::Format(LOCTEXT("CampProgress", "{0}%"), FText::AsNumber((int)(CurrentCamp->GetCyberCapturePercentage() * 100)));
 	}
-	else
-	{
-		return FText::AsNumber(0);
-	}
+	return FText::AsNumber(0);
 }
 
-FText UCampProgressWidget::GetDieselProgressText() const
+FORCEINLINE FText UCampProgressWidget::GetDieselProgressText() const
 {
 	if (CurrentCamp != nullptr)
 	{
 		return FText::Format(LOCTEXT("CampProgress", "{0}%"), FText::AsNumber((int)(CurrentCamp->GetDieselCapturePercentage() * 100)));
 	}
-	else
-	{
-		return FText::AsNumber(0);
-	}
+	return FText::AsNumber(0);
 }
 
-void UCampProgressWidget::SetCurrentCreepCamp(ACreepCamp* newCreepCamp)
+FORCEINLINE void UCampProgressWidget::SetCurrentCreepCamp(ACreepCamp* newCreepCamp)
 {
 	CurrentCamp = newCreepCamp;
 }

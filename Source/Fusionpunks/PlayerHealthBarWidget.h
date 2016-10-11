@@ -15,7 +15,7 @@ class FUSIONPUNKS_API UPlayerHealthBarWidget : public UUserWidget
 	
 public:
 	UFUNCTION(BlueprintCallable, Category = Player)
-		float GetPlayerHealthPercentage() const;
+		float GetPlayerHealthAsDecimal() const;
 
 	UFUNCTION(BlueprintCallable, Category = Player)
 		FText GetPlayerHealthText() const;	

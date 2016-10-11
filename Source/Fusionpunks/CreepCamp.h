@@ -92,6 +92,10 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick( float DeltaSeconds ) override;
 	void LinkToHeroes(class AHeroBase* hero);
+
+	FName team;
+	FORCEINLINE FName GetTeam() const { return team; }
+
 //enum, captureStruct, variablesStruct 
 private:
 	UPROPERTY(EditAnywhere, Category = Stats)
@@ -104,7 +108,6 @@ private:
 
 	class AHeroBase* dieselHero;
 	class AHeroBase* cyberHero;
-
 
 //creep class references
 private:
@@ -155,28 +158,24 @@ protected:
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 public:
-						//Brendon - Note: Move these to structs????
+	//Brendon - Note: Move these to structs????
 //Camp Capture Functions
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
-		float GetCyberCapturePercentage();
+		FORCEINLINE float GetCyberCapturePercentage() const { return captureVariables.cyberCaptureProgress / captureVariables.captureTime; }
 
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
-		float GetDieselCapturePercentage();
+		FORCEINLINE float GetDieselCapturePercentage() const {return captureVariables.dieselCaptureProgress / captureVariables.captureTime;}
 
 
 //Creep Spawning Functions
 public:
-	UFUNCTION(BlueprintCallable, Category = CampFunctions)
-		void MinusOneFromCreepCamp();
-
 	void RemoveCreep(ACreep* CreepInCamp);
 	void DestroyAllCreeps();
 
-	float GetDistanceValue() const;
-	void  SetDistanceValue(float value);
+	FORCEINLINE const float GetDistanceValue() const { return distanceValue; }
+	FORCEINLINE void SetDistanceValue(float value) { distanceValue = value; }
 
-	ECampType GetCampType();
-
+	FORCEINLINE const ECampType GetCampType() const {return campType;}
 
 //Creep Spawn Locations
 protected:
@@ -205,5 +204,9 @@ protected:
 		void SetToNeutralCamp();
 
 public:
+<<<<<<< HEAD
 	ACreep* SendCreepToPlayer(class AHeroBase* Player);
+=======
+	 ACreep* GetNextCreep(class AHeroBase* Hero);
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 };
