@@ -10,7 +10,15 @@
 UCreepFormation::UCreepFormation()
 {
 	bWantsBeginPlay = true;
+
+	PrimaryComponentTick.bCanEverTick = true;
+
+	formationType = EFormationType::FT_Line;
+
+	owningHero = Cast<AHeroBase>(GetOwner());
+
 	PrimaryComponentTick.bCanEverTick = false;
+
 }
 
 void UCreepFormation::BeginPlay()
@@ -21,6 +29,11 @@ void UCreepFormation::BeginPlay()
 void UCreepFormation::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
+
+
+	
+	
+
 
 	//if (owningHero)
 	//{
@@ -105,6 +118,7 @@ void UCreepFormation::CalculateSlotPositions(int ArmySize)
 			//implement 
 		}break;
 	}
+
 }
 
 

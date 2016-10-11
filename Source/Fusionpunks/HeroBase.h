@@ -74,11 +74,15 @@ public:
 		FORCEINLINE float GetCurrentHealth() const { return currentHealth; }
 
 	UFUNCTION(BlueprintCallable, Category = HeroFunctions)
+		float GetMaxHealth();
+	void Attack(AActor* enemy);
+
 		FORCEINLINE float GetMaxHealth() const { return maxHealth; }
+
 
 protected:
 	void StartAttack();
-	void Attack(AActor* enemy);
+	
 	void AdjustCameraZoom(float Value);
 	void SwapAICamera();
 
@@ -103,8 +107,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float damageIncreasePerLevel;
 
-	float currentHealth;
-	
+	UPROPERTY(VisibleAnywhere)
+		float currentHealth;
+	UPROPERTY(VisibleAnywhere)
+		float healthPercent;
+
 	int32 currentLevel;
 	
 
@@ -134,6 +141,7 @@ public:
 	FORCEINLINE  int32 GetLevel() const { return currentLevel; }
 	FORCEINLINE  float GetAttackDamage() const { return basicAttackDamage; }
 	FORCEINLINE TArray<class ACreepCamp*> GetCapturedCamps() const { return capturedCamps; }
+	FORCEINLINE class HeroStats* GetHeroStats() const { return heroStats; }
 	void AddToCapturedCamps(class ACreepCamp* camp);
 	void RemoveFromCapturedCamps(class ACreepCamp* camp);
 	void UpdateHeroStats();
@@ -174,7 +182,7 @@ public:
 	FORCEINLINE FName GetTeam() const { return team; }
 
 	UPROPERTY(EditDefaultsOnly)
-		UWidgetComponent* widgetComponent;
+		class UWidgetComponent* widgetComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category = Widgets)
 		TSubclassOf<class UPlayerCompassWidget> CompassWidgetClass;
@@ -185,9 +193,36 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		int32 maxArmySize;
 
+
+public:
+	
+	//AI HERO FUNCTIONS
+	// USE ONLY WITH AI HERO TASKS!!
+
+	bool CheckForNearbyEnemyCreeps();
+
+	bool CheckForNearbyEnemyHero();
+
+	FORCEINLINE TArray<class ACreep*> GetNearbyEnemyCreeps() const { return nearbyEnemyCreeps; }
+	
+
+private:
+
+
 	int32 currentArmySize;
 
 	TArray<class ACreep*> CreepArmy;
+
+
+
+	//AIHERO
+	TArray<class ACreep*> nearbyEnemyCreeps;
+	AHeroBase* nearbyEnemyHero;
+
+
+public:
+	TArray<ACreep*> AHeroBase::GetCreepArmyArray();
+	
 	void UpdateCreepArmy();
 
 	ACreepCamp* visitingCamp;
@@ -201,4 +236,5 @@ protected:
 	class UCreepFormation* creepFormationComp;
 public:
 	FVector GetSlotPosition(int SlotNumber);
+
 };

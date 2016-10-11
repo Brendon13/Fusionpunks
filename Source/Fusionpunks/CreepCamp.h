@@ -124,14 +124,14 @@ private:
 //Meshes and triggers 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = Appearance)
-		UStaticMeshComponent* campMesh; 
+		class UStaticMeshComponent* campMesh; 
 
 	UPROPERTY(EditDefaultsOnly, Category = CollisionComponents)
-		USphereComponent* sphereTrigger;
+		class USphereComponent* sphereTrigger;
 
 	//mesh for the ring around the camp
 	UPROPERTY(EditDefaultsOnly, Category = Appearance)
-		UStaticMeshComponent* ringMesh;
+		class UStaticMeshComponent* ringMesh;
 
 
 //Ring Rotations Stuff
@@ -204,5 +204,9 @@ protected:
 		void SetToNeutralCamp();
 
 public:
-	 ACreep* GetNextCreep(class AHeroBase* Hero);
+
+	ACreep* SendCreepToPlayer(class AHeroBase* Player);
+
+	ACreep* GetNextCreep(class AHeroBase* Hero);
+
 };

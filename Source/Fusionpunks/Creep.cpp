@@ -156,8 +156,9 @@ void ACreep::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 
 float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	currentHealth -= Damage;
-
+	UE_LOG(LogTemp, Error, TEXT("Creep Took %f damage"), Damage);
 	if (FloatingDamageWidgetClass)
 	{
 		UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
@@ -292,12 +293,17 @@ float ACreep::MeleeAttack()
 
 FORCEINLINE void ACreep::SetToWalk()
 {
+
 	GetCharacterMovement()->MaxWalkSpeed = patrolMovementSpeed;
+
 }
 
 FORCEINLINE void ACreep::SetToRun()
 {
+
+
 	GetCharacterMovement()->MaxWalkSpeed = runSpeed; 
+
 }
 
 void ACreep::JoinPlayerArmy(AHeroBase* PlayerToFollow, int SlotAssignment)
@@ -305,11 +311,13 @@ void ACreep::JoinPlayerArmy(AHeroBase* PlayerToFollow, int SlotAssignment)
 	//NOTE::Brendon - Might not need reference to player to follow in class
 	playerToFollow = PlayerToFollow;
 	bBelongsToCamp = false; 
+
 	slotAssignment = SlotAssignment;
 
 	UCharacterMovementComponent* movementComp = GetCharacterMovement();
 	movementComp->MaxWalkSpeed = runSpeed;
 	//GetCharacterMovement()->MaxWalkSpeed = runSpeed;
+
 
 	ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
 	if (AiController)
