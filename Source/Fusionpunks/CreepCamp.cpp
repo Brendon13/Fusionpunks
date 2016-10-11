@@ -69,6 +69,7 @@ void ACreepCamp::BeginPlay()
 
 	if (campType == ECampType::CT_Cyber)
 	{
+		team = FName::FName(TEXT("Cyber"));
 		FActorSpawnParameters spawnParameters;
 		spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
@@ -92,6 +93,8 @@ void ACreepCamp::BeginPlay()
 	}
 	else if (campType == ECampType::CT_Diesel)
 	{
+		team = FName::FName(TEXT("Diesel"));
+
 		FActorSpawnParameters spawnParameters;
 		spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
@@ -115,6 +118,8 @@ void ACreepCamp::BeginPlay()
 	}
 	else
 	{
+		team = FName::FName(TEXT("Neutral"));
+
 		FActorSpawnParameters spawnParameters;
 		spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
@@ -404,18 +409,10 @@ void ACreepCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 	}
 }
 
-float ACreepCamp::GetCyberCapturePercentage()
-{
-	return captureVariables.cyberCaptureProgress / captureVariables.captureTime;
-}
-
-float ACreepCamp::GetDieselCapturePercentage()
-{
-	return captureVariables.dieselCaptureProgress / captureVariables.captureTime;
-}
-
 void ACreepCamp::SetToDieselCamp()
 {
+	team = FName::FName(TEXT("Diesel"));
+
 	captureVariables.bDieselIsCapturing = false;
 	campType = ECampType::CT_Diesel;
 	//set color and transparency of ring
@@ -432,6 +429,7 @@ void ACreepCamp::SetToDieselCamp()
 //change camp functionality to cyber function
 void ACreepCamp::SetToCyberCamp()
 {
+	team = FName::FName(TEXT("Cyber"));
 	captureVariables.bCyberIsCapturing = false;
 	campType = ECampType::CT_Cyber;
 
@@ -448,6 +446,7 @@ void ACreepCamp::SetToCyberCamp()
 
 void ACreepCamp::SetToNeutralCamp()
 {
+	team = FName::FName(TEXT("Neutral"));
 	campType = ECampType::CT_Neutral;
 
 	//set color and transparency of ring
@@ -460,12 +459,6 @@ void ACreepCamp::SetToNeutralCamp()
 	cyberHero->UpdateHeroStats();
 	dieselHero->UpdateHeroStats();
 }
-
-void ACreepCamp::MinusOneFromCreepCamp()
-{
-	spawningVariables.creepCount--;
-}
-
 
 void ACreepCamp::RemoveCreep(ACreep* CreepInCamp)
 {
@@ -488,32 +481,6 @@ void ACreepCamp::DestroyAllCreeps()
 	}
 }
 
-ACreep* ACreepCamp::SendCreepToPlayer(AHeroBase* Player)
-{
-	if (creepArray.Num() > 0)
-	{
-		creepArray[0]->JoinPlayerArmy(Player);
-		return creepArray.Pop();
-	}
-	else
-	{
-		return nullptr;
-	}
-}
-
-float ACreepCamp::GetDistanceValue() const {
-	return distanceValue;
-}
-
-void ACreepCamp::SetDistanceValue(float value) {
-	distanceValue = value;
-}
-
-ECampType ACreepCamp::GetCampType()
-{
-	return campType;
-}
-
 void ACreepCamp::LinkToHeroes(AHeroBase* hero)
 {
 	if (hero->GetTeam().Compare(FName::FName(TEXT("Cyber"))) == 0)
@@ -526,4 +493,14 @@ void ACreepCamp::LinkToHeroes(AHeroBase* hero)
 		dieselHero = hero;
 		UE_LOG(LogTemp, Log, TEXT("Found Diesel Hero."));
 	}
+}
+
+ACreep* ACreepCamp::GetNextCreep(AHeroBase* Hero)
+{
+	const bool bSameTeam = team.IsEqual(Hero->GetTeam());
+	if (bSameTeam)
+	{
+		return (creepArray.Num() > 0 ? creepArray.Pop() : nullptr);
+	}
+	return nullptr;
 }

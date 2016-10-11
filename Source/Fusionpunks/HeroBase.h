@@ -68,13 +68,13 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = HeroFunctions)
-		float GetPlayerHealthPercentage();
+		FORCEINLINE float GetPlayerHealthAsDecimal() const { return currentHealth / maxHealth; }
 
 	UFUNCTION(BlueprintCallable, Category = HeroFunctions)
-		float GetCurrentHealth();
+		FORCEINLINE float GetCurrentHealth() const { return currentHealth; }
 
 	UFUNCTION(BlueprintCallable, Category = HeroFunctions)
-		float GetMaxHealth();
+		FORCEINLINE float GetMaxHealth() const { return maxHealth; }
 
 protected:
 	void StartAttack();
@@ -152,7 +152,7 @@ protected:
 
 	TArray<class ACreepCamp*> capturedCamps;
 	
-private:
+protected:
 	//function for Trigger Events
 	UFUNCTION()
 		void OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
@@ -184,14 +184,21 @@ protected:
 	virtual void RecruitCreep();
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		int32 maxArmySize;
-private:
+
 	int32 currentArmySize;
-	
-	ACreepCamp* visitingCamp;
+
 	TArray<class ACreep*> CreepArmy;
+	void UpdateCreepArmy();
+
+	ACreepCamp* visitingCamp;
 
 public:
-	TArray<ACreep*> AHeroBase::GetCreepArmyArray();
+	FORCEINLINE TArray<ACreep*> GetCreepArmyArray() const { return CreepArmy;  }
+	void RemoveCreepFromArmy(class ACreep* creep);
+
+protected:
 	UPROPERTY(EditDefaultsOnly)
 	class UCreepFormation* creepFormationComp;
+public:
+	FVector GetSlotPosition(int SlotNumber);
 };

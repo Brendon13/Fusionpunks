@@ -7,6 +7,7 @@
 #include "HeroStats.h"
 #include "RespawnOverTime.h"
 #include "PlayerCompassWidget.h"
+#include "CreepFormation.h"
 #include "HeroBase.h"
 
 
@@ -108,7 +109,6 @@ void AHeroBase::BeginPlay()
 void AHeroBase::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-
 }
 
 // Called to bind functionality to input
@@ -281,21 +281,6 @@ void AHeroBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* O
 	}
 }
 
-float AHeroBase::GetPlayerHealthPercentage()
-{
-	return currentHealth / maxHealth;
-}
-
-float AHeroBase::GetCurrentHealth()
-{
-	return currentHealth;
-}
-
-float AHeroBase::GetMaxHealth()
-{
-	return maxHealth;
-}
-
 void AHeroBase::LevelUp()
 {
 	currentLevel++;
@@ -328,33 +313,47 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 
 void AHeroBase::RecruitCreep()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Recruit Creep!"));
 	if (visitingCamp)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("At Camp!"));
 		if (currentArmySize < maxArmySize)
 		{
-			ACreep* creep = visitingCamp->SendCreepToPlayer(this);
+			ACreep* creep = visitingCamp->GetNextCreep(this);
 			if (creep)
 			{
 				//IMPLEMENT SOUND TO PLAY!
 				currentArmySize++;
 				CreepArmy.Add(creep);
-				creep->JoinPlayerArmy(this);
-				UE_LOG(LogTemp, Warning, TEXT("Creep successfully recruited!"));
+				creepFormationComp->CalculateSlotPositions(currentArmySize);
+				creep->JoinPlayerArmy(this, currentArmySize);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Cannot recruit creeps from the opposing teams!"));
+				return;
 			}
 		}
 		else
 		{
 		    //DISPLAY MESSAGE TO PLAYER THAT HE IS AT HIS MAX CREEP ARMY SIZE!
 			UE_LOG(LogTemp, Warning, TEXT("At max creep army size!"));
+			return;
 		}
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Not near a camp to recruit a creep!"));
 	}
-	
+}
+
+void AHeroBase::RemoveCreepFromArmy(ACreep* creep)
+{
+	if (CreepArmy.Contains(creep))
+	{
+		CreepArmy.Remove(creep);
+		currentArmySize--;
+		creepFormationComp->CalculateSlotPositions(currentArmySize);
+		UpdateCreepArmy();
+	}
 }
 
 void AHeroBase::SwapAICamera()
@@ -371,6 +370,7 @@ void AHeroBase::SwapAICamera()
 		OurPlayerController->SetViewTargetWithBlend(this);
 	}
 }
+
 void AHeroBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
@@ -410,10 +410,20 @@ void AHeroBase::UpdateHeroStats()
 {
 	heroStats->UpdateStats();
 	heroStats->DisplayStats();
-
 }
 
-TArray<ACreep*> AHeroBase::GetCreepArmyArray()
+
+void AHeroBase::UpdateCreepArmy()
 {
-	return CreepArmy;
+	for (int32 i = 1; i <= currentArmySize; i++)
+	{
+		CreepArmy[i]->slotAssignment = i;
+	}
+}
+
+FVector AHeroBase::GetSlotPosition(int SlotNumber)
+{
+	FVector pos = creepFormationComp->GetPositionInFormation(SlotNumber);
+	pos += GetActorLocation();
+	return pos; 
 }
