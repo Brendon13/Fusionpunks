@@ -490,14 +490,12 @@ void AHeroBase::UpdateHeroStats()
 }
 
 
-<<<<<<< HEAD
-}
 
 TArray<ACreep*> AHeroBase::GetCreepArmyArray()
 {
 	return CreepArmy;
 }
-=======
+
 void AHeroBase::UpdateCreepArmy()
 {
 	for (int32 i = 1; i <= currentArmySize; i++)
@@ -512,4 +510,8 @@ FVector AHeroBase::GetSlotPosition(int SlotNumber)
 	pos += GetActorLocation();
 	return pos; 
 }
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
+
+float AHeroBase::GetMaxHealth() 
+{
+	return maxHealth;
+}

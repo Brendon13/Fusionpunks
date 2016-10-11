@@ -293,27 +293,17 @@ float ACreep::MeleeAttack()
 
 FORCEINLINE void ACreep::SetToWalk()
 {
-<<<<<<< HEAD
-	if (GetCharacterMovement())
-	{
-		GetCharacterMovement()->MaxWalkSpeed = runSpeed;
-	}
-	
-=======
+
 	GetCharacterMovement()->MaxWalkSpeed = patrolMovementSpeed;
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
+
 }
 
 FORCEINLINE void ACreep::SetToRun()
 {
-<<<<<<< HEAD
-	if (GetCharacterMovement())
-	{
-		GetCharacterMovement()->MaxWalkSpeed = patrolMovementSpeed;
-	}
-=======
+
+
 	GetCharacterMovement()->MaxWalkSpeed = runSpeed; 
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
+
 }
 
 void ACreep::JoinPlayerArmy(AHeroBase* PlayerToFollow, int SlotAssignment)
@@ -321,24 +311,13 @@ void ACreep::JoinPlayerArmy(AHeroBase* PlayerToFollow, int SlotAssignment)
 	//NOTE::Brendon - Might not need reference to player to follow in class
 	playerToFollow = PlayerToFollow;
 	bBelongsToCamp = false; 
-<<<<<<< HEAD
 
-	try
-	{
-		GetCharacterMovement()->MaxWalkSpeed = runSpeed;
-	}
-	catch (const std::exception&)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Error setting creep movement speed to run in JoinPlayerArmy"));
-	}
-	
-=======
 	slotAssignment = SlotAssignment;
 
 	UCharacterMovementComponent* movementComp = GetCharacterMovement();
 	movementComp->MaxWalkSpeed = runSpeed;
 	//GetCharacterMovement()->MaxWalkSpeed = runSpeed;
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
+
 
 	ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
 	if (AiController)

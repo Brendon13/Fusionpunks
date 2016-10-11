@@ -9,7 +9,7 @@ HeroStats::HeroStats(AHeroBase* Hero)
 {
 	hero = Hero;
 	currentHealth = hero->GetCurrentHealth();
-	healthPercent = hero->GetPlayerHealthPercentage();
+	healthPercent = hero->GetPlayerHealthAsDecimal();
 	respawnTime = hero->GetRespawnTime();
 	attackDamage = hero->GetAttackDamage();
 	level = hero->GetLevel();
@@ -27,7 +27,7 @@ HeroStats::~HeroStats()
 void HeroStats::UpdateStats()
 {
 	currentHealth = hero->GetCurrentHealth();
-	healthPercent = hero->GetPlayerHealthPercentage();
+	healthPercent = hero->GetPlayerHealthAsDecimal();
 	respawnTime = hero->GetRespawnTime();
 	attackDamage = hero->GetAttackDamage();
 	level = hero->GetLevel();

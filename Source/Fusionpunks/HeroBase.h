@@ -74,12 +74,11 @@ public:
 		FORCEINLINE float GetCurrentHealth() const { return currentHealth; }
 
 	UFUNCTION(BlueprintCallable, Category = HeroFunctions)
-<<<<<<< HEAD
 		float GetMaxHealth();
 	void Attack(AActor* enemy);
-=======
+
 		FORCEINLINE float GetMaxHealth() const { return maxHealth; }
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
+
 
 protected:
 	void StartAttack();
@@ -194,7 +193,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		int32 maxArmySize;
 
-<<<<<<< HEAD
+
 public:
 	
 	//AI HERO FUNCTIONS
@@ -208,12 +207,12 @@ public:
 	
 
 private:
-=======
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
+
+
 	int32 currentArmySize;
 
 	TArray<class ACreep*> CreepArmy;
-<<<<<<< HEAD
+
 
 
 	//AIHERO
@@ -223,10 +222,7 @@ private:
 
 public:
 	TArray<ACreep*> AHeroBase::GetCreepArmyArray();
-	UPROPERTY(EditDefaultsOnly)
-	class UCreepFormation* creepFormationComp;
-
-=======
+	
 	void UpdateCreepArmy();
 
 	ACreepCamp* visitingCamp;
@@ -240,5 +236,5 @@ protected:
 	class UCreepFormation* creepFormationComp;
 public:
 	FVector GetSlotPosition(int SlotNumber);
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
+
 };

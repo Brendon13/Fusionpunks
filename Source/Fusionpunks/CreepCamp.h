@@ -204,9 +204,9 @@ protected:
 		void SetToNeutralCamp();
 
 public:
-<<<<<<< HEAD
+
 	ACreep* SendCreepToPlayer(class AHeroBase* Player);
-=======
-	 ACreep* GetNextCreep(class AHeroBase* Hero);
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
+
+	ACreep* GetNextCreep(class AHeroBase* Hero);
+
 };

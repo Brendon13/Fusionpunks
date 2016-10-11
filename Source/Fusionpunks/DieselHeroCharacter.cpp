@@ -28,10 +28,7 @@ ADieselHeroCharacter::ADieselHeroCharacter()
 	bIsDashing = false;
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ADieselHeroCharacter::OnHit);
 
-<<<<<<< HEAD
 
-=======
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 	Tags.Add(TEXT("Diesel"));
 	team = FName::FName(TEXT("Diesel"));
 }
