@@ -20,7 +20,7 @@ void UPlayerCompassWidget::NativeTick(const FGeometry& MyGeometry, float InDelta
 
 	if (owningHero != nullptr)
 	{
-		if (owningHero->GetPlayerHealthPercentage() <= 0.15f)
+		if (owningHero->GetPlayerHealthAsDecimal() <= 0.15f)
 		{
 			if (PulseAnimation && !IsPlayingAnimation())
 			{
@@ -39,8 +39,8 @@ FLinearColor UPlayerCompassWidget::SetCompassColor() const
 {
 	if (owningHero != nullptr)
 	{
-		float red = (1 - owningHero->GetPlayerHealthPercentage());
-		float green = owningHero->GetPlayerHealthPercentage();
+		float red = (1 - owningHero->GetPlayerHealthAsDecimal());
+		float green = owningHero->GetPlayerHealthAsDecimal();
 		float blue = 0;
 		return FLinearColor::FLinearColor(red, green, blue, imageAlpha);
 	}

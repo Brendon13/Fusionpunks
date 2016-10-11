@@ -6,6 +6,7 @@
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 #include "FloatingDamageWidget.h"
 #include "CreepAIController.h"
+#include "HeroBase.h"
 #include "Creep.h"
 
 
@@ -48,6 +49,7 @@ ACreep::ACreep()
 	patrolRadius = 2000.0f;
 	GetCharacterMovement()->MaxWalkSpeed = 150.0f;
 	BaseTurnRate = 45.f;
+	distanceFromCamp = 0;
 
 	meleeAttackCooldown = 2.0f;
 	meleeAttackCooldownTimer = -0.1f;
@@ -113,18 +115,24 @@ void ACreep::Tick( float DeltaTime )
 		meleeAttackCooldownTimer -= DeltaTime;
 		bCanMeleeAttack = meleeAttackCooldownTimer <= 0;
 	}
-	float distance = 0;
+	distanceFromCamp = 0;
 	if (creepCampHome)
 	{
-		distance = (GetActorLocation() - creepCampHome->GetActorLocation()).Size();
+		distanceFromCamp = (GetActorLocation() - creepCampHome->GetActorLocation()).Size();
+
+		if (distanceFromCamp > chaseDistance)
+		{
+			EnemyTarget = nullptr;
+			ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
+			AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", nullptr);
+			SetToWalk();
+		}
 	}
 
-	if (distance > chaseDistance)
+	if (!bBelongsToCamp)
 	{
-		EnemyTarget = nullptr;
 		ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
-		AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", nullptr);
-		SetToWalk();	
+		AiController->GetBlackboardComponent()->SetValueAsVector("FormationPosition", playerToFollow->GetSlotPosition(slotAssignment));
 	}
 }
 
@@ -157,13 +165,15 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 		floatingDamageWidget->AddToViewport();
 	}
 	
-
 	if (currentHealth <= 0)
 	{
 		if (bBelongsToCamp && creepCampHome != nullptr)
 		{
 			creepCampHome->RemoveCreep(this);
-			//creepCampHome->MinusOneFromCreepCamp();
+		}
+		else if (!bBelongsToCamp && playerToFollow)
+		{
+			playerToFollow->RemoveCreepFromArmy(this);
 		}
 		this->Destroy();
 	}
@@ -190,25 +200,6 @@ void ACreep::SetCreepCampHome(ACreepCamp* home, bool BelongsToCamp = false)
 	{
 		AiController->GetBlackboardComponent()->SetValueAsBool(TEXT("belongsToCamp"), bBelongsToCamp);
 		AiController->GetBlackboardComponent()->SetValueAsObject(TEXT("CreepCampHome"), creepCampHome);
-	}
-}
-
-UFUNCTION()
-float ACreep::GetPatrolRadius()
-{
-	return patrolRadius;
-}
-
-UFUNCTION()
-ACreepCamp* ACreep::GetCreepCampHome() const
-{
-	if (creepCampHome)
-	{
-		return creepCampHome;
-	}
-	else
-	{
-		return nullptr;
 	}
 }
 
@@ -266,7 +257,6 @@ void ACreep::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* O
 			AiController->GetBlackboardComponent()->SetValueAsObject("SelfActor", this);
 			AiController->RestartBehaviorTree();
 		}
-		
 	}
 }
 
@@ -300,44 +290,33 @@ float ACreep::MeleeAttack()
 	}
 }
 
-void ACreep::SetToRun()
+FORCEINLINE void ACreep::SetToWalk()
 {
-	if (GetCharacterMovement())
-	{
-		GetCharacterMovement()->MaxWalkSpeed = runSpeed;
-	}
-	
+	GetCharacterMovement()->MaxWalkSpeed = patrolMovementSpeed;
 }
 
-void ACreep::SetToWalk()
+FORCEINLINE void ACreep::SetToRun()
 {
-	if (GetCharacterMovement())
-	{
-		GetCharacterMovement()->MaxWalkSpeed = patrolMovementSpeed;
-	}
+	GetCharacterMovement()->MaxWalkSpeed = runSpeed; 
 }
 
-void ACreep::JoinPlayerArmy(AActor* PlayerToFollow)
+void ACreep::JoinPlayerArmy(AHeroBase* PlayerToFollow, int SlotAssignment)
 {
 	//NOTE::Brendon - Might not need reference to player to follow in class
 	playerToFollow = PlayerToFollow;
 	bBelongsToCamp = false; 
+	slotAssignment = SlotAssignment;
 
-	try
-	{
-		GetCharacterMovement()->MaxWalkSpeed = runSpeed;
-	}
-	catch (const std::exception&)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Error setting creep movement speed to run in JoinPlayerArmy"));
-	}
-	
+	UCharacterMovementComponent* movementComp = GetCharacterMovement();
+	movementComp->MaxWalkSpeed = runSpeed;
+	//GetCharacterMovement()->MaxWalkSpeed = runSpeed;
 
 	ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
 	if (AiController)
 	{
 		AiController->GetBlackboardComponent()->SetValueAsObject("HeroToFollow", playerToFollow);
 		AiController->GetBlackboardComponent()->SetValueAsBool("belongsToCamp", false);
+		AiController->GetBlackboardComponent()->SetValueAsVector("SlotPosition", playerToFollow->GetSlotPosition(slotAssignment));
 		AiController->RestartBehaviorTree();
 		creepCampHome = nullptr;
 	}

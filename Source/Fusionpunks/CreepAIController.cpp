@@ -45,11 +45,6 @@ void ACreepAIController::UpdateControlRotation(float DeltaTime, bool bUpdatePawn
 	Super::UpdateControlRotation(DeltaTime, bUpdatePawn);
 }
 
-UBlackboardComponent* ACreepAIController::GetBlackboardComponent()
-{
-	return BlackboardComponent;
-}
-
 void ACreepAIController::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
 {
 	if (BlackboardComponent)

@@ -24,7 +24,7 @@ public:
 	virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn) override; 
 
 	UFUNCTION(BlueprintCallable, Category = Components)
-	UBlackboardComponent* GetBlackboardComponent();
+		FORCEINLINE UBlackboardComponent* GetBlackboardComponent() const { return BlackboardComponent; }
 
 	UFUNCTION(BlueprintCallable, Category = AI)
 	virtual void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result) override;

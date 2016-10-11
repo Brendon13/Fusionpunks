@@ -6,7 +6,7 @@
 
 #define LOCTEXT_NAMESPACE "MyNamespace"
 
-float UPlayerHealthBarWidget::GetPlayerHealthPercentage() const
+float UPlayerHealthBarWidget::GetPlayerHealthAsDecimal() const
 {
 	AHeroBase* MyCharacter = Cast<AHeroBase>(GetOwningPlayerPawn());
 
