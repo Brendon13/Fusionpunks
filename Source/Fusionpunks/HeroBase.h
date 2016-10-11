@@ -208,8 +208,15 @@ private:
 	ACreepCamp* visitingCamp;
 	TArray<class ACreep*> CreepArmy;
 
+
 	//AIHERO
 	TArray<class ACreep*> nearbyEnemyCreeps;
 	AHeroBase* nearbyEnemyHero;
+
+
+public:
+	TArray<ACreep*> AHeroBase::GetCreepArmyArray();
+	UPROPERTY(EditDefaultsOnly)
+	class UCreepFormation* creepFormationComp;
 
 };

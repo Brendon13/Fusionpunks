@@ -1,0 +1,45 @@
+﻿Merge remote-tracking branch 'refs/remotes/origin/Master-(Do-Not-Touch)' into andrewBranch2
+
+# Conflicts:
+#	.vs/Fusionpunks/v14/.suo
+#	Binaries/Win64/FusionpunksEditor.target
+#	Binaries/Win64/UE4Editor-Fusionpunks-6706.pdb
+#	Binaries/Win64/UE4Editor-Fusionpunks.dll
+#	Binaries/Win64/UE4Editor-Fusionpunks.pdb
+#	Binaries/Win64/UE4Editor.modules
+#	Content/Heroes/AI/GeneralRank_AI.uasset
+#	Content/Heroes/AI/Prophet_AI.uasset
+#	Content/Heroes/Prophet/Prophet_BP.uasset
+#	Content/Levels/GameMap.umap
+#	Fusionpunks.sln
+#	Source/Fusionpunks/DieselHeroCharacter.cpp
+#	Source/Fusionpunks/HeroBase.h
+#
+# It looks like you may be committing a merge.
+# If this is not correct, please remove the file
+#	.git/MERGE_HEAD
+# and try again.
+
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch andrewBranch2
+# Your branch is up-to-date with 'origin/andrewBranch2'.
+#
+# All conflicts fixed but you are still merging.
+#
+# Changes to be committed:
+#	deleted:    Content/AIStuff/Creeps/CreepBlackboard_BB.uasset
+#	renamed:    Content/AIStuff/Creeps/CreepBehaviorTree.uasset -> Content/Creeps/AI/CreepBehaviorTree.uasset
+#	modified:   Content/Creeps/AI/CreepBlackboard_BB.uasset
+#	modified:   Fusionpunks.sln
+#	modified:   Source/Fusionpunks/Creep.cpp
+#	modified:   Source/Fusionpunks/CreepAIController.cpp
+#	new file:   Source/Fusionpunks/CreepFormation.cpp
+#	new file:   Source/Fusionpunks/CreepFormation.h
+#	modified:   Source/Fusionpunks/CyberHeroCharacter.cpp
+#	modified:   Source/Fusionpunks/DieselHeroCharacter.cpp
+#	modified:   Source/Fusionpunks/HeroBase.cpp
+#	modified:   Source/Fusionpunks/HeroBase.h
+#
+

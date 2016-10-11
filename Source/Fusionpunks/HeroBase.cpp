@@ -78,7 +78,7 @@ AHeroBase::AHeroBase()
 	}
 
 	
-	
+	creepFormationComp = CreateDefaultSubobject<UCreepFormation>(TEXT("CreepFormationComponent"));
 	
 }
 
@@ -488,4 +488,9 @@ void AHeroBase::UpdateHeroStats()
 	heroStats->UpdateStats();
 	heroStats->DisplayStats();
 
+}
+
+TArray<ACreep*> AHeroBase::GetCreepArmyArray()
+{
+	return CreepArmy;
 }

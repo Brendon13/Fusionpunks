@@ -27,7 +27,9 @@ ADieselHeroCharacter::ADieselHeroCharacter()
 	dashTimer = dashMaxTime;
 	bIsDashing = false;
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ADieselHeroCharacter::OnHit);
-	healthPercent = GetPlayerHealthPercentage();
+
+
+	Tags.Add(TEXT("Diesel"));
 	team = FName::FName(TEXT("Diesel"));
 }
 
