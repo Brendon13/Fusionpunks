@@ -38,6 +38,8 @@ ACreep::ACreep()
 	}
 
 	AIControllerClass = ACreepAIController::StaticClass();
+	GetMesh()->bReceivesDecals = false; 
+	GetCapsuleComponent()->SetCanEverAffectNavigation(true);
 
 	//NOTE::BRENDON - Will have to change current level based on players level when spawned from a controlled camp 
 	//i.e. Diesel hero is level 9 -> creep should also be level 9 
@@ -151,17 +153,36 @@ void ACreep::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
 	InputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	InputComponent->BindAxis("TurnRate", this, &ACreep::TurnAtRate);
-
 }
 
 float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	if (EnemyTarget == nullptr)
+	{
+		EnemyTarget = DamageCauser;
+		ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
+		AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", EnemyTarget);
+		SetToRun();
+		AiController->RestartBehaviorTree();
+	}
 	currentHealth -= Damage;
+	//UE_LOG(LogTemp, Error, TEXT("Creep Took %f damage"), Damage);
+
+	/*APlayerController* playerController = Cast<APlayerController>(EventInstigator);
+	if (playerController)
+	{
+
+	}*/
 
 	if (FloatingDamageWidgetClass)
 	{
 		UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
+		//floatingDamageWidget->SetVisibility(ESlateVisibility::Hidden);
+		floatingDamageWidget->SetAlignmentInViewport(FVector2D::FVector2D(0.5f, 0.5f));
 		floatingDamageWidget->SetIncDamage(Damage);
+		floatingDamageWidget->SetOwningPawn(this);
 		floatingDamageWidget->AddToViewport();
 	}
 	
@@ -237,15 +258,15 @@ void ACreep::MoveRight(float Value)
 		AddMovementInput(Direction, Value);
 	}
 }
-
+//NOTE::IF CREEP GETS ATTACKED WALKING BACK TO CAMP ATTACK PLAYER 
 //function for Trigger Events
 UFUNCTION()
 void ACreep::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-	//if we are a neutral creep
+	//if we are a neutral creep attack enemy targets 
 	if(bBelongsToCamp && EnemyTarget == nullptr && OtherActor->Tags.Contains(team) == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Creep Entered Player Trigger!"));
+		//UE_LOG(LogTemp, Warning, TEXT("Creep Entered Player Trigger!"));
 		EnemyTarget = OtherActor;
 		SetToRun();
 		ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
@@ -265,6 +286,10 @@ UFUNCTION()
 void ACreep::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Creep Exited Trigger!"));
+	if (EnemyTarget == OtherActor)
+	{
+		ClearEnemyTarget();
+	}
 }
 
 void ACreep::ClearEnemyTarget()
@@ -280,12 +305,12 @@ float ACreep::MeleeAttack()
 	{
 		meleeAttackCooldownTimer = meleeAttackCooldown;
 		bCanMeleeAttack = false; 
-		UE_LOG(LogTemp, Warning, TEXT("Creep Attacked for: %f"), attackPower);
+		//UE_LOG(LogTemp, Warning, TEXT("Creep Attacked for: %f"), attackPower);
 		return attackPower;
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Creep Attacked for: %f"), 0);
+		//UE_LOG(LogTemp, Warning, TEXT("Creep Attacked for: %f"), 0);
 		return 0;
 	}
 }
@@ -305,11 +330,13 @@ void ACreep::JoinPlayerArmy(AHeroBase* PlayerToFollow, int SlotAssignment)
 	//NOTE::Brendon - Might not need reference to player to follow in class
 	playerToFollow = PlayerToFollow;
 	bBelongsToCamp = false; 
+
 	slotAssignment = SlotAssignment;
 
 	UCharacterMovementComponent* movementComp = GetCharacterMovement();
 	movementComp->MaxWalkSpeed = runSpeed;
 	//GetCharacterMovement()->MaxWalkSpeed = runSpeed;
+
 
 	ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
 	if (AiController)
@@ -319,5 +346,26 @@ void ACreep::JoinPlayerArmy(AHeroBase* PlayerToFollow, int SlotAssignment)
 		AiController->GetBlackboardComponent()->SetValueAsVector("SlotPosition", playerToFollow->GetSlotPosition(slotAssignment));
 		AiController->RestartBehaviorTree();
 		creepCampHome = nullptr;
+	}
+}
+
+void ACreep::SetEnemyTarget(AActor* enemy)
+{
+	EnemyTarget = enemy;
+	ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
+	if (AiController)
+	{
+		if (EnemyTarget != nullptr)
+		{
+			AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", EnemyTarget);
+			AiController->GetBlackboardComponent()->SetValueAsBool("AtTargetPosition", false);
+			AiController->GetBlackboardComponent()->SetValueAsBool("hasWaited", true);
+			AiController->RestartBehaviorTree();
+		}
+		else
+		{
+			AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", nullptr);
+			AiController->RestartBehaviorTree();
+		}
 	}
 }

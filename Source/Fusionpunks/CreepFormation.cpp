@@ -10,7 +10,15 @@
 UCreepFormation::UCreepFormation()
 {
 	bWantsBeginPlay = true;
+
+	PrimaryComponentTick.bCanEverTick = true;
+
+	formationType = EFormationType::FT_Line;
+
+	owningHero = Cast<AHeroBase>(GetOwner());
+
 	PrimaryComponentTick.bCanEverTick = false;
+
 }
 
 void UCreepFormation::BeginPlay()
@@ -91,8 +99,7 @@ void UCreepFormation::CalculateSlotPositions(int ArmySize)
 		case EFormationType::FT_Circle:
 		{
 			for (int i = 1; i <= armySize; i++)
-			{
-				float angleInc = 360 / 8; 
+			{ 
 				float theta = 6.28f / armySize;
 				float angle = theta * i;
 
@@ -105,6 +112,7 @@ void UCreepFormation::CalculateSlotPositions(int ArmySize)
 			//implement 
 		}break;
 	}
+
 }
 
 

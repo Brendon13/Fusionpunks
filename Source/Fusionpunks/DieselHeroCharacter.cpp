@@ -10,9 +10,9 @@
 
 ADieselHeroCharacter::ADieselHeroCharacter()
 {
-	maxHealth = 10;
+	maxHealth = 250;
 	currentHealth = maxHealth;
-
+	basicAttackDamage = 10;
 	pullRadius = 500.0f;
 	pullForce = 200.0f;
 
@@ -21,12 +21,13 @@ ADieselHeroCharacter::ADieselHeroCharacter()
 	leapMaxAirTime = 0.75f;
 	timeInAirTimer = leapMaxAirTime;
 	bIsLeaping = false;
-
+	
 	dashForce = 16000.0f;
 	dashMaxTime = 0.25f;
 	dashTimer = dashMaxTime;
 	bIsDashing = false;
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ADieselHeroCharacter::OnHit);
+
 
 	Tags.Add(TEXT("Diesel"));
 	team = FName::FName(TEXT("Diesel"));

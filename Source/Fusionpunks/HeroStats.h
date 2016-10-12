@@ -15,12 +15,13 @@ public:
 
 private:
 	class AHeroBase* hero;
-	float currentHealth, respawnTime, attackDamage;
+	float currentHealth, respawnTime, attackDamage, healthPercent;
 	int32 level, armySize, numCampsCaptured;
 	TArray<class ACreepCamp*> capturedCamps;
-
 	FName team;
-	
+
+public:
+	FORCEINLINE float GetHealthPercent() const { return healthPercent; }
 
 
 

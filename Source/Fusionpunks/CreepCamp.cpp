@@ -12,21 +12,21 @@
 // Sets default values
 ACreepCamp::ACreepCamp()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	//Create and Set the Static Mesh Component
 	campMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CampMesh"));
-	const ConstructorHelpers::FObjectFinder<UStaticMesh>campStaticMesh(TEXT("StaticMesh'/Game/CreepCamp/Models/mk6_goerge.mk6_goerge'"));
-	campMesh->SetStaticMesh(campStaticMesh.Object);
+	//const ConstructorHelpers::FObjectFinder<UStaticMesh>campStaticMesh(TEXT("StaticMesh'/Game/CreepCamp/Models/mk6_goerge.mk6_goerge'"));
+	//campMesh->SetStaticMesh(campStaticMesh.Object);
 	campMesh->bGenerateOverlapEvents = false;
 	campMesh->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
 	RootComponent = campMesh;
 
 	//Create our ring around the camp
 	ringMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CaptureRing"));
-	const ConstructorHelpers::FObjectFinder<UStaticMesh> ringStaticMesh(TEXT("StaticMesh'/Game/CreepCamp/Models/CreepCampCircle.CreepCampCircle'"));
-	ringMesh->SetStaticMesh(ringStaticMesh.Object);
+	//const ConstructorHelpers::FObjectFinder<UStaticMesh> ringStaticMesh(TEXT("StaticMesh'/Game/CreepCamp/Models/CreepCampCircle.CreepCampCircle'"));
+	//ringMesh->SetStaticMesh(ringStaticMesh.Object);
 	ringMesh->SetRelativeScale3D(FVector(4.0f, 4.0f, 3.25f));
 	ringMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 5.5f));
 	ringMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -471,14 +471,23 @@ void ACreepCamp::RemoveCreep(ACreep* CreepInCamp)
 
 void ACreepCamp::DestroyAllCreeps()
 {
-	for (int i = 0; i < creepArray.Num(); i++)
+	/*for (int i = 0; i < creepArray.Num(); i++)
 	{
 		if (!creepArray[i]->IsActorBeingDestroyed())
 		{
 			creepArray[i]->Destroy();
-			spawningVariables.creepCount = 0;
+			creepArray[i]
+		}
+	}*/
+	for (int i = 0; i < creepArray.Num(); i++)
+	{
+		if (creepArray[i]->IsActorBeingDestroyed() == false)
+		{
+			creepArray[i]->Destroy();
 		}
 	}
+	creepArray.Empty();
+	spawningVariables.creepCount = 0;
 }
 
 void ACreepCamp::LinkToHeroes(AHeroBase* hero)

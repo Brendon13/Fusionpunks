@@ -80,7 +80,7 @@ AHeroBase::AHeroBase()
 
 	
 	creepFormationComp = CreateDefaultSubobject<UCreepFormation>(TEXT("CreepFormationComponent"));
-	
+	commandAttackCount = 0;
 }
 
 // Called when the game starts or when spawned
@@ -137,6 +137,8 @@ void AHeroBase::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 	InputComponent->BindAxis("CameraZoom", this, &AHeroBase::AdjustCameraZoom);
 
 	InputComponent->BindAction("RecruitCreep", IE_Pressed, this, &AHeroBase::RecruitCreep);
+	InputComponent->BindAction("CreepCommandAttack", IE_Pressed, this, &AHeroBase::CreepCommand_AttackTarget);
+
 
 	InputComponent->BindAction("AICamera", IE_Pressed, this, &AHeroBase::SwapAICamera);
 }
@@ -192,14 +194,80 @@ void AHeroBase::HideCampProgress()
 	APlayerHUD* playerHUD = Cast<APlayerHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHUD());
 	playerHUD->HideCampProgress();
 }
+
+
+bool AHeroBase::CheckForNearbyEnemyCreeps() 
+{
+	FCollisionObjectQueryParams obejctQP;
+
+	obejctQP.AddObjectTypesToQuery(Creeps);
+	
+	//Overlap multi by channel as a sphere (for pick ups?)
+	FCollisionQueryParams QueryParameters;
+	QueryParameters.AddIgnoredActor(this);
+	QueryParameters.OwnerTag = TEXT("Player");
+
+	TArray<FOverlapResult> Results;
+	GetWorld()->OverlapMultiByObjectType(Results,
+		GetActorLocation(),
+		FQuat(),
+		obejctQP,
+		FCollisionShape::MakeSphere(600.f),
+		QueryParameters);
+
+
+	nearbyEnemyCreeps.Empty();
+	if (Results.Num() > 0)
+	{
+		for (int32 i = 0; i < Results.Num(); i++) 
+		{
+			nearbyEnemyCreeps.Add(Cast<ACreep>(Results[i].GetActor()));
+		}
+
+	}
+	return Results.Num() > 0;
+	
+		
+}
+bool AHeroBase::CheckForNearbyEnemyHero()
+{
+
+	FCollisionObjectQueryParams obejctQP;
+
+	obejctQP.AddObjectTypesToQuery(AIHero);
+
+	//Overlap multi by channel as a sphere (for pick ups?)
+	FCollisionQueryParams QueryParameters;
+	QueryParameters.AddIgnoredActor(this);
+	QueryParameters.OwnerTag = TEXT("Player");
+
+
+	TArray<FOverlapResult> Results;
+	GetWorld()->OverlapMultiByObjectType(Results,
+		GetActorLocation(),
+		FQuat(),
+		obejctQP,
+		FCollisionShape::MakeSphere(300.f),
+		QueryParameters);
+
+
+
+	if (Results.Num() == 1)
+	{
+		nearbyEnemyHero = Cast<AHeroBase>(Results[0].GetActor());
+
+	}
+	return Results.Num() > 0;
+}
+
 void AHeroBase::StartAttack()
 {
-	UE_LOG(LogTemp, Display, TEXT("Basic Attack PRESSED"));
+	//UE_LOG(LogTemp, Display, TEXT("Basic Attack PRESSED"));
 
 	AActor *closestEnemy;
 
 	FCollisionObjectQueryParams obejctQP;
-
+	obejctQP.AddObjectTypesToQuery(AIHero);
 	obejctQP.AddObjectTypesToQuery(Creeps);
 	obejctQP.AddObjectTypesToQuery(DamageableStructures);
 	//Overlap multi by channel as a sphere (for pick ups?)
@@ -255,12 +323,12 @@ void AHeroBase::AdjustCameraZoom(float Value)
 	
 	if (Value < 0 && FollowCamera->FieldOfView >= 90)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Zooming Camera Down"));
+		//UE_LOG(LogTemp, Display, TEXT("Zooming Camera Down"));
 		GetCameraBoom()->TargetArmLength += Value * 10.0f;
 	}
 	else if (Value> 0 && FollowCamera->FieldOfView <= 120)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Zooming Camera UP"));
+		//UE_LOG(LogTemp, Display, TEXT("Zooming Camera UP"));
 		GetCameraBoom()->TargetArmLength += Value * 10.0f;
 	}
 }
@@ -296,7 +364,7 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	currentHealth -= DamageAmount;
 
-	UE_LOG(LogTemp, Log, TEXT("Tower took %f damage."), DamageAmount);
+	//UE_LOG(LogTemp, Log, TEXT("Hero took %f damage."), DamageAmount);
 	if (currentHealth <= 0 && !bIsRespawning)
 	{
 		currentHealth = 0;
@@ -413,6 +481,12 @@ void AHeroBase::UpdateHeroStats()
 }
 
 
+
+TArray<ACreep*> AHeroBase::GetCreepArmyArray()
+{
+	return CreepArmy;
+}
+
 void AHeroBase::UpdateCreepArmy()
 {
 	for (int32 i = 1; i <= currentArmySize; i++)
@@ -426,4 +500,108 @@ FVector AHeroBase::GetSlotPosition(int SlotNumber)
 	FVector pos = creepFormationComp->GetPositionInFormation(SlotNumber);
 	pos += GetActorLocation();
 	return pos; 
+}
+
+float AHeroBase::GetMaxHealth() 
+{
+	return maxHealth;
+}
+
+//NOTE::Brendon -  Add variable for the length of the raycast to adjust in blueprint
+//NOTE::Brendon - Change FCollisionShape::MakeSphere to a raycast that is dependent on a normalized vector direction 
+AActor* AHeroBase::CreepCommand_Attack_CheckTarget(FVector Direction)
+{
+	FVector direction = Direction;
+
+	FCollisionObjectQueryParams obejctQP;
+	obejctQP.AddObjectTypesToQuery(Creeps);
+
+	FCollisionQueryParams QueryParameters;
+	QueryParameters.AddIgnoredActor(this);
+	QueryParameters.OwnerTag = TEXT("Player");
+	GetWorld()->OverlapMultiByObjectType(creepCommand_TargetResults, direction, FQuat(), obejctQP, FCollisionShape::MakeSphere(1000.0f), QueryParameters);
+
+	AActor* closestEnemy = nullptr;
+	if (creepCommand_TargetResults.Num() > 0)
+	{
+		closestEnemy = creepCommand_TargetResults[0].GetActor();
+
+		for (int i = 0; i < creepCommand_TargetResults.Num(); i++)
+		{
+			if (GetDistanceTo(creepCommand_TargetResults[i].GetActor()) <= GetDistanceTo(closestEnemy))
+			{
+				closestEnemy = creepCommand_TargetResults[i].GetActor();
+			}
+		}
+	}
+	return closestEnemy;
+}
+
+void AHeroBase::CreepCommand_AttackTarget()
+{
+	AActor* EnemyTarget = CreepCommand_Attack_CheckTarget(GetActorLocation());
+	if (EnemyTarget)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Enemy Found! (CreepCommand_AttackTarget)"));
+		HighlightCreepArmyTarget(EnemyTarget, creepCommand_TargetResults);
+
+		for (int i = 0; i < CreepArmy.Num(); i++)
+		{
+			CreepArmy[i]->SetEnemyTarget(EnemyTarget);
+		}
+	}
+
+	/*UE_LOG(LogTemp, Warning, TEXT("Initiate CreepCommand_AttackTarget"));
+	AActor* EnemyTarget = CreepCommand_Attack_CheckTarget(GetActorLocation());
+	if (commandAttackCount == 0)
+	{
+		if (EnemyTarget)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Enemy Found! (CreepCommand_AttackTarget)"));
+			HighlightCreepArmyTarget(EnemyTarget, creepCommand_TargetResults);
+			commandAttackCount++;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No Enemy Target Found! (CreepCommand_AttackTarget)"));
+			commandAttackCount = 0;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Setting Enemy (CreepCommand_AttackTarget)"));
+		commandAttackCount = 0;
+		for (int i = 0; i < CreepArmy.Num(); i++)
+		{
+			CreepArmy[i]->SetEnemyTarget(EnemyTarget);
+		}
+	}*/
+	
+	
+}
+
+void AHeroBase::UnHighlightCreepArmyTarget(AActor* enemy)
+{
+	if (enemy->IsA(ACreep::StaticClass()))
+	{
+		Cast<ACreep>(enemy)->GetMesh()->SetRenderCustomDepth(false);
+	}
+}
+
+void AHeroBase::HighlightCreepArmyTarget(AActor* enemy, TArray<FOverlapResult> enemies)
+{
+	if (enemy->IsA(ACreep::StaticClass()))
+	{
+		Cast<ACreep>(enemy)->GetMesh()->SetRenderCustomDepth(true);
+		Cast<ACreep>(enemy)->GetMesh()->CustomDepthStencilValue = STENCIL_ENEMY_OUTLINE;
+	}
+
+	for (int i = 0; i < enemies.Num(); i++)
+	{
+		if (enemy != enemies[i].GetActor() && enemies[i].GetActor()->IsA(ACreep::StaticClass()))
+		{
+			Cast<ACreep>(enemies[i].GetActor())->GetMesh()->SetRenderCustomDepth(false);
+		}
+
+	}
 }
