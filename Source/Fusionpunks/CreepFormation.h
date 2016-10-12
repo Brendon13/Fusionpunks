@@ -13,7 +13,6 @@ enum class EFormationType : uint8
 
 	FT_Line		UMETA(DisplayerName = "LineFormation")
 
-
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -32,14 +31,12 @@ public:
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
+
 	UPROPERTY(EditAnywhere, Category = AIStats)
 	EFormationType formationType;
 
 private:
 	class AHeroBase* owningHero;
-
-	
-	
 
 private:
 	TArray<FVector> slotArray;

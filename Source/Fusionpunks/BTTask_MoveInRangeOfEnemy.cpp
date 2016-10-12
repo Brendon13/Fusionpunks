@@ -20,13 +20,18 @@ EBTNodeResult::Type UBTTask_MoveInRangeOfEnemy::ExecuteTask(UBehaviorTreeCompone
 		target = Cast<ACreep>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("AttackTarget"));
 		if (target != nullptr)
 		{
+			if (hero->GetDistanceTo(target) >= 5)
+			{
+				bNotifyTick = true;
+				return EBTNodeResult::InProgress;
+			}
+
+			return EBTNodeResult::Failed;
 			
 			bNotifyTick = true;
 		    return EBTNodeResult::InProgress;
-			
 		}
 		return EBTNodeResult::Failed;
-
 	}
 	else
 	{
@@ -59,7 +64,6 @@ void UBTTask_MoveInRangeOfEnemy::TickTask(UBehaviorTreeComponent& OwnerComp, uin
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	}
-
 
 }
 

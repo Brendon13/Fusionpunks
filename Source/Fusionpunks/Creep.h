@@ -153,6 +153,7 @@ public:
 	void JoinPlayerArmy(class AHeroBase* PlayerToFollow, int SlotAssignment);
 	int slotAssignment;
 	void SetPlayerToFollow(class AHeroBase* Hero) { playerToFollow = Hero; }
+	void SetEnemyTarget(AActor* enemy);
 private:
 	class AHeroBase* playerToFollow;
 	float distanceFromCamp;
