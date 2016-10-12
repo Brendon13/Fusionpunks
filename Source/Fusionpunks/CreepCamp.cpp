@@ -371,18 +371,25 @@ void ACreepCamp::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActo
 		if (Cast<AHeroBase>(OtherActor))
 		{
 			AHeroBase* heroChar = Cast<AHeroBase>(OtherActor);
-			heroChar->ShowCampProgress(this);
+			
+			if (!OtherActor->Tags.Contains("AI"))
+				heroChar->ShowCampProgress(this);
 		}
 
 		if (OtherActor->Tags.Contains("CyberPlayer"))
 		{
 			captureVariables.bCyberIsCapturing = true;
+			
+		
 		}
 
 		if (OtherActor->Tags.Contains("DieselPlayer"))
 		{
 			captureVariables.bDieselIsCapturing = true;
+
 		}
+		
+		
 	}
 }
 
@@ -396,7 +403,8 @@ void ACreepCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 		if (Cast<AHeroBase>(OtherActor))
 		{
 			AHeroBase* heroChar = Cast<AHeroBase>(OtherActor);
-			heroChar->HideCampProgress();
+			if (!OtherActor->Tags.Contains("AI"))
+				heroChar->HideCampProgress();
 		}
 
 		if (OtherActor->Tags.Contains("CyberPlayer"))
@@ -408,6 +416,9 @@ void ACreepCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 		{
 			captureVariables.bDieselIsCapturing = false;
 		}
+
+		
+
 		if (ringMesh != nullptr)
 			ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
 	}
@@ -493,7 +504,7 @@ void ACreepCamp::DestroyAllCreeps()
 	}*/
 	for (int i = 0; i < creepArray.Num(); i++)
 	{
-		if (creepArray[i]->IsActorBeingDestroyed() == false)
+		if (creepArray[i] != nullptr ||creepArray[i]->IsActorBeingDestroyed() == false)
 		{
 			creepArray[i]->Destroy();
 		}

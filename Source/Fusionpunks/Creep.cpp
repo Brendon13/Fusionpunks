@@ -166,6 +166,7 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 		AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", EnemyTarget);
 		SetToRun();
 		AiController->RestartBehaviorTree();
+
 	}
 	currentHealth -= Damage;
 	//UE_LOG(LogTemp, Error, TEXT("Creep Took %f damage"), Damage);
@@ -179,7 +180,7 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 	currentHealth -= Damage;
 	//UE_LOG(LogTemp, Error, TEXT("Creep Took %f damage"), Damage);
 
-	if (FloatingDamageWidgetClass)
+	if (!DamageCauser->ActorHasTag("AI") && FloatingDamageWidgetClass)
 	{
 		UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
 		//floatingDamageWidget->SetVisibility(ESlateVisibility::Hidden);

@@ -214,6 +214,7 @@ bool AHeroBase::CheckForNearbyEnemyCreeps()
 	QueryParameters.AddIgnoredActor(this);
 	QueryParameters.OwnerTag = TEXT("Player");
 
+
 	TArray<FOverlapResult> Results;
 	GetWorld()->OverlapMultiByObjectType(Results,
 		GetActorLocation(),
@@ -227,11 +228,19 @@ bool AHeroBase::CheckForNearbyEnemyCreeps()
 	{
 		for (int32 i = 0; i < Results.Num(); i++) 
 		{
-			nearbyEnemyCreeps.Add(Cast<ACreep>(Results[i].GetActor()));
+			if (team.Compare("Diesel") == 0 && !Results[i].GetActor()->ActorHasTag("Diesel"))
+			{
+				nearbyEnemyCreeps.Add(Cast<ACreep>(Results[i].GetActor()));
+			}
+
+			else if (team.Compare("Cyber") == 0 && !Results[i].GetActor()->ActorHasTag("Cyber"))
+			{
+				nearbyEnemyCreeps.Add(Cast<ACreep>(Results[i].GetActor()));
+			}
 		}
 
 	}
-	return Results.Num() > 0;	
+	return nearbyEnemyCreeps.Num() > 0;	
 }
 bool AHeroBase::CheckForNearbyEnemyHero()
 {
