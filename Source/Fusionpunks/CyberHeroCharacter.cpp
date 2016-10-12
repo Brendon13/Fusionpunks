@@ -94,12 +94,12 @@ AActor* ACyberHeroCharacter::UpdateTarget()
 	
 	if (skillTargetResults.Num() == 0)
 	{
-		UE_LOG(LogTemp, Display, TEXT("No Enemies Nearby"));
+		//UE_LOG(LogTemp, Display, TEXT("No Enemies Nearby"));
 		return NULL;
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT("Enemy Found"));
+		//UE_LOG(LogTemp, Display, TEXT("Enemy Found"));
 		closestEnemy = skillTargetResults[0].GetActor();
 
 		for (int i = 0; i < skillTargetResults.Num(); i++)

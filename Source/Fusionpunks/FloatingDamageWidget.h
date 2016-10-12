@@ -20,19 +20,17 @@ public:
 
 	/*UFUNCTION(BlueprintCallable, Category = Animations)
 		void PlayTextFloatUpAnimation();*/
+	UFUNCTION(BlueprintCallable, Category = WidgtFunctions)
+		void SetOwningPawn(APawn* Owner) { OwningPawn = Owner; }
+
+	UFUNCTION(BlueprintCallable, Category = WidgtFunctions)
+		APawn* GetOwningPawn() const { return OwningPawn; }
 
 private:
 	UFUNCTION(BlueprintCallable, Category = Combat)
 		FText GetIncDamage() const;
 	
     float incDamage;
-//	float timer;
-//	bool bIsAnimating;
-//
-//public:
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
-//		class UWidgetAnimation* textFloatUpAnimation;
-	
-
+	APawn* OwningPawn;
 	
 };

@@ -483,14 +483,23 @@ void ACreepCamp::RemoveCreep(ACreep* CreepInCamp)
 
 void ACreepCamp::DestroyAllCreeps()
 {
-	for (int i = 0; i < creepArray.Num(); i++)
+	/*for (int i = 0; i < creepArray.Num(); i++)
 	{
 		if (!creepArray[i]->IsActorBeingDestroyed())
 		{
 			creepArray[i]->Destroy();
-			spawningVariables.creepCount = 0;
+			creepArray[i]
+		}
+	}*/
+	for (int i = 0; i < creepArray.Num(); i++)
+	{
+		if (creepArray[i]->IsActorBeingDestroyed() == false)
+		{
+			creepArray[i]->Destroy();
 		}
 	}
+	creepArray.Empty();
+	spawningVariables.creepCount = 0;
 }
 
 void ACreepCamp::LinkToHeroes(AHeroBase* hero)
