@@ -205,11 +205,6 @@ void AHeroBase::HideCampProgress()
 
 bool AHeroBase::CheckForNearbyEnemyCreeps() 
 {
-<<<<<<< HEAD
-=======
-
-	
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 	FCollisionObjectQueryParams obejctQP;
 
 	obejctQP.AddObjectTypesToQuery(Creeps);
@@ -219,10 +214,6 @@ bool AHeroBase::CheckForNearbyEnemyCreeps()
 	QueryParameters.AddIgnoredActor(this);
 	QueryParameters.OwnerTag = TEXT("Player");
 
-<<<<<<< HEAD
-=======
-
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 	TArray<FOverlapResult> Results;
 	GetWorld()->OverlapMultiByObjectType(Results,
 		GetActorLocation(),
@@ -231,31 +222,19 @@ bool AHeroBase::CheckForNearbyEnemyCreeps()
 		FCollisionShape::MakeSphere(600.f),
 		QueryParameters);
 
-
 	nearbyEnemyCreeps.Empty();
 	if (Results.Num() > 0)
 	{
-<<<<<<< HEAD
-=======
-		
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 		for (int32 i = 0; i < Results.Num(); i++) 
 		{
 			nearbyEnemyCreeps.Add(Cast<ACreep>(Results[i].GetActor()));
 		}
 
 	}
-	return Results.Num() > 0;
-	
-		
+	return Results.Num() > 0;	
 }
 bool AHeroBase::CheckForNearbyEnemyHero()
 {
-<<<<<<< HEAD
-
-=======
-	
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 	FCollisionObjectQueryParams obejctQP;
 
 	obejctQP.AddObjectTypesToQuery(AIHero);
@@ -265,7 +244,6 @@ bool AHeroBase::CheckForNearbyEnemyHero()
 	QueryParameters.AddIgnoredActor(this);
 	QueryParameters.OwnerTag = TEXT("Player");
 
-
 	TArray<FOverlapResult> Results;
 	GetWorld()->OverlapMultiByObjectType(Results,
 		GetActorLocation(),
@@ -273,8 +251,6 @@ bool AHeroBase::CheckForNearbyEnemyHero()
 		obejctQP,
 		FCollisionShape::MakeSphere(300.f),
 		QueryParameters);
-
-
 
 	if (Results.Num() == 1)
 	{
@@ -284,16 +260,6 @@ bool AHeroBase::CheckForNearbyEnemyHero()
 	return Results.Num() > 0;
 }
 
-<<<<<<< HEAD
-=======
-
-
-
-
-
-
-
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 void AHeroBase::StartAttack()
 {
 	//UE_LOG(LogTemp, Display, TEXT("Basic Attack PRESSED"));
@@ -308,7 +274,6 @@ void AHeroBase::StartAttack()
 	FCollisionQueryParams QueryParameters;
 	QueryParameters.AddIgnoredActor(this);
 	QueryParameters.OwnerTag = TEXT("Player");
-
 
 	TArray<FOverlapResult> Results;
 	GetWorld()->OverlapMultiByObjectType(Results,
@@ -397,12 +362,8 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	currentHealth -= DamageAmount;
-
-<<<<<<< HEAD
 	//UE_LOG(LogTemp, Log, TEXT("Hero took %f damage."), DamageAmount);
-=======
-	UE_LOG(LogTemp, Log, TEXT("Hero took %f damage."), DamageAmount);
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
+
 	if (currentHealth <= 0 && !bIsRespawning)
 	{
 		currentHealth = 0;
@@ -411,7 +372,6 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 		SetActorEnableCollision(false);
 		bIsRespawning = true;
 		respawnEffect->StartTimer(respawnTime, this);
-		
 	}
 	return DamageAmount;
 
@@ -519,7 +479,6 @@ void AHeroBase::UpdateHeroStats()
 }
 
 
-
 TArray<ACreep*> AHeroBase::GetCreepArmyArray()
 {
 	return CreepArmy;
@@ -544,7 +503,6 @@ float AHeroBase::GetMaxHealth()
 {
 	return maxHealth;
 }
-<<<<<<< HEAD
 
 //NOTE::Brendon -  Add variable for the length of the raycast to adjust in blueprint
 //NOTE::Brendon - Change FCollisionShape::MakeSphere to a raycast that is dependent on a normalized vector direction 
@@ -615,8 +573,6 @@ void AHeroBase::CreepCommand_AttackTarget()
 			CreepArmy[i]->SetEnemyTarget(EnemyTarget);
 		}
 	}*/
-	
-	
 }
 
 void AHeroBase::UnHighlightCreepArmyTarget(AActor* enemy)
@@ -644,5 +600,3 @@ void AHeroBase::HighlightCreepArmyTarget(AActor* enemy, TArray<FOverlapResult> e
 
 	}
 }
-=======
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)

@@ -22,20 +22,15 @@ EBTNodeResult::Type UBTTask_AttackCreeps::ExecuteTask(UBehaviorTreeComponent& Ow
 			bNotifyTick = true;
 			return EBTNodeResult::InProgress;
 		}
-<<<<<<< HEAD
-=======
 		UE_LOG(LogTemp, Error, TEXT("Cant Find Creep To Attack"));
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
-		return EBTNodeResult::Failed;
 
+		return EBTNodeResult::Failed;
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Cant Find Hero"));
 		return EBTNodeResult::Failed;
 	}
-
-	
 }
 
 void UBTTask_AttackCreeps::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -57,11 +52,7 @@ void UBTTask_AttackCreeps::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 				isAttacking = false;
 				FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 			}
-
 		}
-	
-
-
 }
 
 void UBTTask_AttackCreeps::OnTaskFinished(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, EBTNodeResult::Type TaskResult)

@@ -12,11 +12,7 @@ enum class EFormationType : uint8
 	FT_Circle    UMETA(DisplayName = "CircleHeroFormation"),
 
 	FT_Line		UMETA(DisplayerName = "LineFormation")
-<<<<<<< HEAD
-=======
 
-
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -35,22 +31,13 @@ public:
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
-<<<<<<< HEAD
-	UPROPERTY(EditAnywhere, Category = Formation)
-=======
+
 	UPROPERTY(EditAnywhere, Category = AIStats)
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 	EFormationType formationType;
 
 private:
 	class AHeroBase* owningHero;
 
-<<<<<<< HEAD
-=======
-	
-	
-
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 private:
 	TArray<FVector> slotArray;
 	UPROPERTY(EditDefaultsOnly, Category = CircleFormation)

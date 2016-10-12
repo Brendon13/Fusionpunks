@@ -158,7 +158,6 @@ void ACreep::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-<<<<<<< HEAD
 
 	if (EnemyTarget == nullptr)
 	{
@@ -177,10 +176,9 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 
 	}*/
 
-=======
 	currentHealth -= Damage;
-	UE_LOG(LogTemp, Error, TEXT("Creep Took %f damage"), Damage);
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
+	//UE_LOG(LogTemp, Error, TEXT("Creep Took %f damage"), Damage);
+
 	if (FloatingDamageWidgetClass)
 	{
 		UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
@@ -322,17 +320,12 @@ float ACreep::MeleeAttack()
 
 FORCEINLINE void ACreep::SetToWalk()
 {
-
 	GetCharacterMovement()->MaxWalkSpeed = patrolMovementSpeed;
-
 }
 
 FORCEINLINE void ACreep::SetToRun()
 {
-
-
 	GetCharacterMovement()->MaxWalkSpeed = runSpeed; 
-
 }
 
 void ACreep::JoinPlayerArmy(AHeroBase* PlayerToFollow, int SlotAssignment)

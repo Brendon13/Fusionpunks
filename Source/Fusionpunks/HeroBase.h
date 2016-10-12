@@ -113,8 +113,6 @@ protected:
 		float healthPercent;
 
 	int32 currentLevel;
-	
-
 
 	UFUNCTION(BlueprintCallable, category = Stats)
 		virtual void LevelUp();
@@ -142,10 +140,7 @@ public:
 	FORCEINLINE  float GetAttackDamage() const { return basicAttackDamage; }
 	FORCEINLINE TArray<class ACreepCamp*> GetCapturedCamps() const { return capturedCamps; }
 	FORCEINLINE class HeroStats* GetHeroStats() const { return heroStats; }
-<<<<<<< HEAD
-=======
-	
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
+
 	void AddToCapturedCamps(class ACreepCamp* camp);
 	void RemoveFromCapturedCamps(class ACreepCamp* camp);
 	void UpdateHeroStats();
@@ -163,8 +158,6 @@ protected:
 	class HeroStats* heroStats;
 
 	TArray<class ACreepCamp*> capturedCamps;
-
-	
 
 	
 	
@@ -203,37 +196,26 @@ protected:
 
 
 public:
-	
 	//AI HERO FUNCTIONS
 	// USE ONLY WITH AI HERO TASKS!!
-
 	bool CheckForNearbyEnemyCreeps();
-
 	bool CheckForNearbyEnemyHero();
-
 	FORCEINLINE TArray<class ACreep*> GetNearbyEnemyCreeps() const { return nearbyEnemyCreeps; }
-	
-
 private:
-
-
-	int32 currentArmySize;
-
-	TArray<class ACreep*> CreepArmy;
-
-
-
 	//AIHERO
 	TArray<class ACreep*> nearbyEnemyCreeps;
 	AHeroBase* nearbyEnemyHero;
 
-
 public:
 	TArray<ACreep*> AHeroBase::GetCreepArmyArray();
-	
 	void UpdateCreepArmy();
-
 	ACreepCamp* visitingCamp;
+
+
+
+private:
+	int32 currentArmySize;
+	TArray<class ACreep*> CreepArmy;
 
 public:
 	FORCEINLINE TArray<ACreep*> GetCreepArmyArray() const { return CreepArmy;  }
@@ -245,7 +227,7 @@ protected:
 public:
 	FVector GetSlotPosition(int SlotNumber);
 
-<<<<<<< HEAD
+
 protected:
 //Creep Command Functions
 	virtual AActor* CreepCommand_Attack_CheckTarget(FVector Direction);
@@ -255,6 +237,4 @@ protected:
 	void HighlightCreepArmyTarget(AActor* enemy, TArray<FOverlapResult> enemies);
 	int8 commandAttackCount;
 
-=======
->>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 };
