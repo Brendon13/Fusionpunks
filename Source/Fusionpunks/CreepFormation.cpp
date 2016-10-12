@@ -30,6 +30,11 @@ void UCreepFormation::TickComponent( float DeltaTime, ELevelTick TickType, FActo
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
+
+	
+	
+
+
 	//if (owningHero)
 	//{
 	//	const TArray<class ACreep*>& creepArmyArray = owningHero->GetCreepArmyArray();

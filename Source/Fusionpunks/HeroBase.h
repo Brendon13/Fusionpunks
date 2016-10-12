@@ -142,6 +142,10 @@ public:
 	FORCEINLINE  float GetAttackDamage() const { return basicAttackDamage; }
 	FORCEINLINE TArray<class ACreepCamp*> GetCapturedCamps() const { return capturedCamps; }
 	FORCEINLINE class HeroStats* GetHeroStats() const { return heroStats; }
+<<<<<<< HEAD
+=======
+	
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 	void AddToCapturedCamps(class ACreepCamp* camp);
 	void RemoveFromCapturedCamps(class ACreepCamp* camp);
 	void UpdateHeroStats();
@@ -159,6 +163,10 @@ protected:
 	class HeroStats* heroStats;
 
 	TArray<class ACreepCamp*> capturedCamps;
+
+	
+
+	
 	
 protected:
 	//function for Trigger Events
@@ -237,6 +245,7 @@ protected:
 public:
 	FVector GetSlotPosition(int SlotNumber);
 
+<<<<<<< HEAD
 protected:
 //Creep Command Functions
 	virtual AActor* CreepCommand_Attack_CheckTarget(FVector Direction);
@@ -246,4 +255,6 @@ protected:
 	void HighlightCreepArmyTarget(AActor* enemy, TArray<FOverlapResult> enemies);
 	int8 commandAttackCount;
 
+=======
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 };

@@ -101,7 +101,9 @@ protected:
 		FPriorityList campPriorityList;
 	UPROPERTY(EditDefaultsOnly)
 			TSubclassOf<ACreepCamp> creepCampClass;
-
+	
+	UPROPERTY(EditDefaultsOnly, Category = HomeBase)
+		TSubclassOf<class ABase> baseClass;
 
 	
 };

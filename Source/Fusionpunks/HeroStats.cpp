@@ -17,6 +17,7 @@ HeroStats::HeroStats(AHeroBase* Hero)
 	team = hero->GetTeam();
 	capturedCamps = hero->GetCapturedCamps();
 	numCampsCaptured = capturedCamps.Num();
+	
 }
 
 HeroStats::~HeroStats()

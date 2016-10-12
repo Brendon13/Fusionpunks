@@ -27,6 +27,7 @@ ADieselHeroCharacter::ADieselHeroCharacter()
 	dashTimer = dashMaxTime;
 	bIsDashing = false;
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ADieselHeroCharacter::OnHit);
+	respawnTime = 1;
 
 
 	Tags.Add(TEXT("Diesel"));

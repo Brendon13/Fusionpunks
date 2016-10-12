@@ -22,6 +22,10 @@ EBTNodeResult::Type UBTTask_AttackCreeps::ExecuteTask(UBehaviorTreeComponent& Ow
 			bNotifyTick = true;
 			return EBTNodeResult::InProgress;
 		}
+<<<<<<< HEAD
+=======
+		UE_LOG(LogTemp, Error, TEXT("Cant Find Creep To Attack"));
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 		return EBTNodeResult::Failed;
 
 	}

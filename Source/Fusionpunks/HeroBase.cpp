@@ -5,6 +5,7 @@
 #include "PlayerHud.h"
 #include "Creep.h"
 #include "HeroStats.h"
+#include "Base.h"
 #include "RespawnOverTime.h"
 #include "PlayerCompassWidget.h"
 #include "CreepFormation.h"
@@ -93,8 +94,9 @@ void AHeroBase::BeginPlay()
 	
 	GetWorld()->GetAuthGameMode()->Children.Add(this);
 	respawnEffect = GetWorld()->SpawnActor<ARespawnOverTime>(respawnClass, FVector::ZeroVector, FRotator::ZeroRotator);
-	startingLocation = GetActorLocation();
 
+	startingLocation = GetActorLocation();
+	
 	if (Cast<UPlayerCompassWidget>(widgetComponent->GetUserWidgetObject()))
 	{
 		UPlayerCompassWidget* thisPlayerCompassWidget = Cast<UPlayerCompassWidget>(widgetComponent->GetUserWidgetObject());
@@ -103,6 +105,11 @@ void AHeroBase::BeginPlay()
 	heroStats = new HeroStats(this);
 	heroStats->DisplayStats();
 	LinkToCreepCamps();
+
+	
+		
+	
+	
 }
 
 // Called every frame
@@ -198,6 +205,11 @@ void AHeroBase::HideCampProgress()
 
 bool AHeroBase::CheckForNearbyEnemyCreeps() 
 {
+<<<<<<< HEAD
+=======
+
+	
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 	FCollisionObjectQueryParams obejctQP;
 
 	obejctQP.AddObjectTypesToQuery(Creeps);
@@ -207,6 +219,10 @@ bool AHeroBase::CheckForNearbyEnemyCreeps()
 	QueryParameters.AddIgnoredActor(this);
 	QueryParameters.OwnerTag = TEXT("Player");
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 	TArray<FOverlapResult> Results;
 	GetWorld()->OverlapMultiByObjectType(Results,
 		GetActorLocation(),
@@ -219,6 +235,10 @@ bool AHeroBase::CheckForNearbyEnemyCreeps()
 	nearbyEnemyCreeps.Empty();
 	if (Results.Num() > 0)
 	{
+<<<<<<< HEAD
+=======
+		
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 		for (int32 i = 0; i < Results.Num(); i++) 
 		{
 			nearbyEnemyCreeps.Add(Cast<ACreep>(Results[i].GetActor()));
@@ -231,7 +251,11 @@ bool AHeroBase::CheckForNearbyEnemyCreeps()
 }
 bool AHeroBase::CheckForNearbyEnemyHero()
 {
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 	FCollisionObjectQueryParams obejctQP;
 
 	obejctQP.AddObjectTypesToQuery(AIHero);
@@ -260,6 +284,16 @@ bool AHeroBase::CheckForNearbyEnemyHero()
 	return Results.Num() > 0;
 }
 
+<<<<<<< HEAD
+=======
+
+
+
+
+
+
+
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 void AHeroBase::StartAttack()
 {
 	//UE_LOG(LogTemp, Display, TEXT("Basic Attack PRESSED"));
@@ -364,7 +398,11 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	currentHealth -= DamageAmount;
 
+<<<<<<< HEAD
 	//UE_LOG(LogTemp, Log, TEXT("Hero took %f damage."), DamageAmount);
+=======
+	UE_LOG(LogTemp, Log, TEXT("Hero took %f damage."), DamageAmount);
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)
 	if (currentHealth <= 0 && !bIsRespawning)
 	{
 		currentHealth = 0;
@@ -506,6 +544,7 @@ float AHeroBase::GetMaxHealth()
 {
 	return maxHealth;
 }
+<<<<<<< HEAD
 
 //NOTE::Brendon -  Add variable for the length of the raycast to adjust in blueprint
 //NOTE::Brendon - Change FCollisionShape::MakeSphere to a raycast that is dependent on a normalized vector direction 
@@ -605,3 +644,5 @@ void AHeroBase::HighlightCreepArmyTarget(AActor* enemy, TArray<FOverlapResult> e
 
 	}
 }
+=======
+>>>>>>> refs/remotes/origin/Master-(Do-Not-Touch)

@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
+#include "HeroBase.h"
 #include "HeroAIController.h"
 
 AHeroAIController::AHeroAIController()
@@ -44,7 +45,17 @@ void AHeroAIController::BeginPlay()
 	UE_LOG(LogTemp, Log, TEXT("Found %d CreepCamps."), creepCamps.Num());
 	campPriorityList.GeneratePriorityList(creepCamps, GetPawn());
 	campPriorityList.DisplayDistances();
+
 	
+	
+	TArray<AActor*> bases;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), baseClass, bases);
+	if (bases.Num() > 0)
+	{
+		UE_LOG(LogTemp, Display, TEXT("BASE FOUND"));
+		BlackboardComponent->SetValueAsObject("Home", bases[0]);
+		
+	}
 	
 }
 
