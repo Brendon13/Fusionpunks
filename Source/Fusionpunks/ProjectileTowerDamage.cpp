@@ -22,8 +22,11 @@ void AProjectileTowerDamage::ApplyEffect()
 	FDamageEvent DamageEvent;
 	ADieselTower* tower = Cast <ADieselTower> (GetOwner());
 	AProjectile* projectile = tower->SpawnProjectile();
-	projectile->SetDamage(tower->damage);
-	projectile->SetTarget(effectTarget);
+	if (projectile)
+	{
+		projectile->SetDamage(tower->damage);
+		projectile->SetTarget(effectTarget);
+	}
 
 	//float damage = attackTarget->TakeDamage(20f, DamageEvent, NULL, this);
 }

@@ -18,9 +18,9 @@ void ARespawnOverTime::ApplyEffect()
 {
 	AHeroBase* hero = Cast<AHeroBase>(effectTarget);
 	hero->SetActorLocation(hero->startingLocation);
+	hero->ResetHealth();
 	hero->GetMesh()->SetVisibility(true);
 	hero->SetActorEnableCollision(true);
 	hero->GetController()->EnableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	hero->ResetHealth();
 	hero->bIsRespawning = false;
 }

@@ -49,12 +49,7 @@ void ADieselTower::CleanUp()
 void ADieselTower::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	if (bHasSpawed && currProjectile->IsActorBeingDestroyed())
-	{
-		bHasSpawned = false;
-	}
-
-	spawnTimer += DeltaTime;
+	
 	if (enemyUnits.Num() > 0)
 	{
 		if (enemyUnits[0]->IsA(ACharacter::StaticClass()))
@@ -83,7 +78,7 @@ AProjectile* ADieselTower::SpawnProjectile()
 	if (whatToSpawn != NULL)
 	{
 		UWorld* const world = GetWorld();
-		if (world && !bHasSpawed)
+		if (world)
 		{
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
