@@ -129,9 +129,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = CollisionComponents)
 		class USphereComponent* sphereTrigger;
 
-	//mesh for the ring around the camp
-	UPROPERTY(EditDefaultsOnly, Category = Appearance)
-		class UStaticMeshComponent* ringMesh;
+	////mesh for the ring around the camp
+	//UPROPERTY(EditDefaultsOnly, Category = Appearance)
+	//	class UStaticMeshComponent* ringMesh;
 
 
 //Ring Rotations Stuff

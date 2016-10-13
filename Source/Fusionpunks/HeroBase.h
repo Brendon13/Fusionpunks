@@ -77,8 +77,14 @@ public:
 		float GetMaxHealth();
 	void Attack(AActor* enemy);
 
-		FORCEINLINE float GetMaxHealth() const { return maxHealth; }
+	FORCEINLINE float GetMaxHealth() const { return maxHealth; }
 
+
+	void HealOverTime();
+	void Heal(float amount);
+
+	UPROPERTY(EditDefaultsOnly, Category = Abilities)
+		TSubclassOf<class AHealOverTime> healOverTimeClass;
 
 protected:
 	void StartAttack();
@@ -182,18 +188,18 @@ protected:
 public:
 	FORCEINLINE FName GetTeam() const { return team; }
 
-	UPROPERTY(EditDefaultsOnly)
-		class UWidgetComponent* widgetComponent;
+	//UPROPERTY(EditDefaultsOnly)
+	//	class UWidgetComponent* widgetComponent;
 
-	UPROPERTY(EditDefaultsOnly, Category = Widgets)
-		TSubclassOf<class UPlayerCompassWidget> CompassWidgetClass;
+	//UPROPERTY(EditDefaultsOnly, Category = Widgets)
+	//	TSubclassOf<class UPlayerCompassWidget> CompassWidgetClass;
+
 
 //AI Stuff
 protected:
 	virtual void RecruitCreep();
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		int32 maxArmySize;
-
 
 public:
 	//AI HERO FUNCTIONS
@@ -212,7 +218,6 @@ public:
 	ACreepCamp* visitingCamp;
 
 
-
 private:
 	int32 currentArmySize;
 	TArray<class ACreep*> CreepArmy;
@@ -228,13 +233,24 @@ public:
 	FVector GetSlotPosition(int SlotNumber);
 
 
+//UI STUFF
 protected:
-//Creep Command Functions
-	virtual AActor* CreepCommand_Attack_CheckTarget(FVector Direction);
-	virtual void CreepCommand_AttackTarget();
-	TArray<FOverlapResult> creepCommand_TargetResults;
-	void UnHighlightCreepArmyTarget(AActor* enemy);
-	void HighlightCreepArmyTarget(AActor* enemy, TArray<FOverlapResult> enemies);
-	int8 commandAttackCount;
+	UPROPERTY(EditDefaultsOnly)
+	UDecalComponent* compassDecalComponent;
+
+//Ability Functions
+protected:
+	void SacrificeCreep();
+
+
+
+//protected:
+////Creep Command Functions
+//	virtual AActor* CreepCommand_Attack_CheckTarget(FVector Direction);
+//	virtual void CreepCommand_AttackTarget();
+//	TArray<FOverlapResult> creepCommand_TargetResults;
+//	void UnHighlightCreepArmyTarget(AActor* enemy);
+//	void HighlightCreepArmyTarget(AActor* enemy, TArray<FOverlapResult> enemies);
+//	int8 commandAttackCount;
 
 };

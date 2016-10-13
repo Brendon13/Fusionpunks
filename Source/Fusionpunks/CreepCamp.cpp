@@ -24,12 +24,12 @@ ACreepCamp::ACreepCamp()
 	RootComponent = campMesh;
 
 	//Create our ring around the camp
-	ringMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CaptureRing"));
+	//ringMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CaptureRing"));
 	//const ConstructorHelpers::FObjectFinder<UStaticMesh> ringStaticMesh(TEXT("StaticMesh'/Game/CreepCamp/Models/CreepCampCircle.CreepCampCircle'"));
 	//ringMesh->SetStaticMesh(ringStaticMesh.Object);
-	ringMesh->SetRelativeScale3D(FVector(4.0f, 4.0f, 3.25f));
-	ringMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 5.5f));
-	ringMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	//ringMesh->SetRelativeScale3D(FVector(4.0f, 4.0f, 3.25f));
+	//ringMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 5.5f));
+	//ringMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
 	//create & Set box trigger for capturing the camp
 	sphereTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("TriggerCollider"));
@@ -54,8 +54,8 @@ ACreepCamp::ACreepCamp()
 void ACreepCamp::BeginPlay()
 {
 	Super::BeginPlay();
-	if(ringMesh!= nullptr)
-		ringRotation = ringMesh->GetComponentRotation();
+	/*if(ringMesh!= nullptr)
+		ringRotation = ringMesh->GetComponentRotation();*/
 	sphereTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACreepCamp::OnOverlapBegin);
 	sphereTrigger->OnComponentEndOverlap.AddDynamic(this, &ACreepCamp::OnOverlapEnd);
 	
@@ -161,34 +161,34 @@ void ACreepCamp::Tick( float DeltaTime )
 			+ MCaptureTimer + FString::FromInt((int)captureVariables.captureTime));
 	}
 	//Rotate the ring every frame
-	ringRotation.Yaw += DeltaTime * ringRotationSpeed;
-	if (ringMesh != nullptr)
-	ringMesh->SetRelativeRotation(ringRotation);
+	//ringRotation.Yaw += DeltaTime * ringRotationSpeed;
+	/*if (ringMesh != nullptr)
+	ringMesh->SetRelativeRotation(ringRotation);*/
 
 	//if cyber is capturing
 	if (campType != ECampType::CT_Cyber && !captureVariables.bDieselIsCapturing && captureVariables.bCyberIsCapturing)
 	{
-		//Note: Make this better
-		if (ringMaterialAlpha >= 1)
-		{
-			bCountUp = false;
-		}
-		else if (ringMaterialAlpha <= 0.1f)
-		{
-			bCountUp = true;
-		}
+		////Note: Make this better
+		//if (ringMaterialAlpha >= 1)
+		//{
+		//	bCountUp = false;
+		//}
+		//else if (ringMaterialAlpha <= 0.1f)
+		//{
+		//	bCountUp = true;
+		//}
 
-		if (bCountUp)
-		{
-			ringMaterialAlpha += DeltaTime * ringMaterialAlphaSpeed;
-		}
-		else if (!bCountUp	)
-		{
-			ringMaterialAlpha -= DeltaTime * ringMaterialAlphaSpeed;
-		}
-		//set ring material to fade in and out
-		if (ringMesh != nullptr)
-			ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), ringMaterialAlpha);
+		//if (bCountUp)
+		//{
+		//	ringMaterialAlpha += DeltaTime * ringMaterialAlphaSpeed;
+		//}
+		//else if (!bCountUp	)
+		//{
+		//	ringMaterialAlpha -= DeltaTime * ringMaterialAlphaSpeed;
+		//}
+		////set ring material to fade in and out
+		//if (ringMesh != nullptr)
+		//	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), ringMaterialAlpha);
 
 		//check capture progress
 		if (captureVariables.dieselCaptureProgress >= 0)
@@ -210,27 +210,27 @@ void ACreepCamp::Tick( float DeltaTime )
 	//is Diesel capturing?
 	else if (campType != ECampType::CT_Diesel && !captureVariables.bCyberIsCapturing && captureVariables.bDieselIsCapturing)
 	{
-		if (ringMaterialAlpha >= 1)
-		{
-			bCountUp = false;
-		}
-		else if (ringMaterialAlpha <= 0.1f)
-		{
-			bCountUp = true;
-		}
+		//if (ringMaterialAlpha >= 1)
+		//{
+		//	bCountUp = false;
+		//}
+		//else if (ringMaterialAlpha <= 0.1f)
+		//{
+		//	bCountUp = true;
+		//}
 
-		if (bCountUp)
-		{
-			ringMaterialAlpha += DeltaTime * ringMaterialAlphaSpeed;
-		}
-		else if (!bCountUp)
-		{
-			ringMaterialAlpha -= DeltaTime * ringMaterialAlphaSpeed;
-		}
+		//if (bCountUp)
+		//{
+		//	ringMaterialAlpha += DeltaTime * ringMaterialAlphaSpeed;
+		//}
+		//else if (!bCountUp)
+		//{
+		//	ringMaterialAlpha -= DeltaTime * ringMaterialAlphaSpeed;
+		//}
 
-		//set ring material to fade in and out
-		if (ringMesh != nullptr)
-			ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), FMath::Sin(ringMaterialAlpha));
+		////set ring material to fade in and out
+		//if (ringMesh != nullptr)
+		//	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), FMath::Sin(ringMaterialAlpha));
 
 		if (captureVariables.cyberCaptureProgress >= 0)
 		{
@@ -419,8 +419,8 @@ void ACreepCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 		
 
-		if (ringMesh != nullptr)
-			ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
+		/*if (ringMesh != nullptr)
+			ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);*/
 	}
 }
 
@@ -431,10 +431,10 @@ void ACreepCamp::SetToDieselCamp()
 	captureVariables.bDieselIsCapturing = false;
 	campType = ECampType::CT_Diesel;
 	//set color and transparency of ring
-	if (ringMesh != nullptr) {
+	/*if (ringMesh != nullptr) {
 		ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0, 0, 0));
 		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
-	}
+	}*/
 	dieselHero->AddToCapturedCamps(this);
 	cyberHero->RemoveFromCapturedCamps(this);
 
@@ -451,11 +451,11 @@ void ACreepCamp::SetToCyberCamp()
 	campType = ECampType::CT_Cyber;
 
 	//set color and transparency of ring 
-	if (ringMesh != nullptr)
+	/*if (ringMesh != nullptr)
 	{
 		ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0.0, 0.0f, 1.0f));
 		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
-	}
+	}*/
 	cyberHero->AddToCapturedCamps(this);
 	dieselHero->RemoveFromCapturedCamps(this);
 
@@ -470,11 +470,11 @@ void ACreepCamp::SetToNeutralCamp()
 	campType = ECampType::CT_Neutral;
 
 	//set color and transparency of ring
-	if (ringMesh != nullptr)
+	/*if (ringMesh != nullptr)
 	{
 		ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(1.0f, 1.0f, 1.0f));
 		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
-	}
+	}*/
 	dieselHero->RemoveFromCapturedCamps(this);
 	cyberHero->RemoveFromCapturedCamps(this);
 
