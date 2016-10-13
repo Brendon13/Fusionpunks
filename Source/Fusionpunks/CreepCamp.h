@@ -192,6 +192,8 @@ protected:
 
 	TArray<FVector> creepSpawnArray;
 	float distanceValue;
+	
+	
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
@@ -202,6 +204,8 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		void SetToNeutralCamp();
+
+	
 
 public:
 

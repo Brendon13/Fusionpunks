@@ -66,6 +66,7 @@ void ACyberTower::Tick(float DeltaTime)
 			}
 			beam->SetBeamSourcePoint(0, sourceLocation, 0);
 			beam->SetBeamTargetPoint(0, enemyUnits[0]->GetActorLocation(), 0);
+			
 			if (!bIsDealingDMG)
 			{
 				towerDMG->StartTimer(damageEverySeconds, enemyUnits[0]);

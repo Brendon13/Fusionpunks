@@ -13,11 +13,21 @@ EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent&
 	{
 		TArray<ACreepCamp*> creepCamps = heroAI->GetCreepCampList();
 		ACreepCamp* targetCamp = nullptr;
+		
+		AActor* hero = heroAI->GetPawn();
+		ECampType enemyCampType;
+
+		if (hero->ActorHasTag("Cyber"))
+			enemyCampType = ECampType::CT_Diesel;
+
+		else
+			enemyCampType = ECampType::CT_Cyber;
+
 		if (creepCamps.Num() > 0) 
 		{
 			for (int32 i = 0; i < creepCamps.Num(); i++) 
 			{
-				if (creepCamps[i]->GetCampType() == ECampType::CT_Neutral)
+				if (creepCamps[i]->GetCampType() == ECampType::CT_Neutral || creepCamps[i]->GetCampType() == enemyCampType)
 				{
 					targetCamp = creepCamps[i];
 					break;
