@@ -42,7 +42,7 @@ void APlayerHUD::BeginPlay()
 		campProgressWidget->SetVisibility(ESlateVisibility::Hidden);
 
 		gameTimerWidget = CreateWidget<UGameTimerWidget>(GetOwningPlayerController(), gameTimerWidgetClass);
-		gameTimerWidget->AddToViewport();
+		gameTimerWidget->AddToViewport(1);
 	}
 	/*if (GetWorld()->GetName() == "MechanicsTesting")
 	{

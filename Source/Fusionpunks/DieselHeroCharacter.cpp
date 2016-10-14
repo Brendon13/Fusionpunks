@@ -2,6 +2,7 @@
 
 #include "Fusionpunks.h"
 #include "PlayerHUD.h"
+#include "RankUIWidget.h"
 #include "FusionpunksGameState.h"
 #include "DieselHeroCharacter.h"
 
@@ -37,6 +38,12 @@ ADieselHeroCharacter::ADieselHeroCharacter()
 void ADieselHeroCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (UIWidgetClass && ActorHasTag(TEXT("AI")) == false)
+	{
+		UIWidget = CreateWidget<URankUIWidget>(GetWorld(), UIWidgetClass);
+		UIWidget->AddToViewport(0);
+	}
 }
 
 void ADieselHeroCharacter::Tick(float DeltaTime)

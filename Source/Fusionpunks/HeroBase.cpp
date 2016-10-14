@@ -499,11 +499,11 @@ TArray<ACreep*> AHeroBase::GetCreepArmyArray()
 
 void AHeroBase::UpdateCreepArmy()
 {
-	for (int32 i = 1; i <= currentArmySize; i++)
+	for (int32 i = 1; i <= CreepArmy.Num(); i++)
 	{
-		if (CreepArmy[i] != nullptr)
+		if (CreepArmy[i - 1] != nullptr)
 		{
-			CreepArmy[i]->slotAssignment = i;
+			CreepArmy[i - 1]->slotAssignment = i;
 		}	
 	}
 }
