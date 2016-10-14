@@ -4,6 +4,7 @@
 #include "TestCreep.h"
 #include "ChainLightning.h"
 #include "FusionpunksGameState.h"
+#include "ProphetUIWidget.h"
 #include "CyberHeroCharacter.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -54,6 +55,12 @@ void ACyberHeroCharacter::DetermineClickEvent()
 void ACyberHeroCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (UIWidgetClass && ActorHasTag(TEXT("AI")) == false)
+	{
+		UIWidget = CreateWidget<UProphetUIWidget>(GetWorld(), UIWidgetClass);
+		UIWidget->AddToViewport(0);
+	}
 }
 
 void ACyberHeroCharacter::Tick(float DeltaTime)

@@ -49,6 +49,13 @@ private:
 	TArray<FOverlapResult> skillTargetResults;
 	TArray<FOverlapResult> oldTargetResults;
 
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = UI)
+		TSubclassOf<class UProphetUIWidget> UIWidgetClass;
+
+	class UProphetUIWidget* UIWidget;
+
+	
 	
 };
 

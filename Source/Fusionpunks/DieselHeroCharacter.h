@@ -69,6 +69,12 @@ private:
 	float dashTimer;
 	bool bIsDashing;
 
+//UI Stuff
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = UI)
+		TSubclassOf<class URankUIWidget> UIWidgetClass;
+
+	class URankUIWidget* UIWidget;
 
 
 
