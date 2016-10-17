@@ -15,10 +15,5 @@ class FUSIONPUNKS_API URankUIWidget : public UUserWidget
 
 protected:
 	class ADieselHeroCharacter* owningCharacter;
-
-public:
-	UFUNCTION(BlueprintCallable, Category = Player)
-		FText GetArmySize() const;
-
-	FORCEINLINE void SetOwningCharacter(ADieselHeroCharacter* dieselCharacter) { owningCharacter = dieselCharacter; }
+	
 };

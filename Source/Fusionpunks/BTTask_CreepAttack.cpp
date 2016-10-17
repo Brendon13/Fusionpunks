@@ -21,7 +21,7 @@ EBTNodeResult::Type UBTTask_CreepAttack::ExecuteTask(UBehaviorTreeComponent& Own
 			more info @ https://www.unrealengine.com/blog/damage-in-ue4*/
 			FDamageEvent damageEvent;
 			enemy->TakeDamage(owner->MeleeAttack(), damageEvent, owner->GetController(), owner);
-			//UE_LOG(LogTemp, Warning, TEXT("Took Damage From Creep"));
+			UE_LOG(LogTemp, Warning, TEXT("Took Damage From Creep"));
 
 			return EBTNodeResult::Succeeded;
 		}

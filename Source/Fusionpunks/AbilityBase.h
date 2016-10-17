@@ -17,19 +17,16 @@ public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
-	// Called every fram)e
+	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
 	virtual void Use();
 
 	virtual bool CanUse();
 
-	FORCEINLINE float GetCoolDownRemainingAsDecimal() const { return (coolDownLeft >= 0 ? coolDownLeft / maxCoolDown : 0.0f); }
-	FORCEINLINE float GetCoolDownRemaining() const { return (coolDownLeft >= 0 ? coolDownLeft : 0.0f); }
-
 protected:
-	UPROPERTY(EditDefaultsonly, Category = Cooldown)
-	float maxCoolDown;
+	UPROPERTY(EDITDefaultsOnly)
+		float maxCoolDown;
 
 private:
 	float coolDownLeft;
