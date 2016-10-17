@@ -27,9 +27,9 @@ void ACyberHeroCharacter::SetupPlayerInputComponent(class UInputComponent* Input
 	// Set up gameplay key bindings
 	Super::SetupPlayerInputComponent(InputComponent);
 	check(InputComponent);
-
+	
 	InputComponent->BindAction("Basic Attack", IE_Pressed, this, &ACyberHeroCharacter::DetermineClickEvent);
-	InputComponent->BindAction("Skill1", IE_Pressed, this, &ACyberHeroCharacter::OnSkillPressed);
+	//InputComponent->BindAction("Skill1", IE_Pressed, this, &ACyberHeroCharacter::OnSkillPressed);
 }
 
 
@@ -59,6 +59,7 @@ void ACyberHeroCharacter::BeginPlay()
 	if (UIWidgetClass && ActorHasTag(TEXT("AI")) == false)
 	{
 		UIWidget = CreateWidget<UProphetUIWidget>(GetWorld(), UIWidgetClass);
+		UIWidget->SetOwningCharacter(this);
 		UIWidget->AddToViewport(0);
 	}
 }

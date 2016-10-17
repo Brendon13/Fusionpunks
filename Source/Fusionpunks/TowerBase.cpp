@@ -44,8 +44,8 @@ ATowerBase::ATowerBase()
 
 void ATowerBase::TriggerExit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (enemyUnits.Contains(OtherActor))
-		enemyUnits.Remove(OtherActor);
+	
+	enemyUnits.Remove(OtherActor);
 	
 }
 
@@ -53,10 +53,7 @@ void ATowerBase::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor*
 {
 	if (OtherActor->IsA(ACharacter::StaticClass()))
 	{
-		if (ActorHasTag("Diesel") && !OtherActor->ActorHasTag("Diesel"))
-			enemyUnits.Add(OtherActor);
-		else if (ActorHasTag("Cyber") && !OtherActor->ActorHasTag("Cyber"))
-			enemyUnits.Add(OtherActor);
+		enemyUnits.Add(OtherActor);
 	}
 }
 

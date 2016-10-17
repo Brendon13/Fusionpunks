@@ -56,8 +56,6 @@ void AHeroAIController::BeginPlay()
 		BlackboardComponent->SetValueAsObject("Home", bases[0]);
 		
 	}
-	BlackboardComponent->SetValueAsBool("ReachedCamp", false);
-	BlackboardComponent->SetValueAsBool("CapturedCamp", true);
 	
 }
 
@@ -76,18 +74,3 @@ TArray<ACreepCamp*> AHeroAIController::GetCreepCampList()
 	return campPriorityList.creepCampList;
 }
 
-void AHeroAIController::ResetAllCampsSafetyStatus() 
-{
-	campPriorityList.ResetCampsSafetyStatus();
-}
-TArray<ACreepCamp*> AHeroAIController::GetSortedOwnedCampList() 
-{
-	campOwnedPriorityList.EmptyList();
-	campOwnedPriorityList.GeneratePriorityList(Cast<AHeroBase>(GetPawn())->GetCapturedCamps(), GetPawn());
-	return campOwnedPriorityList.creepCampList;
-
-}
-void AHeroAIController::ResetAllCampsRecruitStatus()
-{
-	campPriorityList.ResetCampsRecruitedStatus();
-}

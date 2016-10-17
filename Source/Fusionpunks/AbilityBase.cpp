@@ -37,7 +37,7 @@ void AAbilityBase::Use()
 }
 bool AAbilityBase::CanUse()
 {
-	return coolDownLeft >= 0;
+	return coolDownLeft <= 0;
 }
 
 

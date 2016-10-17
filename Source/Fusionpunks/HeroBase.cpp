@@ -10,6 +10,7 @@
 #include "PlayerCompassWidget.h"
 #include "CreepFormation.h"
 #include "HealOverTime.h"
+#include "AbilityBase.h"
 #include "HeroBase.h"
 
 
@@ -85,6 +86,9 @@ AHeroBase::AHeroBase()
 
 	compassDecalComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("CompassDecalComponent"));
 	compassDecalComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
+
+	AbilitiesClass.SetNum(NUMBEROFABILITIES);
+	Abilities.SetNum(NUMBEROFABILITIES);
 }
 
 // Called when the game starts or when spawned
@@ -92,6 +96,7 @@ void AHeroBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	compassDecalMaterialDynamic = compassDecalComponent->CreateDynamicMaterialInstance();
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHeroBase::OnOverlapBegin);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHeroBase::OnOverlapEnd);
 	
@@ -109,16 +114,28 @@ void AHeroBase::BeginPlay()
 	heroStats->DisplayStats();
 	LinkToCreepCamps();
 
-	
-		
-	
-	
 }
 
 // Called every frame
 void AHeroBase::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
+
+	FLinearColor materialColor = FLinearColor::FLinearColor(1 - GetPlayerHealthAsDecimal(), GetPlayerHealthAsDecimal(), 0, 1.0f);
+	compassDecalMaterialDynamic->SetVectorParameterValue("Base_Colour", materialColor);
+
+	//UMaterialInstance* material = Cast<UMaterialInstance>(compassDecalComponent->GetDecalMaterial());
+	//if (material)
+	//{
+	//	material->Para
+	//	if (material->VectorParameterValues.Num() > 0)
+	//	{
+	//		material->VectorParameterValues[0].ParameterValue.R = 1 - GetPlayerHealthAsDecimal();
+	//		material->VectorParameterValues[0].ParameterValue.G = GetPlayerHealthAsDecimal();
+	//		material->VectorParameterValues[0].ParameterValue.B = 0;
+	//			//FLinearColor(1 - GetPlayerHealthAsDecimal(), GetPlayerHealthAsDecimal(), 0, 1.0f);
+	//	}
+	//}
 }
 
 // Called to bind functionality to input
@@ -128,8 +145,8 @@ void AHeroBase::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 	// Set up gameplay key bindings
 	check(InputComponent);
 
-	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	//InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	//InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	InputComponent->BindAxis("MoveForward", this, &AHeroBase::MoveForward);
 	InputComponent->BindAxis("MoveRight", this, &AHeroBase::MoveRight);
@@ -152,6 +169,11 @@ void AHeroBase::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 	InputComponent->BindAction("AICamera", IE_Pressed, this, &AHeroBase::SwapAICamera);
 
 	InputComponent->BindAction("SacrificeCreep", IE_Pressed, this, &AHeroBase::SacrificeCreep);
+
+	InputComponent->BindAction("Ability1", IE_Pressed, this, &AHeroBase::UseAbility0);
+	InputComponent->BindAction("Ability2", IE_Pressed, this, &AHeroBase::UseAbility1);
+	InputComponent->BindAction("Ability3", IE_Pressed, this, &AHeroBase::UseAbility2);
+	InputComponent->BindAction("Ability4", IE_Pressed, this, &AHeroBase::UseAbility3);
 }
 void AHeroBase::TurnAtRate(float Rate)
 {
@@ -400,7 +422,6 @@ void AHeroBase::RecruitCreep()
 			if (creep)
 			{
 				//IMPLEMENT SOUND TO PLAY!
-				UE_LOG(LogTemp, Warning, TEXT("RECRUITED CREEP!"));
 				currentArmySize++;
 				CreepArmy.Add(creep);
 				creepFormationComp->CalculateSlotPositions(currentArmySize);
@@ -644,5 +665,53 @@ void AHeroBase::SacrificeCreep()
 		ACreep* creep = CreepArmy.Pop();
 		creep->Destroy();
 		HealOverTime();
+	}
+}
+
+void AHeroBase::UseAbility0()
+{
+	if (AbilitiesClass[0] != nullptr)
+	{
+		//spawn ability
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Ability 1 is Unassigned!"))
+	}
+}
+
+void AHeroBase::UseAbility1()
+{
+	if (AbilitiesClass[1] != nullptr)
+	{
+		//spawn ability
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Ability 2 is Unassigned!"))
+	}
+}
+
+void AHeroBase::UseAbility2()
+{
+	if (AbilitiesClass[2] != nullptr)
+	{
+		//spawn ability
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Ability 3 is Unassigned!"))
+	}
+}
+
+void AHeroBase::UseAbility3()
+{
+	if (AbilitiesClass[3] != nullptr)
+	{
+		//spawn ability
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Ability 4 is Unassigned!"))
 	}
 }

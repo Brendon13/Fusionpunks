@@ -146,6 +146,12 @@ void ACreepCamp::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	if (campType == ECampType::CT_Cyber)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Creep Count: %i"), spawningVariables.creepCount);
+		UE_LOG(LogTemp, Warning, TEXT("Creep Count: %i"), spawningVariables.cyberCreepLimit);
+	}
+		
 	//Debug Messages to print to screen
 	//Could probably make an entire struct to handle this 
 
@@ -166,7 +172,7 @@ void ACreepCamp::Tick( float DeltaTime )
 	ringMesh->SetRelativeRotation(ringRotation);*/
 
 	//if cyber is capturing
-	if (campType != ECampType::CT_Cyber && !captureVariables.bDieselIsCapturing && captureVariables.bCyberIsCapturing)
+	if (campType != ECampType::CT_Cyber && spawningVariables.creepCount == 0 && !captureVariables.bDieselIsCapturing && captureVariables.bCyberIsCapturing)
 	{
 		////Note: Make this better
 		//if (ringMaterialAlpha >= 1)
@@ -208,7 +214,7 @@ void ACreepCamp::Tick( float DeltaTime )
 		}
 	}
 	//is Diesel capturing?
-	else if (campType != ECampType::CT_Diesel && !captureVariables.bCyberIsCapturing && captureVariables.bDieselIsCapturing)
+	else if (campType != ECampType::CT_Diesel && spawningVariables.creepCount == 0 && !captureVariables.bCyberIsCapturing && captureVariables.bDieselIsCapturing)
 	{
 		//if (ringMaterialAlpha >= 1)
 		//{
@@ -252,37 +258,33 @@ void ACreepCamp::Tick( float DeltaTime )
 	//Note - Brendon: Do we want to keep spawning creeps at neutral camps or have a cap???
 	//spawning creeps
 	//if neutral camp
-	if (campType == ECampType::CT_Neutral)
+	if (campType == ECampType::CT_Neutral && spawningVariables.creepCount < spawningVariables.neutralCreepLimit)
 	{
-		if (spawningVariables.creepCount < spawningVariables.neutralCreepLimit)
+		spawningVariables.creepSpawnTimer -= DeltaTime;
+		if (spawningVariables.creepSpawnTimer <= 0)
 		{
-			spawningVariables.creepSpawnTimer -= DeltaTime;
+			FActorSpawnParameters spawnParameters;
+			spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-			if (spawningVariables.creepSpawnTimer <= 0)
+			int random = FMath::RandRange(0, 2);
+			ANeutralCreep* neutralCreep = (ANeutralCreep*)GetWorld()->SpawnActor<ANeutralCreep>
+				(neutralCreepRef,
+					creepSpawnArray[random],
+					FRotator::ZeroRotator,
+					spawnParameters);
+
+			if (neutralCreep->IsValidLowLevel())
 			{
-				FActorSpawnParameters spawnParameters;
-				spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-				//NOTE - Brendon:: Change this to play creep creation animation(camp) and spawn it in the middle of the camp
-				//Then creep behavior should change to patrolling camp 
-				int random = FMath::RandRange(0, 2);
-				ANeutralCreep* neutralCreep = (ANeutralCreep*)GetWorld()->SpawnActor<ANeutralCreep>
-					(neutralCreepRef,
-						creepSpawnArray[random],
-						FRotator::ZeroRotator,
-						spawnParameters);
-
-				if (neutralCreep->IsValidLowLevel())
-				{
-					neutralCreep->SetCreepCampHome(this, true);
-					creepArray.Add(neutralCreep);
-					spawningVariables.creepCount++;
-				}
-
-				spawningVariables.creepSpawnTimer = spawningVariables.creepSpawnTimerTarget;
+				neutralCreep->SetCreepCampHome(this, true);
+				creepArray.Add(neutralCreep);
+				spawningVariables.creepCount++;
 			}
+
+			spawningVariables.creepSpawnTimer = spawningVariables.creepSpawnTimerTarget;
 		}
 	}
-	else
+	//if cyber camp
+	else if(campType == ECampType::CT_Cyber && spawningVariables.creepCount < spawningVariables.cyberCreepLimit)
 	{
 		spawningVariables.creepSpawnTimer -= DeltaTime;
 
@@ -292,9 +294,8 @@ void ACreepCamp::Tick( float DeltaTime )
 			{
 				FActorSpawnParameters spawnParameters;
 				spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-				//NOTE - Brendon:: Change this to play creep creation animation(camp) and spawn it in the middle of the camp
-				//Then creep behavior should change to patrolling camp 
 				int random = FMath::RandRange(0, 2);
+
 				ACyberCreep* cyberCreep = (ACyberCreep*)GetWorld()->SpawnActor<ACyberCreep>
 					(cyberCreepRef,
 						creepSpawnArray[random],
@@ -308,55 +309,62 @@ void ACreepCamp::Tick( float DeltaTime )
 					spawningVariables.creepCount++;
 				}
 			}
-			else
-			{
-				FActorSpawnParameters spawnParameters;
-				spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-				//NOTE - Brendon:: Change this to play creep creation animation(camp) and spawn it in the middle of the camp
-				//Then creep behavior should change to patrolling camp 
-				int random = FMath::RandRange(0, 2);
-				ADieselCreep* dieselCreep = (ADieselCreep*)GetWorld()->SpawnActor<ADieselCreep>
-					(dieselCreepRef,
-						creepSpawnArray[random],
-						FRotator::ZeroRotator,
-						spawnParameters);
+			spawningVariables.creepSpawnTimer = spawningVariables.creepSpawnTimerTarget;
+		}
+		
+	}
+	//if diesel camp
+	else if (campType == ECampType::CT_Diesel && spawningVariables.creepCount < spawningVariables.dieselCreepLimit)
+	{
 
-				if (dieselCreep->IsValidLowLevel())
-				{
-					dieselCreep->SetCreepCampHome(this, true);
-					creepArray.Add(dieselCreep);
-					spawningVariables.creepCount++;
-				}
+		if (spawningVariables.creepSpawnTimer <= 0)
+		{
+			FActorSpawnParameters spawnParameters;
+			spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+			int random = FMath::RandRange(0, 2);
+			ADieselCreep* dieselCreep = (ADieselCreep*)GetWorld()->SpawnActor<ADieselCreep>
+				(dieselCreepRef,
+					creepSpawnArray[random],
+					FRotator::ZeroRotator,
+					spawnParameters);
+
+			if (dieselCreep->IsValidLowLevel())
+			{
+				dieselCreep->SetCreepCampHome(this, true);
+				creepArray.Add(dieselCreep);
+				spawningVariables.creepCount++;
 			}
 
-			//NOTE - BRENDON: Can change multiplier and target timer in Blueprints, have to balance this 
-			/*														 @ 3 Creeps
-			(5 seconds		    +						   (3   *   1.5)) = 9 seconds
-			@ 4 Creeps
-			(5 seconds			+						(4		*	 1.5)) = 11 seconds */
-			spawningVariables.creepSpawnTimer = spawningVariables.creepSpawnTimerTarget + (spawningVariables.creepCount * spawningVariables.creepSpawnTimerMultiplier);
+			spawningVariables.creepSpawnTimer = spawningVariables.creepSpawnTimerTarget;
 		}
 	}
 
 	//update the capture target depending on how many creeps are in the camp
-	if (campType != ECampType::CT_Neutral && spawningVariables.creepCount > 3)
-	{	
-		/*                              @3 Creeps:              */
-		captureVariables.captureTime = captureVariables.targetCaptureTime + (spawningVariables.creepCount * captureVariables.captureTimeMultiplier);
+	//if (campType != ECampType::CT_Neutral && spawningVariables.creepCount > 3)
+	//{	
+	//	/*                              @3 Creeps:              */
+	//	captureVariables.captureTime = captureVariables.targetCaptureTime + (spawningVariables.creepCount * captureVariables.captureTimeMultiplier);
 
-		//update capture progress bar for whoever owns the camp
-		if (!captureVariables.bCyberIsCapturing && !captureVariables.bDieselIsCapturing)
-		{
-			if (campType == ECampType::CT_Cyber)
-			{
-				captureVariables.cyberCaptureProgress = captureVariables.captureTime;
-			}
-			else
-			{
-				captureVariables.dieselCaptureProgress = captureVariables.captureTime;
-			}
-		}
-	}
+	//	//update capture progress bar for whoever owns the camp
+	//	if (!captureVariables.bCyberIsCapturing && !captureVariables.bDieselIsCapturing)
+	//	{
+	//		if (campType == ECampType::CT_Cyber)
+	//		{
+	//			captureVariables.cyberCaptureProgress = captureVariables.captureTime;
+	//		}
+	//		else
+	//		{
+	//			captureVariables.dieselCaptureProgress = captureVariables.captureTime;
+	//		}
+	//	}
+	//}
+
+	//NOTE - BRENDON: Can change multiplier and target timer in Blueprints, have to balance this 
+	/*														 @ 3 Creeps
+	(5 seconds		    +						   (3   *   1.5)) = 9 seconds
+	@ 4 Creeps
+	(5 seconds			+						(4		*	 1.5)) = 11 seconds */
+	//spawningVariables.creepSpawnTimer = spawningVariables.creepSpawnTimerTarget + (spawningVariables.creepCount * spawningVariables.creepSpawnTimerMultiplier);
 
 }//end of tick
 
@@ -374,13 +382,11 @@ void ACreepCamp::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActo
 			
 			if (!OtherActor->Tags.Contains("AI"))
 				heroChar->ShowCampProgress(this);
-		}
+		}	
 
 		if (OtherActor->Tags.Contains("CyberPlayer"))
 		{
 			captureVariables.bCyberIsCapturing = true;
-			
-		
 		}
 
 		if (OtherActor->Tags.Contains("DieselPlayer"))
@@ -388,7 +394,6 @@ void ACreepCamp::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActo
 			captureVariables.bDieselIsCapturing = true;
 
 		}
-		
 		
 	}
 }
@@ -417,8 +422,6 @@ void ACreepCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 			captureVariables.bDieselIsCapturing = false;
 		}
 
-		
-
 		/*if (ringMesh != nullptr)
 			ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);*/
 	}
@@ -435,12 +438,17 @@ void ACreepCamp::SetToDieselCamp()
 		ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0, 0, 0));
 		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
 	}*/
-	dieselHero->AddToCapturedCamps(this);
-	cyberHero->RemoveFromCapturedCamps(this);
 
-	//for now
-	cyberHero->UpdateHeroStats();
-	dieselHero->UpdateHeroStats();
+	if (GetWorld()->GetName() != "MechanicsTesting")
+	{
+		dieselHero->AddToCapturedCamps(this);
+		cyberHero->RemoveFromCapturedCamps(this);
+
+		//for now
+		cyberHero->UpdateHeroStats();
+		dieselHero->UpdateHeroStats();
+	}
+	
 }
 
 //change camp functionality to cyber function
@@ -456,12 +464,16 @@ void ACreepCamp::SetToCyberCamp()
 		ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(0.0, 0.0f, 1.0f));
 		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
 	}*/
-	cyberHero->AddToCapturedCamps(this);
-	dieselHero->RemoveFromCapturedCamps(this);
 
-	//for now
-	cyberHero->UpdateHeroStats();
-	dieselHero->UpdateHeroStats();
+	if (GetWorld()->GetName() != "MechanicsTesting")
+	{
+		cyberHero->AddToCapturedCamps(this);
+		dieselHero->RemoveFromCapturedCamps(this);
+
+		//for now
+		cyberHero->UpdateHeroStats();
+		dieselHero->UpdateHeroStats();
+	}
 }
 
 void ACreepCamp::SetToNeutralCamp()
@@ -475,12 +487,15 @@ void ACreepCamp::SetToNeutralCamp()
 		ringMesh->SetVectorParameterValueOnMaterials(TEXT("RingColor"), FVector::FVector(1.0f, 1.0f, 1.0f));
 		ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), 0.5f);
 	}*/
-	dieselHero->RemoveFromCapturedCamps(this);
-	cyberHero->RemoveFromCapturedCamps(this);
+	if (GetWorld()->GetName() != "MechanicsTesting")
+	{
+		dieselHero->RemoveFromCapturedCamps(this);
+		cyberHero->RemoveFromCapturedCamps(this);
 
-	//for now
-	cyberHero->UpdateHeroStats();
-	dieselHero->UpdateHeroStats();
+		//for now
+		cyberHero->UpdateHeroStats();
+		dieselHero->UpdateHeroStats();
+	}
 }
 
 void ACreepCamp::RemoveCreep(ACreep* CreepInCamp)
@@ -532,6 +547,7 @@ ACreep* ACreepCamp::GetNextCreep(AHeroBase* Hero)
 	const bool bSameTeam = team.IsEqual(Hero->GetTeam());
 	if (bSameTeam)
 	{
+		spawningVariables.creepCount--;
 		return (creepArray.Num() > 0 ? creepArray.Pop() : nullptr);
 	}
 	return nullptr;
