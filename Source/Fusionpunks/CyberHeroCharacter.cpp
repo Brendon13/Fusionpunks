@@ -27,7 +27,7 @@ void ACyberHeroCharacter::SetupPlayerInputComponent(class UInputComponent* Input
 	// Set up gameplay key bindings
 	Super::SetupPlayerInputComponent(InputComponent);
 	check(InputComponent);
-	
+
 	InputComponent->BindAction("Basic Attack", IE_Pressed, this, &ACyberHeroCharacter::DetermineClickEvent);
 	InputComponent->BindAction("Skill1", IE_Pressed, this, &ACyberHeroCharacter::OnSkillPressed);
 }
