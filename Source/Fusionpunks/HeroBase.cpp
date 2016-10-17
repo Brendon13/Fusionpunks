@@ -422,6 +422,7 @@ void AHeroBase::RecruitCreep()
 			if (creep)
 			{
 				//IMPLEMENT SOUND TO PLAY!
+				UE_LOG(LogTemp, Warning, TEXT("RECRUITED CREEP!"));
 				currentArmySize++;
 				CreepArmy.Add(creep);
 				creepFormationComp->CalculateSlotPositions(currentArmySize);
