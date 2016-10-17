@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "AbilityBase.h"
 #include "HeroBase.generated.h"
 
 UCLASS(abstract)
@@ -140,7 +141,7 @@ public:
 
 	bool bIsRespawning = false;
 
-	FORCEINLINE int32 GetArmySize() const { return currentArmySize; }
+	FORCEINLINE int32 GetArmySize() const { return CreepArmy.Num(); }
 	FORCEINLINE float GetRespawnTime() const { return respawnTime; }
 	FORCEINLINE  int32 GetLevel() const { return currentLevel; }
 	FORCEINLINE  float GetAttackDamage() const { return basicAttackDamage; }
@@ -237,11 +238,26 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UDecalComponent* compassDecalComponent;
+	UMaterialInstanceDynamic* compassDecalMaterialDynamic;
 
-//Ability Functions
+//Ability Array
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = Abilities)
+	TArray<TSubclassOf<AAbilityBase>> AbilitiesClass;
+
+	TArray<AAbilityBase*> Abilities;
+
+	const int8 NUMBEROFABILITIES = 4;
 	void SacrificeCreep();
 
+public:
+	FORCEINLINE AAbilityBase* GetAbility(int i) const { return (Abilities.Num() >= i ? Abilities[i] : nullptr); }
+
+protected:
+	void UseAbility0();
+	void UseAbility1();
+	void UseAbility2();
+	void UseAbility3();
 
 
 //protected:

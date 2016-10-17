@@ -59,6 +59,8 @@ struct FSpawningVariables
 		creepSpawnTimer = creepSpawnTimerTarget;
 		creepSpawnTimerMultiplier = 1.5f;
 		neutralCreepLimit = 3;
+		cyberCreepLimit = 3;
+		dieselCreepLimit = 3;
 		startCreepAmount = 3;
 		creepCount = 0;
 	}
@@ -70,6 +72,10 @@ struct FSpawningVariables
 	UPROPERTY(EditAnywhere, Category = CampVariables)
 	int neutralCreepLimit;
 	UPROPERTY(EditAnywhere, Category = CampVariables)
+	int cyberCreepLimit;
+	UPROPERTY(EditAnywhere, Category = CampVariables)
+	int dieselCreepLimit;
+	UPROPERTY(EditAnywhere, Category = CampVariables)
 	int startCreepAmount;
 	
 	UPROPERTY(EditAnywhere, Category = CampVariables)
@@ -78,6 +84,8 @@ struct FSpawningVariables
 	float creepSpawnTimerMultiplier;
 	UPROPERTY()
 	float creepSpawnTimer;
+
+
 };
 
 class AHeroBase;
