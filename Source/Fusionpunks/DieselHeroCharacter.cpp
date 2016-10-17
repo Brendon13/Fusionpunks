@@ -42,6 +42,7 @@ void ADieselHeroCharacter::BeginPlay()
 	if (UIWidgetClass && ActorHasTag(TEXT("AI")) == false)
 	{
 		UIWidget = CreateWidget<URankUIWidget>(GetWorld(), UIWidgetClass);
+		UIWidget->SetOwningCharacter(this);
 		UIWidget->AddToViewport(0);
 	}
 }

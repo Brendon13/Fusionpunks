@@ -22,7 +22,8 @@ private:
 
 public:
 	FORCEINLINE float GetHealthPercent() const { return healthPercent; }
-	FORCEINLINE int32 GetArmySize() const { return armySize; }
+
+
 
 
 };

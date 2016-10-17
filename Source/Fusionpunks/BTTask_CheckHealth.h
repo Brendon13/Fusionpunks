@@ -3,7 +3,6 @@
 #pragma once
 
 #include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
-
 #include "BTTask_CheckHealth.generated.h"
 
 /**

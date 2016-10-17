@@ -59,6 +59,8 @@ struct FSpawningVariables
 		creepSpawnTimer = creepSpawnTimerTarget;
 		creepSpawnTimerMultiplier = 1.5f;
 		neutralCreepLimit = 3;
+		cyberCreepLimit = 3;
+		dieselCreepLimit = 3;
 		startCreepAmount = 3;
 		creepCount = 0;
 	}
@@ -70,6 +72,10 @@ struct FSpawningVariables
 	UPROPERTY(EditAnywhere, Category = CampVariables)
 	int neutralCreepLimit;
 	UPROPERTY(EditAnywhere, Category = CampVariables)
+	int cyberCreepLimit;
+	UPROPERTY(EditAnywhere, Category = CampVariables)
+	int dieselCreepLimit;
+	UPROPERTY(EditAnywhere, Category = CampVariables)
 	int startCreepAmount;
 	
 	UPROPERTY(EditAnywhere, Category = CampVariables)
@@ -78,6 +84,8 @@ struct FSpawningVariables
 	float creepSpawnTimerMultiplier;
 	UPROPERTY()
 	float creepSpawnTimer;
+
+
 };
 
 class AHeroBase;
@@ -174,14 +182,9 @@ public:
 
 	FORCEINLINE const float GetDistanceValue() const { return distanceValue; }
 	FORCEINLINE void SetDistanceValue(float value) { distanceValue = value; }
-	FORCEINLINE int32 GetNumOfCreepsAtCamp() const { return spawningVariables.creepCount; }
+
 	FORCEINLINE const ECampType GetCampType() const {return campType;}
-	
-	//FOR HERO AI CAMP SEARCH 
-	FORCEINLINE const bool GetCampSafety() const { return bSafeToCapture; }
-	FORCEINLINE void SetCampSafety(bool status) { bSafeToCapture = status; }
-	FORCEINLINE void SetCampRecruitedStatus(bool status) { bRecruitedByFromAI = status; }
-	FORCEINLINE const bool HasBeenRecruitedFrom() { return bRecruitedByFromAI; }
+
 //Creep Spawn Locations
 protected:
 	TArray<ACreep*> creepArray;
@@ -199,9 +202,6 @@ protected:
 	float distanceValue;
 	
 	
-	//FOR HERO AI CAMP SEARCH 
-	bool bSafeToCapture = true;
-	bool bRecruitedByFromAI = false;
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
