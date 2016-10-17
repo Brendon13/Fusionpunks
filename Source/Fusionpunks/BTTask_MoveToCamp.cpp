@@ -12,10 +12,16 @@ EBTNodeResult::Type UBTTask_MoveToCamp::ExecuteTask(UBehaviorTreeComponent& Owne
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 	targetCamp = Cast<ACreepCamp>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("CampTarget"));
+	//OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
 	hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
+
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
+		return EBTNodeResult::Succeeded;
 
 	if (hero != nullptr)
 	{
+		
+		
 		heroStats = hero->GetHeroStats();
 		return EBTNodeResult::InProgress;
 		
@@ -32,15 +38,19 @@ EBTNodeResult::Type UBTTask_MoveToCamp::ExecuteTask(UBehaviorTreeComponent& Owne
 void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-	
+
 	heroStats->UpdateStats();
-	
 
-	if (targetCamp->GetCampType() != ECampType::CT_Neutral)
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
 	{
-		UE_LOG(LogTemp, Display, TEXT("CAMP STATUS HAS CHANGED WHILE AI HEADING TO CAMP"));
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		return FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
 
+	if (hero->GetDistanceTo(targetCamp) < 650)
+	{
+		UE_LOG(LogTemp, Error, TEXT("TOO CLOSE TO CAMP"));
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", true);
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 	
 	
