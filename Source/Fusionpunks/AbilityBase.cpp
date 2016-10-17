@@ -3,7 +3,7 @@
 #include "Fusionpunks.h"
 #include "AbilityBase.h"
 
-
+// Stuff
 // Sets default values
 AAbilityBase::AAbilityBase()
 {
