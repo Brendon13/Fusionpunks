@@ -187,7 +187,7 @@ protected:
 		 TSubclassOf<ACreepCamp> creepCampClass;
 public:
 	FORCEINLINE FName GetTeam() const { return team; }
-
+	virtual void RecruitCreep();
 	//UPROPERTY(EditDefaultsOnly)
 	//	class UWidgetComponent* widgetComponent;
 
@@ -197,7 +197,7 @@ public:
 
 //AI Stuff
 protected:
-	virtual void RecruitCreep();
+	
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		int32 maxArmySize;
 
