@@ -8,50 +8,69 @@
 EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
+	
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
+		return EBTNodeResult::Succeeded;
+
 	AHeroAIController* heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
-	if (heroAI!= nullptr) 
-	{
-		TArray<ACreepCamp*> creepCamps = heroAI->GetCreepCampList();
-		ACreepCamp* targetCamp = nullptr;
-		
-		AActor* hero = heroAI->GetPawn();
-		ECampType enemyCampType;
+	
+	
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("CapturedCamp"))
+	{	
+		//CAMP HAS ALREADY BEEN CAPTURED SO CHOOSE NEW CAMP
 
-		if (hero->ActorHasTag("Cyber"))
-			enemyCampType = ECampType::CT_Diesel;
-
-		else
-			enemyCampType = ECampType::CT_Cyber;
-
-		if (creepCamps.Num() > 0) 
+		if (heroAI != nullptr)
 		{
-			for (int32 i = 0; i < creepCamps.Num(); i++) 
+			TArray<ACreepCamp*> creepCamps = heroAI->GetCreepCampList();
+			ACreepCamp* targetCamp = nullptr;
+
+			AActor* hero = heroAI->GetPawn();
+			ECampType enemyCampType;
+
+			if (hero->ActorHasTag("Cyber"))
+				enemyCampType = ECampType::CT_Diesel;
+
+			else
+				enemyCampType = ECampType::CT_Cyber;
+
+			if (creepCamps.Num() > 0)
 			{
-				if (creepCamps[i]->GetCampType() == ECampType::CT_Neutral || creepCamps[i]->GetCampType() == enemyCampType)
+				for (int32 i = 0; i < creepCamps.Num(); i++)
 				{
-					targetCamp = creepCamps[i];
-					break;
+					if ((creepCamps[i]->GetCampType() == ECampType::CT_Neutral || creepCamps[i]->GetCampType() == enemyCampType)
+						&& creepCamps[i]->GetCampSafety())
+					{
+						targetCamp = creepCamps[i];
+						break;
+					}
 				}
+
+				if (targetCamp != nullptr)
+				{
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject("CampTarget", targetCamp);
+					OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", false);
+				
+					return EBTNodeResult::Succeeded;
+				}
+
+				// TARGET CAMP IS NULL 
+				return EBTNodeResult::Failed;
+
 			}
-			
-			if (targetCamp != nullptr)
+
+			else
 			{
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject("CampTarget", targetCamp);
-				return EBTNodeResult::Succeeded;
+				//CANT FIND CREEP CAMPS
+				return EBTNodeResult::Failed;
 			}
-		    return EBTNodeResult::Failed;
-			
+
+
 		}
-
-		else 
-		{
-			return EBTNodeResult::Failed;
-		}
-
-
+		// HERO AI PTR IS NULL
+		return EBTNodeResult::Failed;
 	}
-
-	return EBTNodeResult::Failed;
+	// IF TARGET CAMP HAS NOT BEEN CAPTURED YET
+	return EBTNodeResult::Succeeded;
 }
 
 

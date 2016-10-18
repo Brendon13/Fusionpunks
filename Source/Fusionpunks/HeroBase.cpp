@@ -89,6 +89,8 @@ AHeroBase::AHeroBase()
 
 	AbilitiesClass.SetNum(NUMBEROFABILITIES);
 	Abilities.SetNum(NUMBEROFABILITIES);
+
+	bIsAttacking = false; 
 }
 
 // Called when the game starts or when spawned
@@ -338,7 +340,15 @@ void AHeroBase::StartAttack()
 		{
 			Attack(closestEnemy);
 		}
-		
+	}
+
+	UBoolProperty* boolProp = FindField<UBoolProperty>(GetMesh()->GetAnimInstance()->GetClass(), TEXT("MeleeAttacking"));
+	if (boolProp)
+	{
+		bIsAttacking = true;
+		boolProp->SetPropertyValue_InContainer(GetMesh()->GetAnimInstance(), true);
+		//bool meleeAttack = boolProp->GetPropertyValue_InContainer(GetMesh()->GetAnimInstance());
+		GetWorld()->GetTimerManager().SetTimer(attackTimerHandle, this, &AHeroBase::StopAttacking, 1.0f, false);
 	}
 }
 void AHeroBase::ResetHealth()
@@ -349,6 +359,7 @@ void AHeroBase::Attack(AActor* enemy)
 {
 	FDamageEvent DamageEvent;
 
+	
 	float damage = enemy->TakeDamage(basicAttackDamage, DamageEvent, Cast<APlayerController>(GetController()), this);
 }
 
@@ -670,9 +681,15 @@ void AHeroBase::SacrificeCreep()
 
 void AHeroBase::UseAbility0()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Using Ability 1"));
 	if (AbilitiesClass[0] != nullptr)
 	{
-		//spawn ability
+		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 1"));
+		//spawn the ability
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+
+		Abilities[0] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[0]->GetClass(), GetActorLocation(), FRotator::ZeroRotator, spawnParams);
 	}
 	else
 	{
@@ -684,7 +701,7 @@ void AHeroBase::UseAbility1()
 {
 	if (AbilitiesClass[1] != nullptr)
 	{
-		//spawn ability
+		//spawn ability 
 	}
 	else
 	{
@@ -713,5 +730,19 @@ void AHeroBase::UseAbility3()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Ability 4 is Unassigned!"))
+	}
+}
+
+void AHeroBase::StopAttacking()
+{
+	if (attackTimerHandle.IsValid())
+		GetWorld()->GetTimerManager().ClearTimer(attackTimerHandle);
+	
+	UBoolProperty* boolProp = FindField<UBoolProperty>(GetMesh()->GetAnimInstance()->GetClass(), TEXT("MeleeAttacking"));
+	if (boolProp)
+	{
+		bIsAttacking = false;
+		boolProp->SetPropertyValue_InContainer(GetMesh()->GetAnimInstance(), false);
+		//bool meleeAttack = boolProp->GetPropertyValue_InContainer(GetMesh()->GetAnimInstance());
 	}
 }

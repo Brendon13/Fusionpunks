@@ -110,6 +110,12 @@ protected:
 		float patrolRadius;
 
 	AActor* EnemyTarget;
+
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		float agroRadius;
+
+	UPROPERTY(EditDefaultsOnly)
+	USphereComponent* agroRadiusSphere; 
 public:
 	UFUNCTION(BlueprintCallable, Category = CampVariables)
 		FORCEINLINE float GetPatrolRadius() const { return patrolRadius; }

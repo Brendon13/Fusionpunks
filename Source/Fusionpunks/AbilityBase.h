@@ -31,6 +31,8 @@ protected:
 	UPROPERTY(EditDefaultsonly, Category = Cooldown)
 	float maxCoolDown;
 
+	virtual void Ability() { check(0 && "You must override this") };
+
 private:
 	float coolDownLeft;
 

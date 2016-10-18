@@ -37,6 +37,9 @@ ACreep::ACreep()
 		FloatingDamageWidgetClass = Cast<UClass>(FloatingDamageWidgetFinder.Object);
 	}
 
+	agroRadiusSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AgroRadius"));
+	agroRadiusSphere->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
 	AIControllerClass = ACreepAIController::StaticClass();
 	GetMesh()->bReceivesDecals = false; 
 	GetCapsuleComponent()->SetCanEverAffectNavigation(true);
@@ -47,6 +50,7 @@ ACreep::ACreep()
 	maxLevel = 10;
 	maxHealth = 10;
 	meleeAttackRange = 200.0f;
+	agroRadius = 250.0f;
 
 	patrolRadius = 2000.0f;
 	GetCharacterMovement()->MaxWalkSpeed = 150.0f;
@@ -64,6 +68,7 @@ void ACreep::BeginPlay()
 {
 	Super::BeginPlay();
 
+	agroRadiusSphere->SetSphereRadius(agroRadius, true);
 	currentHealth = maxHealth;
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ACreep::OnOverlapBegin);
@@ -268,7 +273,7 @@ UFUNCTION()
 void ACreep::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	//if we are a neutral creep attack enemy targets 
-	if(bBelongsToCamp && EnemyTarget == nullptr && OtherActor->Tags.Contains(team) == false)
+	if(EnemyTarget == nullptr && OtherActor->Tags.Contains(team) == false)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("Creep Entered Player Trigger!"));
 		EnemyTarget = OtherActor;
@@ -277,9 +282,9 @@ void ACreep::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* O
 		if (AiController)
 		{
 			AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", EnemyTarget);
-			AiController->GetBlackboardComponent()->SetValueAsBool("AtTargetPosition", false);
-			AiController->GetBlackboardComponent()->SetValueAsBool("hasWaited", true);
-			AiController->GetBlackboardComponent()->SetValueAsObject("SelfActor", this);
+			//AiController->GetBlackboardComponent()->SetValueAsBool("AtTargetPosition", false);
+			//AiController->GetBlackboardComponent()->SetValueAsBool("hasWaited", true);
+			//AiController->GetBlackboardComponent()->SetValueAsObject("SelfActor", this);
 			AiController->RestartBehaviorTree();
 		}
 	}
