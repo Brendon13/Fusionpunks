@@ -25,7 +25,26 @@ struct FPriorityList
 		
 	}
 
-	
+	void ResetCampsSafetyStatus()
+	{
+		for (int32 i = 0; i < creepCampList.Num(); i++)
+		{
+			creepCampList[i]->SetCampSafety(true);
+		}
+	}
+
+	void ResetCampsRecruitedStatus()
+	{
+		for (int32 i = 0; i < creepCampList.Num(); i++)
+		{
+			creepCampList[i]->SetCampRecruitedStatus(false);
+		}
+	}
+
+	void EmptyList() 
+	{
+		creepCampList.Empty();
+	}
 
 	void GeneratePriorityList(TArray<class ACreepCamp*> creepCamps, AActor* owner)
 	{
@@ -76,13 +95,19 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
 	TArray<ACreepCamp*> GetCreepCampList();
+	TArray<ACreepCamp*> GetSortedOwnedCampList();
+
+
+
+
 	//virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn) override;
 
 
 	//UFUNCTION(BlueprintCallable, Category = Components)
 		//UBlackboardComponent* GetBlackboardComponent();
 	
-
+	void ResetAllCampsSafetyStatus();
+	void ResetAllCampsRecruitStatus();
 protected:
 	UPROPERTY(EditDefaultsOnly)
 		UBehaviorTree* BehaviorTreeAsset;
@@ -93,17 +118,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 		UBlackboardComponent* BlackboardComponent;
 
+
 	UPROPERTY(EditDefaultsOnly)
 		UPawnSensingComponent* PawnSensingComponent;
 
 		TArray<ACreepCamp*> creepCamps;
 		
 		FPriorityList campPriorityList;
+		FPriorityList campOwnedPriorityList;
+		
 	UPROPERTY(EditDefaultsOnly)
 			TSubclassOf<ACreepCamp> creepCampClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category = HomeBase)
 		TSubclassOf<class ABase> baseClass;
+
 
 	
 };

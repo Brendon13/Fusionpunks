@@ -26,18 +26,19 @@ void AAbilityBase::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 	coolDownLeft -= DeltaTime;
-	
 }
 void AAbilityBase::Use()
 {
 	if (CanUse())
 	{
 		coolDownLeft = maxCoolDown;
+		Ability();
 	}
 }
 bool AAbilityBase::CanUse()
 {
 	return coolDownLeft <= 0;
 }
+
 
 

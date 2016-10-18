@@ -23,7 +23,6 @@ struct FCaptureVariables
 	{
 		//Default unless set in blueprint 
 		targetCaptureTime = 5.0f;
-		captureTimeMultiplier = 1.5f;
 		captureTime = targetCaptureTime;
 		cyberCaptureProgress = 0;
 		dieselCaptureProgress = 0;
@@ -34,8 +33,6 @@ struct FCaptureVariables
 	When a camp is captured all the creeps associated with it should die */
 	UPROPERTY(EditAnywhere, Category = CampVariables)
 	float targetCaptureTime;
-	UPROPERTY(EditAnywhere, Category = CampVariables)
-	float captureTimeMultiplier;
 	UPROPERTY()
 	float captureTime;
 	UPROPERTY()
@@ -57,7 +54,6 @@ struct FSpawningVariables
 	{
 		creepSpawnTimerTarget = 5.0f;
 		creepSpawnTimer = creepSpawnTimerTarget;
-		creepSpawnTimerMultiplier = 1.5f;
 		neutralCreepLimit = 3;
 		cyberCreepLimit = 3;
 		dieselCreepLimit = 3;
@@ -80,8 +76,6 @@ struct FSpawningVariables
 	
 	UPROPERTY(EditAnywhere, Category = CampVariables)
 	float creepSpawnTimerTarget;
-	UPROPERTY(EditAnywhere, Category = CampVariables)
-	float creepSpawnTimerMultiplier;
 	UPROPERTY()
 	float creepSpawnTimer;
 
@@ -174,6 +168,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		FORCEINLINE float GetDieselCapturePercentage() const {return captureVariables.dieselCaptureProgress / captureVariables.captureTime;}
 
+		FORCEINLINE int32 GetNumOfCreepsAtCamp() const { return spawningVariables.creepCount; }
+		FORCEINLINE const bool GetCampSafety() const { return bSafeToCapture; }
+		FORCEINLINE void SetCampSafety(bool status) { bSafeToCapture = status; }
+		FORCEINLINE void SetCampRecruitedStatus(bool status) { bRecruitedByFromAI = status; }
+		FORCEINLINE const bool HasBeenRecruitedFrom() { return bRecruitedByFromAI; }
 
 //Creep Spawning Functions
 public:
@@ -201,7 +200,9 @@ protected:
 	TArray<FVector> creepSpawnArray;
 	float distanceValue;
 	
-	
+	//FOR HERO AI CAMP SEARCH 
+	bool bSafeToCapture = true;
+	bool bRecruitedByFromAI = false;
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)

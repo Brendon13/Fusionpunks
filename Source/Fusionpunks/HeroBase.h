@@ -1,3 +1,4 @@
+
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
@@ -194,11 +195,10 @@ public:
 
 	//UPROPERTY(EditDefaultsOnly, Category = Widgets)
 	//	TSubclassOf<class UPlayerCompassWidget> CompassWidgetClass;
-
+	virtual void RecruitCreep();
 
 //AI Stuff
 protected:
-	virtual void RecruitCreep();
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		int32 maxArmySize;
 
@@ -260,6 +260,15 @@ protected:
 	void UseAbility3();
 
 
+public:
+	bool bIsAttacking;
+	FTimerHandle attackTimerHandle; 
+
+	UFUNCTION(BlueprintCallable, Category = HeroBlueprintFunctions)
+	FORCEINLINE bool GetBIsAttacking() const { return bIsAttacking; }
+
+protected:
+	void StopAttacking();
 //protected:
 ////Creep Command Functions
 //	virtual AActor* CreepCommand_Attack_CheckTarget(FVector Direction);

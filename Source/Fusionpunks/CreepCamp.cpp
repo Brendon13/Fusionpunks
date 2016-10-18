@@ -146,11 +146,11 @@ void ACreepCamp::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
-	if (campType == ECampType::CT_Cyber)
+	/*if (campType == ECampType::CT_Cyber)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Creep Count: %i"), spawningVariables.creepCount);
 		UE_LOG(LogTemp, Warning, TEXT("Creep Count: %i"), spawningVariables.cyberCreepLimit);
-	}
+	}*/
 		
 	//Debug Messages to print to screen
 	//Could probably make an entire struct to handle this 
@@ -316,9 +316,11 @@ void ACreepCamp::Tick( float DeltaTime )
 	//if diesel camp
 	else if (campType == ECampType::CT_Diesel && spawningVariables.creepCount < spawningVariables.dieselCreepLimit)
 	{
+		spawningVariables.creepSpawnTimer -= DeltaTime;
 
 		if (spawningVariables.creepSpawnTimer <= 0)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("SPAWN DIESEL CREEP PLEASE!"));
 			FActorSpawnParameters spawnParameters;
 			spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 			int random = FMath::RandRange(0, 2);
