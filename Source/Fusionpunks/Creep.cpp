@@ -282,9 +282,9 @@ void ACreep::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* O
 		if (AiController)
 		{
 			AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", EnemyTarget);
-			//AiController->GetBlackboardComponent()->SetValueAsBool("AtTargetPosition", false);
-			//AiController->GetBlackboardComponent()->SetValueAsBool("hasWaited", true);
-			//AiController->GetBlackboardComponent()->SetValueAsObject("SelfActor", this);
+			AiController->GetBlackboardComponent()->SetValueAsBool("AtTargetPosition", false);
+			AiController->GetBlackboardComponent()->SetValueAsBool("hasWaited", true);
+			AiController->GetBlackboardComponent()->SetValueAsObject("SelfActor", this);
 			AiController->RestartBehaviorTree();
 		}
 	}
