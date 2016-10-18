@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
+#include "Creep.h"
+#include "HeroBase.h"
 #include "Ability_ForcePush.h"
 
 
@@ -37,17 +39,33 @@ void AAbility_ForcePush::Ability()
 		{
 			for (int i = 0; i < Results.Num(); i++)
 			{
-				ACharacter* enemy = Cast<ACharacter>(Results[i].GetActor());
-
-				if (enemy)
+				AHeroBase* enemyHero = Cast<AHeroBase>(GetOwner());
+				ACreep* enemyCreep = Cast<ACreep>(Results[i].GetActor());
+				if (enemyCreep)
 				{
-					enemy->TakeDamage(damage, FDamageEvent::FDamageEvent(), owner->GetController(), owner);
-
-					FVector dir = enemy->GetActorLocation() - owner->GetActorLocation();
-					dir.Normalize();
-					dir *= -1 * PushForce;
-					enemy->GetMesh()->AddForceAtLocation(dir, enemy->GetActorLocation());
+					if (!owner->Tags.Contains(enemyCreep->GetTeam()))
+					{
+						enemyCreep->TakeDamage(damage, FDamageEvent::FDamageEvent(), owner->GetController(), owner);
+						FVector dir = enemyCreep->GetActorLocation() - owner->GetActorLocation();
+						dir.Normalize();
+						dir *= -1 * PushForce;
+						//enemyCreep->GetMesh()->AddForceAtLocation(dir, enemyCreep->GetActorLocation());
+						enemyCreep->GetCharacterMovement()->AddRadialImpulse(owner->GetActorLocation(), PushRadius, PushForce, ERadialImpulseFalloff::RIF_Linear, false);
+						continue;
+					}
 				}
+				else if(enemyHero)
+				{
+					enemyHero->TakeDamage(damage, FDamageEvent::FDamageEvent(), owner->GetController(), owner);
+					FVector dir = enemyHero->GetActorLocation() - owner->GetActorLocation();
+					dir.Normalize();
+					dir *= PushForce;
+					//enemyCreep->GetMesh()->AddForceAtLocation(dir, enemyCreep->GetActorLocation());
+					//enemyHero->GetCharacterMovement()->AddImpulse(owner->GetActorLocation(), true);
+					enemyHero->GetCharacterMovement()->AddForce(dir);
+					continue;
+				}
+
 			}
 		}
 	}

@@ -93,8 +93,10 @@ protected:
 
 
 //Damage stuff
+public:
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+protected:
 	UPROPERTY(EditDefaultsOnly, Category = Widgets)
 	TSubclassOf<class UFloatingDamageWidget> FloatingDamageWidgetClass; 
 

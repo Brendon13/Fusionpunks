@@ -689,7 +689,8 @@ void AHeroBase::UseAbility0()
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 
-		Abilities[0] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[0]->GetClass(), GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+		Abilities[0] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[0], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+		Abilities[0]->Use();
 	}
 	else
 	{
@@ -699,9 +700,16 @@ void AHeroBase::UseAbility0()
 
 void AHeroBase::UseAbility1()
 {
+
 	if (AbilitiesClass[1] != nullptr)
 	{
-		//spawn ability 
+		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 2"));
+		//spawn the ability
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+
+		Abilities[1] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[1], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+		Abilities[1]->Use();
 	}
 	else
 	{
@@ -713,7 +721,13 @@ void AHeroBase::UseAbility2()
 {
 	if (AbilitiesClass[2] != nullptr)
 	{
-		//spawn ability
+		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 3"));
+		//spawn the ability
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+
+		Abilities[2] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[2], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+		Abilities[2]->Use();
 	}
 	else
 	{
@@ -726,6 +740,13 @@ void AHeroBase::UseAbility3()
 	if (AbilitiesClass[3] != nullptr)
 	{
 		//spawn ability
+		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 1"));
+		//spawn the ability
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+
+		Abilities[3] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[3], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+		Abilities[3]->Use();
 	}
 	else
 	{
