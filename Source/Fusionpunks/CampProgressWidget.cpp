@@ -6,17 +6,17 @@
 
 #define LOCTEXT_NAMESPACE "MyNamespace"
 
-FORCEINLINE float UCampProgressWidget::GetCyberCaptureProgress() const
+float UCampProgressWidget::GetCyberCaptureProgress() const
 {
 	return (CurrentCamp != nullptr ? CurrentCamp->GetCyberCapturePercentage() : 0);
 }
 
-FORCEINLINE float UCampProgressWidget::GetDieselCaptureProgress() const
+float UCampProgressWidget::GetDieselCaptureProgress() const
 {
 	return (CurrentCamp != nullptr ? CurrentCamp->GetDieselCapturePercentage() : 0);
 }
 
-FORCEINLINE FText UCampProgressWidget::GetCyberProgressText() const
+FText UCampProgressWidget::GetCyberProgressText() const
 {
 	if (CurrentCamp != nullptr)
 	{
@@ -25,7 +25,7 @@ FORCEINLINE FText UCampProgressWidget::GetCyberProgressText() const
 	return FText::AsNumber(0);
 }
 
-FORCEINLINE FText UCampProgressWidget::GetDieselProgressText() const
+FText UCampProgressWidget::GetDieselProgressText() const
 {
 	if (CurrentCamp != nullptr)
 	{
@@ -34,7 +34,7 @@ FORCEINLINE FText UCampProgressWidget::GetDieselProgressText() const
 	return FText::AsNumber(0);
 }
 
-FORCEINLINE void UCampProgressWidget::SetCurrentCreepCamp(ACreepCamp* newCreepCamp)
+void UCampProgressWidget::SetCurrentCreepCamp(ACreepCamp* newCreepCamp)
 {
 	CurrentCamp = newCreepCamp;
 }

@@ -689,8 +689,14 @@ void AHeroBase::UseAbility0()
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 
-		Abilities[0] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[0], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+		if (Abilities[0] == nullptr)
+		{
+			Abilities[0] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[0], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+			Abilities[0]->Use();
+			return;
+		}
 		Abilities[0]->Use();
+		
 	}
 	else
 	{
