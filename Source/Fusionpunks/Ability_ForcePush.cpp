@@ -17,6 +17,9 @@ void AAbility_ForcePush::BeginPlay()
 
 void AAbility_ForcePush::Ability()
 {
+	//always move this to the actors location
+	SetActorLocation(GetOwner()->GetActorLocation());
+
 	UE_LOG(LogTemp, Warning, TEXT("Using FORCE PUSH!"));
 	FCollisionObjectQueryParams obejctQP;
 

@@ -4,7 +4,7 @@
 #include "RankUIWidget.h"
 
 
-FORCEINLINE FText URankUIWidget::GetArmySize() const
+FText URankUIWidget::GetArmySize() const
 {
 	return (owningCharacter ? FText::AsNumber(owningCharacter->GetArmySize()) : FText::AsNumber(0));
 }
