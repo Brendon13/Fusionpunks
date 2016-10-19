@@ -1,8 +1,8 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
 #include "Fusionpunks.h"
-#include "TestCreep.h"
 #include "ChainLightning.h"
+#include  "Creep.h"
 #include "FusionpunksGameState.h"
 #include "ProphetUIWidget.h"
 #include "CyberHeroCharacter.h"
@@ -28,7 +28,7 @@ void ACyberHeroCharacter::SetupPlayerInputComponent(class UInputComponent* Input
 	Super::SetupPlayerInputComponent(InputComponent);
 	check(InputComponent);
 	
-	InputComponent->BindAction("Basic Attack", IE_Pressed, this, &ACyberHeroCharacter::DetermineClickEvent);
+	InputComponent->BindAction("BasicAttack", IE_Pressed, this, &ACyberHeroCharacter::DetermineClickEvent);
 	//InputComponent->BindAction("Skill1", IE_Pressed, this, &ACyberHeroCharacter::OnSkillPressed);
 }
 
@@ -96,35 +96,51 @@ AActor* ACyberHeroCharacter::UpdateTarget()
 		GetActorLocation(),
 		FQuat(),
 		obejctQP,
-		FCollisionShape::MakeSphere(300.f),
+		FCollisionShape::MakeSphere(750),
 		QueryParameters);
 	oldTargetResults = skillTargetResults;
 	
 	if (skillTargetResults.Num() == 0)
 	{
-		//UE_LOG(LogTemp, Display, TEXT("No Enemies Nearby"));
+		UE_LOG(LogTemp, Display, TEXT("No Units Nearby"));
 		return NULL;
 	}
 	else
 	{
-		//UE_LOG(LogTemp, Display, TEXT("Enemy Found"));
-		closestEnemy = skillTargetResults[0].GetActor();
+		UE_LOG(LogTemp, Display, TEXT("Unit Found"));
 
+		TArray<AActor*> enemies;
 		for (int i = 0; i < skillTargetResults.Num(); i++)
 		{
-			if (GetDistanceTo(skillTargetResults[i].GetActor()) <= GetDistanceTo(closestEnemy))
+			if (!skillTargetResults[i].GetActor()->ActorHasTag("Cyber"))
 			{
-				closestEnemy = skillTargetResults[i].GetActor();
+				enemies.Add(skillTargetResults[i].GetActor());
 			}
 		}
 
-		HighlightTarget(closestEnemy, skillTargetResults);
-		return closestEnemy;
+		if (enemies.Num() > 0)
+		{
+			closestEnemy = enemies[0];
+
+			for (int i = 0; i < enemies.Num(); i++)
+			{
+				if (GetDistanceTo(enemies[i]) <= GetDistanceTo(closestEnemy))
+				{
+					closestEnemy = enemies[i];
+				}
+			}
+
+			HighlightTarget(closestEnemy, skillTargetResults);
+			return closestEnemy;
+		}
+			UE_LOG(LogTemp, Display, TEXT("No Enemies Nearby"));
+			return NULL;
 	}
 }
 
-void ACyberHeroCharacter::OnSkillPressed()
+void ACyberHeroCharacter::UseAbility1()
 {
+
 	if (!skillSelected)
 	{
 		skillSelected = true;
@@ -143,6 +159,7 @@ void ACyberHeroCharacter::OnSkillPressed()
 
 void ACyberHeroCharacter::UseSkill(AActor* enemy)
 {
+
 	FActorSpawnParameters spawnParams;
 	spawnParams.Instigator = this;
 
@@ -153,9 +170,8 @@ void ACyberHeroCharacter::UseSkill(AActor* enemy)
 		<AChainLightning>(chainLightningAbility,
 		spawnLoc,
 		FRotator::ZeroRotator);
-	
 	lightning->AddAffectedActor(enemy);
-	lightning->SetBeamPoints(Cast<AActor>(this),enemy);	
+	lightning->SetBeamPoints(Cast<AActor>(this), enemy);
 	lightning->Use();
 
 }
@@ -172,26 +188,26 @@ bool ACyberHeroCharacter::IsAffected(AActor* enemy)
 
 void ACyberHeroCharacter::UnHighlightTarget(AActor* enemy)
 {
-	if (enemy->IsA(ATestCreep::StaticClass()))
+	if (enemy->IsA(ACharacter::StaticClass()))
 	{
-		Cast<ATestCreep>(enemy)->GetMesh()->SetRenderCustomDepth(false);
+		Cast<ACharacter>(enemy)->GetMesh()->SetRenderCustomDepth(false);
 	}
 }
 
 void ACyberHeroCharacter::HighlightTarget(AActor* enemy, TArray<FOverlapResult> enemies)
 {
-	if (enemy->IsA(ATestCreep::StaticClass()))
+	if (enemy->IsA(ACharacter::StaticClass()))
 	{
-		Cast<ATestCreep>(enemy)->GetMesh()->SetRenderCustomDepth(true);
-		Cast<ATestCreep>(enemy)->GetMesh()->CustomDepthStencilValue = STENCIL_ENEMY_OUTLINE;		
+		Cast<ACharacter>(enemy)->GetMesh()->SetRenderCustomDepth(true);
+		Cast<ACharacter>(enemy)->GetMesh()->CustomDepthStencilValue = STENCIL_ENEMY_OUTLINE;
 		
 	}
 
 	for (int i = 0; i < enemies.Num(); i++)
 	{
-		if (enemy != enemies[i].GetActor() && enemies[i].GetActor()->IsA(ATestCreep::StaticClass()))
+		if (enemy != enemies[i].GetActor() && enemies[i].GetActor()->IsA(ACharacter::StaticClass()))
 		{
-			Cast<ATestCreep>(enemies[i].GetActor())->GetMesh()->SetRenderCustomDepth(false);
+			Cast<ACharacter>(enemies[i].GetActor())->GetMesh()->SetRenderCustomDepth(false);
 		}
 
 	}
@@ -201,9 +217,12 @@ void ACyberHeroCharacter::UnHighlightAll(TArray<FOverlapResult> enemies)
 {
 	for (int i = 0; i < enemies.Num(); i++)
 	{
-		if (enemies[i].GetActor()->IsA(ATestCreep::StaticClass()))
+		if (enemies[i].GetActor() != nullptr)
 		{
-			Cast<ATestCreep>(enemies[i].GetActor())->GetMesh()->SetRenderCustomDepth(false);
+			if (enemies[i].GetActor()->IsA(ACharacter::StaticClass()))
+			{
+				Cast<ACharacter>(enemies[i].GetActor())->GetMesh()->SetRenderCustomDepth(false);
+			}
 		}
 	}
 }

@@ -87,9 +87,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = Abilities)
 		TSubclassOf<class AHealOverTime> healOverTimeClass;
-
-protected:
 	void StartAttack();
+protected:
+	
 	
 	void AdjustCameraZoom(float Value);
 	void SwapAICamera();
@@ -254,10 +254,10 @@ public:
 	FORCEINLINE AAbilityBase* GetAbility(int i) const { return (Abilities.Num() >= i ? Abilities[i] : nullptr); }
 
 protected:
-	void UseAbility0();
-	void UseAbility1();
-	void UseAbility2();
-	void UseAbility3();
+	virtual void UseAbility0();
+	virtual void UseAbility1();
+	virtual void UseAbility2();
+	virtual void UseAbility3();
 
 
 public:

@@ -14,10 +14,11 @@ EBTNodeResult::Type UBTTask_RecruitCreeps::ExecuteTask(UBehaviorTreeComponent& O
 	if (hero != nullptr)
 	{
 		numCreepsToRecruit = OwnerComp.GetBlackboardComponent()->GetValueAsInt("NumCreepsToRecruit");
-		bNotifyTick = true;
+		
 		numCreepsRecruited = 0;
 		finishedRecruiting = false;
 		isRecruiting = false;
+		bNotifyTick = true;
 		return EBTNodeResult::InProgress;
 		
 	}
@@ -40,17 +41,11 @@ void UBTTask_RecruitCreeps::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 	}
 	else if (finishedRecruiting)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Finished Recruiting!"));
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 
-	if (hero->IsActorBeingDestroyed()) 
-	{
-		if (recruitTimerHandle.IsValid())
-			GetWorld()->GetTimerManager().ClearTimer(recruitTimerHandle);
-		
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	
-	}
 
 }
 void UBTTask_RecruitCreeps::RecruitOnTimer()

@@ -3,8 +3,7 @@
 #pragma once
 
 #include "AbilityBase.h"
-#include "TestCreep.h"
-//#include "MobaCharacter.h"
+
 #include "ChainLightning.generated.h"
 
 UCLASS()
@@ -25,7 +24,7 @@ public:
 
 	void SetBeamPoints(AActor* a, AActor* b);
 	
-	virtual void Use() override;
+	virtual void Ability() override;
 
 	void AddAffectedActor(AActor* enemy);
 	

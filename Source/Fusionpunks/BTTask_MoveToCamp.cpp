@@ -2,7 +2,7 @@
 
 #include "Fusionpunks.h"
 #include "CreepCamp.h"
-#include "AIController.h"
+#include "HeroAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include"HeroBase.h"
 #include"HeroStats.h"
@@ -12,7 +12,8 @@ EBTNodeResult::Type UBTTask_MoveToCamp::ExecuteTask(UBehaviorTreeComponent& Owne
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 	targetCamp = Cast<ACreepCamp>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("CampTarget"));
-	//OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
+	//OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false
+	heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
 	hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
 
 	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
@@ -20,11 +21,8 @@ EBTNodeResult::Type UBTTask_MoveToCamp::ExecuteTask(UBehaviorTreeComponent& Owne
 
 	if (hero != nullptr)
 	{
-		
-		
 		heroStats = hero->GetHeroStats();
-		return EBTNodeResult::InProgress;
-		
+		return EBTNodeResult::InProgress;	
 	}
 
 	else
@@ -46,7 +44,7 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 		return FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 
-	if (hero->GetDistanceTo(targetCamp) < 650)
+	if (hero->GetDistanceTo(targetCamp) < 600)
 	{
 		UE_LOG(LogTemp, Error, TEXT("TOO CLOSE TO CAMP"));
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", true);
@@ -57,14 +55,19 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 	else if (heroStats->GetHealthPercent() < 0.15f)
 	{
 		UE_LOG(LogTemp, Display, TEXT("AI HAS LOW HP WHILE HEADING TO CAMP"));
+		heroAI->ResetAITreeTaskStatus();
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		
+		
 		
 	}
 	
 	else if (hero->CheckForNearbyEnemyCreeps() ||hero->CheckForNearbyEnemyHero())
 	{
 		UE_LOG(LogTemp, Display, TEXT("AI SENSES ENEMY WHILE HEADING TO CAMP"));
+		heroAI->ResetAITreeTaskStatus();
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		
 		
 
 	}

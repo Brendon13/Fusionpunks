@@ -61,6 +61,12 @@ void AHeroAIController::BeginPlay()
 	
 }
 
+void AHeroAIController::ResetAITreeTaskStatus() 
+{
+	BlackboardComponent->SetValueAsBool("ReachedCamp", false);
+	BlackboardComponent->SetValueAsBool("CapturedCamp", true);
+	ResetAllCampsSafetyStatus();
+}
 
 
 void AHeroAIController::Tick(float DeltaTime)

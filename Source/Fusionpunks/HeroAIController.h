@@ -105,7 +105,7 @@ public:
 
 	//UFUNCTION(BlueprintCallable, Category = Components)
 		//UBlackboardComponent* GetBlackboardComponent();
-	
+	void ResetAITreeTaskStatus();
 	void ResetAllCampsSafetyStatus();
 	void ResetAllCampsRecruitStatus();
 protected:

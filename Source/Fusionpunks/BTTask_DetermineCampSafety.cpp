@@ -24,6 +24,7 @@ EBTNodeResult::Type UBTTask_DetermineCampSafety::ExecuteTask(UBehaviorTreeCompon
 			
 			return EBTNodeResult::Succeeded;
 		}
+		UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));
 		targetCamp->SetCampSafety(false);
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);

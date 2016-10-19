@@ -154,7 +154,7 @@ void AHeroBase::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 	InputComponent->BindAxis("MoveRight", this, &AHeroBase::MoveRight);
 
 	//Attack
-	InputComponent->BindAction("BasicAttack", IE_Pressed, this, &AHeroBase::StartAttack);
+	
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
