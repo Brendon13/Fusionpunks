@@ -142,6 +142,7 @@ public:
 
 	bool bIsRespawning = false;
 
+	
 	FORCEINLINE int32 GetArmySize() const { return CreepArmy.Num(); }
 	FORCEINLINE float GetRespawnTime() const { return respawnTime; }
 	FORCEINLINE  int32 GetLevel() const { return currentLevel; }
@@ -167,6 +168,7 @@ protected:
 
 	TArray<class ACreepCamp*> capturedCamps;
 
+	class AHeroAIController* heroAI;
 	
 	
 protected:

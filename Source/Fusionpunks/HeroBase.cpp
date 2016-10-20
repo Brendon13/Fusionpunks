@@ -6,6 +6,7 @@
 #include "Creep.h"
 #include "HeroStats.h"
 #include "Base.h"
+#include "HeroAIController.h"
 #include "RespawnOverTime.h"
 #include "PlayerCompassWidget.h"
 #include "CreepFormation.h"
@@ -115,6 +116,11 @@ void AHeroBase::BeginPlay()
 	heroStats = new HeroStats(this);
 	heroStats->DisplayStats();
 	LinkToCreepCamps();
+
+	if (ActorHasTag("AI")) 
+	{
+		heroAI = Cast<AHeroAIController>(GetController());
+	}
 
 }
 
@@ -360,7 +366,7 @@ void AHeroBase::Attack(AActor* enemy)
 	FDamageEvent DamageEvent;
 
 	
-	float damage = enemy->TakeDamage(basicAttackDamage, DamageEvent, Cast<APlayerController>(GetController()), this);
+	float damage = enemy->TakeDamage(basicAttackDamage, DamageEvent,GetController(), this);
 }
 
 void AHeroBase::AdjustCameraZoom(float Value)
@@ -418,6 +424,12 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 		SetActorEnableCollision(false);
 		bIsRespawning = true;
 		respawnEffect->StartTimer(respawnTime, this);
+		if (ActorHasTag("AI")) {
+			
+			heroAI->ResetAITreeTaskStatus();
+			heroAI->RestartHeroAITree();
+		}
+
 	}
 	return DamageAmount;
 
