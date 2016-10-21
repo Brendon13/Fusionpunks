@@ -44,7 +44,7 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 		return FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 
-	if (hero->GetDistanceTo(targetCamp) < 600)
+	if (hero->GetDistanceTo(targetCamp) < 650)
 	{
 		UE_LOG(LogTemp, Error, TEXT("TOO CLOSE TO CAMP"));
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", true);

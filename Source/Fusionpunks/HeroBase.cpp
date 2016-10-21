@@ -280,7 +280,7 @@ bool AHeroBase::CheckForNearbyEnemyHero()
 {
 	FCollisionObjectQueryParams obejctQP;
 
-	obejctQP.AddObjectTypesToQuery(AIHero);
+	obejctQP.AddObjectTypesToQuery(Hero);
 
 	//Overlap multi by channel as a sphere (for pick ups?)
 	FCollisionQueryParams QueryParameters;
@@ -292,7 +292,7 @@ bool AHeroBase::CheckForNearbyEnemyHero()
 		GetActorLocation(),
 		FQuat(),
 		obejctQP,
-		FCollisionShape::MakeSphere(300.f),
+		FCollisionShape::MakeSphere(800),
 		QueryParameters);
 
 	if (Results.Num() == 1)
@@ -310,7 +310,7 @@ void AHeroBase::StartAttack()
 	AActor *closestEnemy;
 
 	FCollisionObjectQueryParams obejctQP;
-	obejctQP.AddObjectTypesToQuery(AIHero);
+	obejctQP.AddObjectTypesToQuery(Hero);
 	obejctQP.AddObjectTypesToQuery(Creeps);
 	obejctQP.AddObjectTypesToQuery(DamageableStructures);
 	//Overlap multi by channel as a sphere (for pick ups?)

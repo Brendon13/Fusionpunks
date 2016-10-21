@@ -9,7 +9,7 @@ EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent&
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 	
-	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp")== true)
 		return EBTNodeResult::Succeeded;
 
 	AHeroAIController* heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());

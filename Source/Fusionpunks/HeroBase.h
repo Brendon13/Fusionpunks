@@ -210,6 +210,7 @@ public:
 	bool CheckForNearbyEnemyCreeps();
 	bool CheckForNearbyEnemyHero();
 	FORCEINLINE TArray<class ACreep*> GetNearbyEnemyCreeps() const { return nearbyEnemyCreeps; }
+	FORCEINLINE AHeroBase* GetNearbyEnemyHero() const { return nearbyEnemyHero; }
 private:
 	//AIHERO
 	TArray<class ACreep*> nearbyEnemyCreeps;

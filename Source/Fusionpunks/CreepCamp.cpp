@@ -396,6 +396,8 @@ void ACreepCamp::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActo
 			captureVariables.bDieselIsCapturing = true;
 
 		}
+
+		
 		
 	}
 }

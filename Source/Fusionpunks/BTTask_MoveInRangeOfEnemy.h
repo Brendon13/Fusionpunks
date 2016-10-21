@@ -19,6 +19,6 @@ protected:
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 	class AHeroBase* hero;
 	class HeroStats* heroStats;
-	class ACreep* target;
+	AActor* target;
 	
 };

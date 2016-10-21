@@ -21,8 +21,18 @@ EBTNodeResult::Type UBTTask_DetermineCampSafety::ExecuteTask(UBehaviorTreeCompon
 		if (heroStats->GetHealthPercent() >= healthPercentage && 
 			 targetCamp->GetNumOfCreepsAtCamp()- heroStats->GetArmySize() <= allowedCreepDifference )
 		{
-			
-			return EBTNodeResult::Succeeded;
+			if(hero->ActorHasTag("Cyber") && !targetCamp->IsDieselCapturing()) 
+				return EBTNodeResult::Succeeded;
+			else if (hero->ActorHasTag("Diesel") && !targetCamp->IsCyberCapturing())
+				return EBTNodeResult::Succeeded;
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));
+				targetCamp->SetCampSafety(false);
+				OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
+				OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);
+				return EBTNodeResult::Failed;
+			}
 		}
 		UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));
 		targetCamp->SetCampSafety(false);

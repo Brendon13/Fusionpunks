@@ -170,12 +170,15 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 		ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
 		
 		//Andrew - Got Error said AIController Was null,
-		//Happened 1 time so far.
+		//Happened 2 times so far.
 		// I was attacking AI hero and AI hero was attacking creep in camp.
-
-		AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", EnemyTarget);
-		SetToRun();
-		AiController->RestartBehaviorTree();
+		//Added If statement
+		if (AiController != nullptr)
+		{
+			AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", EnemyTarget);
+			SetToRun();
+			AiController->RestartBehaviorTree();
+		}
 
 	}
 	currentHealth -= Damage;

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
-#include "AIController.h"
+#include "HeroAIController.h"
 #include "HeroBase.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BTTask_RecruitCreeps.h"
@@ -11,6 +11,7 @@ EBTNodeResult::Type UBTTask_RecruitCreeps::ExecuteTask(UBehaviorTreeComponent& O
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 	hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
+	heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
 	if (hero != nullptr)
 	{
 		numCreepsToRecruit = OwnerComp.GetBlackboardComponent()->GetValueAsInt("NumCreepsToRecruit");
@@ -42,7 +43,8 @@ void UBTTask_RecruitCreeps::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 	else if (finishedRecruiting)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Finished Recruiting!"));
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		heroAI->ResetAITreeTaskStatus();
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	}
 
 	

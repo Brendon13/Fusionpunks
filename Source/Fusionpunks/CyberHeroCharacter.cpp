@@ -86,6 +86,7 @@ AActor* ACyberHeroCharacter::UpdateTarget()
 	AActor *closestEnemy;
 	FCollisionObjectQueryParams obejctQP;
 	obejctQP.AddObjectTypesToQuery(Creeps);
+	obejctQP.AddObjectTypesToQuery(Hero);
 	//obejctQP.AddObjectTypesToQuery()
 	//Overlap multi by channel as a sphere (for pick ups?)
 

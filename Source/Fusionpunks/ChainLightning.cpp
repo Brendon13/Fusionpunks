@@ -93,7 +93,7 @@ void AChainLightning::CheckForNearbyEnemies()
 	FCollisionObjectQueryParams obejctQP;
 
 	obejctQP.AddObjectTypesToQuery(Creeps);
-	obejctQP.AddObjectTypesToQuery(AIHero);
+	obejctQP.AddObjectTypesToQuery(Hero);
 	//Overlap multi by channel as a sphere (for pick ups?)
 	FCollisionQueryParams QueryParameters;
 	QueryParameters.AddIgnoredActor(target);
