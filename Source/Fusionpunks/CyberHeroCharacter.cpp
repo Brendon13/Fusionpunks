@@ -238,7 +238,10 @@ void ACyberHeroCharacter::LevelUp()
 		if (GetWorld())
 		{
 			AFusionpunksGameState* gameState = Cast<AFusionpunksGameState>(GetWorld()->GetGameState());
-			gameState->CyberLevelUp();
+			if (gameState)
+			{
+				gameState->CyberLevelUp();
+			}
 		}
 	}
 }

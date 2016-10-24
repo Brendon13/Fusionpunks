@@ -24,7 +24,7 @@ AHeroBase::AHeroBase()
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
 	// set our turn rates for input
-	BaseTurnRate = 45.f;
+	BaseTurnRate = 360.0f;
 	BaseLookUpRate = 45.f;
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
@@ -92,6 +92,8 @@ AHeroBase::AHeroBase()
 	Abilities.SetNum(NUMBEROFABILITIES);
 
 	bIsAttacking = false; 
+
+	currentExperience = 0;
 }
 
 // Called when the game starts or when spawned
@@ -100,6 +102,10 @@ void AHeroBase::BeginPlay()
 	Super::BeginPlay();
 
 	compassDecalMaterialDynamic = compassDecalComponent->CreateDynamicMaterialInstance();
+
+	FLinearColor materialColor = FLinearColor::FLinearColor(1 - GetPlayerHealthAsDecimal(), GetPlayerHealthAsDecimal(), 0, 1.0f);
+	compassDecalMaterialDynamic->SetVectorParameterValue("Base_Colour", materialColor);
+
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHeroBase::OnOverlapBegin);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHeroBase::OnOverlapEnd);
 	
@@ -129,9 +135,10 @@ void AHeroBase::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
-	FLinearColor materialColor = FLinearColor::FLinearColor(1 - GetPlayerHealthAsDecimal(), GetPlayerHealthAsDecimal(), 0, 1.0f);
-	compassDecalMaterialDynamic->SetVectorParameterValue("Base_Colour", materialColor);
-
+	if (Tags.Contains("Cyber"))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("current experience is: %i"), currentExperience);
+	}
 	//UMaterialInstance* material = Cast<UMaterialInstance>(compassDecalComponent->GetDecalMaterial());
 	//if (material)
 	//{
@@ -176,7 +183,7 @@ void AHeroBase::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 
 	InputComponent->BindAction("AICamera", IE_Pressed, this, &AHeroBase::SwapAICamera);
 
-	InputComponent->BindAction("SacrificeCreep", IE_Pressed, this, &AHeroBase::SacrificeCreep);
+	//InputComponent->BindAction("SacrificeCreep", IE_Pressed, this, &AHeroBase::SacrificeCreep);
 
 	InputComponent->BindAction("Ability1", IE_Pressed, this, &AHeroBase::UseAbility0);
 	InputComponent->BindAction("Ability2", IE_Pressed, this, &AHeroBase::UseAbility1);
@@ -416,8 +423,18 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 	currentHealth -= DamageAmount;
 	//UE_LOG(LogTemp, Log, TEXT("Hero took %f damage."), DamageAmount);
 
+	FLinearColor materialColor = FLinearColor::FLinearColor(1 - GetPlayerHealthAsDecimal(), GetPlayerHealthAsDecimal(), 0, 1.0f);
+	compassDecalMaterialDynamic->SetVectorParameterValue("Base_Colour", materialColor);
+
 	if (currentHealth <= 0 && !bIsRespawning)
 	{
+		AHeroBase* hero = Cast<AHeroBase>(DamageCauser);
+		if (hero)
+		{
+			UE_LOG(LogTemp, Log, TEXT("%i experence rewarded"), XPKillReward);
+			hero->AddToExperience(XPKillReward);
+		}
+
 		currentHealth = 0;
 		GetController()->DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 		GetMesh()->SetVisibility(false);
@@ -681,7 +698,7 @@ void AHeroBase::Heal(float amount)
 	}
 }
 
-void AHeroBase::SacrificeCreep()
+bool AHeroBase::SacrificeCreep()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Current health: %f"), currentHealth);
 	if (CreepArmy.Num() > 0 && currentHealth < maxHealth)
@@ -689,7 +706,9 @@ void AHeroBase::SacrificeCreep()
 		ACreep* creep = CreepArmy.Pop();
 		creep->Destroy();
 		HealOverTime();
+		return true;
 	}
+	return false;
 }
 
 void AHeroBase::UseAbility0()
@@ -709,7 +728,6 @@ void AHeroBase::UseAbility0()
 			return;
 		}
 		Abilities[0]->Use();
-		
 	}
 	else
 	{
@@ -720,56 +738,73 @@ void AHeroBase::UseAbility0()
 void AHeroBase::UseAbility1()
 {
 
+	UE_LOG(LogTemp, Warning, TEXT("Using Ability 1"));
 	if (AbilitiesClass[1] != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 2"));
-		//spawn the ability
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = this;
-
-		Abilities[1] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[1], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
-		Abilities[1]->Use();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Ability 2 is Unassigned!"))
-	}
-}
-
-void AHeroBase::UseAbility2()
-{
-	if (AbilitiesClass[2] != nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 3"));
-		//spawn the ability
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = this;
-
-		Abilities[2] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[2], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
-		Abilities[2]->Use();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Ability 3 is Unassigned!"))
-	}
-}
-
-void AHeroBase::UseAbility3()
-{
-	if (AbilitiesClass[3] != nullptr)
-	{
-		//spawn ability
 		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 1"));
 		//spawn the ability
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 
-		Abilities[3] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[3], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+		if (Abilities[1] == nullptr)
+		{
+			Abilities[1] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[1], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+			Abilities[1]->Use();
+			return;
+		}
+		Abilities[1]->Use();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Ability 1 is Unassigned!"))
+	}
+}
+
+void AHeroBase::UseAbility2()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Using Ability 1"));
+	if (AbilitiesClass[2] != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 1"));
+		//spawn the ability
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+
+		if (Abilities[2] == nullptr)
+		{
+			Abilities[2] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[2], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+			Abilities[2]->Use();
+			return;
+		}
+		Abilities[2]->Use();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Ability 1 is Unassigned!"))
+	}
+}
+
+void AHeroBase::UseAbility3()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Using Ability 1"));
+	if (AbilitiesClass[3] != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 1"));
+		//spawn the ability
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+
+		if (Abilities[3] == nullptr)
+		{
+			Abilities[3] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[3], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+			Abilities[3]->Use();
+			return;
+		}
 		Abilities[3]->Use();
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Ability 4 is Unassigned!"))
+		UE_LOG(LogTemp, Warning, TEXT("Ability 1 is Unassigned!"))
 	}
 }
 
@@ -784,5 +819,29 @@ void AHeroBase::StopAttacking()
 		bIsAttacking = false;
 		boolProp->SetPropertyValue_InContainer(GetMesh()->GetAnimInstance(), false);
 		//bool meleeAttack = boolProp->GetPropertyValue_InContainer(GetMesh()->GetAnimInstance());
+	}
+}
+
+void AHeroBase::AddToExperience(int experience)
+{
+	currentExperience += experience;
+
+	if (currentExperience >= experienceGoal)
+	{
+		currentExperience -= experienceGoal;
+		LevelUp();
+	}
+}
+
+void AHeroBase::CreepArmyChangeTeam(bool Attack)
+{
+	for (int i = 0; i < CreepArmy.Num(); i++)
+	{
+		CreepArmy[i]->ChangeTeam();
+		
+		if (Attack)
+		{
+			CreepArmy[i]->AttackLeader();
+		}
 	}
 }

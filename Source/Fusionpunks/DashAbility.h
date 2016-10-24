@@ -14,11 +14,17 @@ class FUSIONPUNKS_API ADashAbility : public AAbilityBase
 	GENERATED_BODY()
 
 public:
-	virtual void Use() override;
+	virtual void Tick(float DeltaSeconds) override;
 	
 protected:
+	virtual bool Ability() override;
+
 	UPROPERTY(EditDefaultsOnly, Category = DashAbility)
 		float DashForce;
 
-	void Dash();
+	UPROPERTY(EditDefaultsOnly, Category = DashAbility)
+		float TargetDashTime;
+
+	float DashTimer;
+	bool bStopped;
 };

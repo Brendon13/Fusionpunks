@@ -94,7 +94,7 @@ protected:
 	void AdjustCameraZoom(float Value);
 	void SwapAICamera();
 
-	//editable stats in blueprint
+//editable stats in blueprint
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float maxHealth;
@@ -108,7 +108,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float basicAttackDamage;
 	
-
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float healthIncreasePerLevel;
 
@@ -128,13 +127,27 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float agroRadius;
 	
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		int XPKillReward;
 
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		int experienceGoal;
+
+	int currentExperience;
+
+public:
+	void AddToExperience(int experience);
+	float GetCurrentExperienceAsDecimal() const { return (float)currentExperience / (float)experienceGoal; }
+
+//CAMP PROGRESS WIDGET
 public:
 	UFUNCTION(BlueprintCallable, Category = UIFunctions)
 		void ShowCampProgress(ACreepCamp* CurrentCamp);
 
 	UFUNCTION(BlueprintCallable, Category = UIFunctions)
 		void HideCampProgress();
+
+
 
 	void ResetHealth();
 
@@ -192,12 +205,6 @@ protected:
 		 TSubclassOf<ACreepCamp> creepCampClass;
 public:
 	FORCEINLINE FName GetTeam() const { return team; }
-
-	//UPROPERTY(EditDefaultsOnly)
-	//	class UWidgetComponent* widgetComponent;
-
-	//UPROPERTY(EditDefaultsOnly, Category = Widgets)
-	//	TSubclassOf<class UPlayerCompassWidget> CompassWidgetClass;
 	virtual void RecruitCreep();
 
 //AI Stuff
@@ -231,6 +238,8 @@ public:
 	FORCEINLINE TArray<ACreep*> GetCreepArmyArray() const { return CreepArmy;  }
 	void RemoveCreepFromArmy(class ACreep* creep);
 
+	void CreepArmyChangeTeam(bool Attack = true);
+
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	class UCreepFormation* creepFormationComp;
@@ -252,10 +261,10 @@ protected:
 	TArray<AAbilityBase*> Abilities;
 
 	const int8 NUMBEROFABILITIES = 4;
-	void SacrificeCreep();
 
 public:
 	FORCEINLINE AAbilityBase* GetAbility(int i) const { return (Abilities.Num() >= i ? Abilities[i] : nullptr); }
+	bool SacrificeCreep();
 
 protected:
 	virtual void UseAbility0();
@@ -263,16 +272,24 @@ protected:
 	virtual void UseAbility2();
 	virtual void UseAbility3();
 
-
-public:
 	bool bIsAttacking;
+	bool bIsCasting;
 	FTimerHandle attackTimerHandle; 
 
+public:
 	UFUNCTION(BlueprintCallable, Category = HeroBlueprintFunctions)
 	FORCEINLINE bool GetBIsAttacking() const { return bIsAttacking; }
 
+	UFUNCTION(BlueprintCallable, Category = HeroBlueprintFunctions)
+	FORCEINLINE bool GetBIsCasting() const { return bIsCasting; }
+
 protected:
 	void StopAttacking();
+
+
+
+
+
 //protected:
 ////Creep Command Functions
 //	virtual AActor* CreepCommand_Attack_CheckTarget(FVector Direction);

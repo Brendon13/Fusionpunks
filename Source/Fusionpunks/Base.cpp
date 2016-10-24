@@ -57,7 +57,10 @@ float ABase::TakeDamage(float DamageAmount,struct FDamageEvent const & DamageEve
 	if(FloatingDamageWidgetClass)
 	{
 		UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
+		//floatingDamageWidget->SetVisibility(ESlateVisibility::Hidden);
+		floatingDamageWidget->SetAlignmentInViewport(FVector2D::FVector2D(0.5f, 0.5f));
 		floatingDamageWidget->SetIncDamage(DamageAmount);
+		floatingDamageWidget->SetOwningPawn(this);
 		floatingDamageWidget->AddToViewport();
 	}
 	
@@ -66,6 +69,15 @@ float ABase::TakeDamage(float DamageAmount,struct FDamageEvent const & DamageEve
 	if (currHP <= 0)
 	{
 		Destroy();
+
+		if (Tags.Contains("CyberBase"))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Diesel Wins!"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Cyber Wins!"));
+		}
 	}
 	return DamageAmount;
 }

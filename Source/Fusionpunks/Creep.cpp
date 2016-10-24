@@ -44,13 +44,13 @@ ACreep::ACreep()
 	GetMesh()->bReceivesDecals = false; 
 	GetCapsuleComponent()->SetCanEverAffectNavigation(true);
 
+
 	//NOTE::BRENDON - Will have to change current level based on players level when spawned from a controlled camp 
 	//i.e. Diesel hero is level 9 -> creep should also be level 9 
 	currentLevel = 1;
 	maxLevel = 10;
 	maxHealth = 10;
 	meleeAttackRange = 200.0f;
-	agroRadius = 250.0f;
 
 	patrolRadius = 2000.0f;
 	GetCharacterMovement()->MaxWalkSpeed = 150.0f;
@@ -68,7 +68,6 @@ void ACreep::BeginPlay()
 {
 	Super::BeginPlay();
 
-	agroRadiusSphere->SetSphereRadius(agroRadius, true);
 	currentHealth = maxHealth;
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ACreep::OnOverlapBegin);
@@ -136,7 +135,7 @@ void ACreep::Tick( float DeltaTime )
 		}
 	}
 
-	if (!bBelongsToCamp)
+	if (!bBelongsToCamp && playerToFollow)
 	{
 		ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
 		AiController->GetBlackboardComponent()->SetValueAsVector("FormationPosition", playerToFollow->GetSlotPosition(slotAssignment));
@@ -182,18 +181,8 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 
 	}
 	currentHealth -= Damage;
-	//UE_LOG(LogTemp, Error, TEXT("Creep Took %f damage"), Damage);
 
-	/*APlayerController* playerController = Cast<APlayerController>(EventInstigator);
-	if (playerController)
-	{
-
-	}*/
-
-	currentHealth -= Damage;
-	//UE_LOG(LogTemp, Error, TEXT("Creep Took %f damage"), Damage);
-
-	if (!DamageCauser->ActorHasTag("AI") && FloatingDamageWidgetClass)
+	if (!DamageCauser->ActorHasTag("AI") && !DamageCauser->ActorHasTag("Creep") && FloatingDamageWidgetClass)
 	{
 		UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
 		//floatingDamageWidget->SetVisibility(ESlateVisibility::Hidden);
@@ -205,6 +194,13 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 	
 	if (currentHealth <= 0)
 	{
+		AHeroBase* hero = Cast<AHeroBase>(DamageCauser);
+		if (hero)
+		{
+			UE_LOG(LogTemp, Log, TEXT("%i experence rewarded"), XPKillReward);
+			hero->AddToExperience(XPKillReward);
+		}
+
 		if (bBelongsToCamp && creepCampHome != nullptr)
 		{
 			creepCampHome->RemoveCreep(this);
@@ -283,7 +279,7 @@ void ACreep::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActor* O
 	//if we are a neutral creep attack enemy targets 
 	if(EnemyTarget == nullptr && OtherActor->Tags.Contains(team) == false)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Creep Entered Player Trigger!"));
+		UE_LOG(LogTemp, Warning, TEXT("Creep Entered Player Trigger!"));
 		EnemyTarget = OtherActor;
 		SetToRun();
 		ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
@@ -320,6 +316,13 @@ float ACreep::MeleeAttack()
 	//NOTE::IMPLEMENT ATTACK ANIMATION PLAYING FOR EACH CREEP TYPE
 	if (bCanMeleeAttack)
 	{
+		UBoolProperty* boolProp = FindField<UBoolProperty>(GetMesh()->GetAnimInstance()->GetClass(), TEXT("IsAttacking?"));
+		if (boolProp)
+		{
+			boolProp->SetPropertyValue_InContainer(GetMesh()->GetAnimInstance(), true);
+			//bool meleeAttack = boolProp->GetPropertyValue_InContainer(GetMesh()->GetAnimInstance());
+			GetWorld()->GetTimerManager().SetTimer(attackTimerHandle, this, &ACreep::StopMeleeAttack, 1.0f, false);
+		}
 		meleeAttackCooldownTimer = meleeAttackCooldown;
 		bCanMeleeAttack = false; 
 		//UE_LOG(LogTemp, Warning, TEXT("Creep Attacked for: %f"), attackPower);
@@ -329,6 +332,19 @@ float ACreep::MeleeAttack()
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("Creep Attacked for: %f"), 0);
 		return 0;
+	}
+}
+
+void ACreep::StopMeleeAttack()
+{
+	if (attackTimerHandle.IsValid())
+		GetWorld()->GetTimerManager().ClearTimer(attackTimerHandle);
+
+	UBoolProperty* boolProp = FindField<UBoolProperty>(GetMesh()->GetAnimInstance()->GetClass(), TEXT("IsAttacking?"));
+	if (boolProp)
+	{
+		boolProp->SetPropertyValue_InContainer(GetMesh()->GetAnimInstance(), false);
+		//bool meleeAttack = boolProp->GetPropertyValue_InContainer(GetMesh()->GetAnimInstance());
 	}
 }
 
@@ -384,5 +400,66 @@ void ACreep::SetEnemyTarget(AActor* enemy)
 			AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", nullptr);
 			AiController->RestartBehaviorTree();
 		}
+	}
+}
+
+void ACreep::Stun(float Duration)
+{
+	ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
+	if (AiController)
+	{
+		AiController->GetBlackboardComponent()->SetValueAsBool("bIsStunned", true);
+		AiController->RestartBehaviorTree();
+		GetCharacterMovement()->MaxWalkSpeed = 0;
+		GetCharacterMovement()->Velocity = FVector::ZeroVector;
+		
+		GetWorld()->GetTimerManager().SetTimer(stunTimerHandle, this, &ACreep::EndStun, 3.0f, false);
+	}
+}
+
+void ACreep::EndStun()
+{
+	if (stunTimerHandle.IsValid())
+		GetWorld()->GetTimerManager().ClearTimer(stunTimerHandle);
+
+	ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
+	if (AiController)
+	{
+		AiController->GetBlackboardComponent()->SetValueAsBool("bIsStunned", false);
+		AiController->RestartBehaviorTree();
+		SetToRun();
+	}
+}
+
+void ACreep::ChangeTeam()
+{
+	if (Tags.Contains("Cyber"))
+	{
+		Tags.Remove("Cyber");
+		Tags.Add("Diesel");
+
+		team = "Diesel";
+	}
+	else if (Tags.Contains("Diesel"))
+	{
+		Tags.Remove("Diesel");
+		Tags.Add("Cyber");
+
+		team = "Cyber";
+	}
+}
+
+void ACreep::AttackLeader()
+{
+	ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
+	if (AiController)
+	{
+		AActor* Leader = Cast<AActor>(AiController->GetBlackboardComponent()->GetValueAsObject("HeroToFollow"));
+		if (Leader)
+		{
+			AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", Leader);
+			AiController->RestartBehaviorTree();
+		}
+		
 	}
 }

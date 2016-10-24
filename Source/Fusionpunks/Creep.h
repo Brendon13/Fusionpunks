@@ -29,6 +29,9 @@ public:
 //editable stats 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		int XPKillReward;
+
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float maxHealth;
 
 	float currentHealth;
@@ -102,6 +105,10 @@ protected:
 
 public:
 	virtual float MeleeAttack();
+	virtual void StopMeleeAttack();
+protected:
+	FTimerHandle attackTimerHandle;
+	FTimerHandle stunTimerHandle;
 
 protected:
 //AISTUFF
@@ -112,9 +119,6 @@ protected:
 		float patrolRadius;
 
 	AActor* EnemyTarget;
-
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
-		float agroRadius;
 
 	UPROPERTY(EditDefaultsOnly)
 	USphereComponent* agroRadiusSphere; 
@@ -156,12 +160,23 @@ protected:
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+
 public:
 	void JoinPlayerArmy(class AHeroBase* PlayerToFollow, int SlotAssignment);
 	int slotAssignment;
 	void SetPlayerToFollow(class AHeroBase* Hero) { playerToFollow = Hero; }
 	void SetEnemyTarget(AActor* enemy);
+
+	//For Possess Enemy Creep Ability 
+	void ChangeTeam();
+	void AttackLeader();
+
 private:
 	class AHeroBase* playerToFollow;
 	float distanceFromCamp;
+
+//Effects Over Time
+public:
+	void Stun(float Duration);
+	void EndStun();
 };

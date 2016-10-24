@@ -21,16 +21,16 @@ public:
 	/*UFUNCTION(BlueprintCallable, Category = Animations)
 		void PlayTextFloatUpAnimation();*/
 	UFUNCTION(BlueprintCallable, Category = WidgtFunctions)
-		void SetOwningPawn(APawn* Owner) { OwningPawn = Owner; }
+		void SetOwningPawn(AActor* Owner) { OwningActor = Owner; }
 
 	UFUNCTION(BlueprintCallable, Category = WidgtFunctions)
-		APawn* GetOwningPawn() const { return OwningPawn; }
+		AActor* GetOwningActor() const { return OwningActor; }
 
 private:
 	UFUNCTION(BlueprintCallable, Category = Combat)
 		FText GetIncDamage() const;
 	
     float incDamage;
-	APawn* OwningPawn;
+	AActor* OwningActor;
 	
 };
