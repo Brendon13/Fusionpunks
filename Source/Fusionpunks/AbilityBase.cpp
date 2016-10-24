@@ -31,8 +31,10 @@ void AAbilityBase::Use()
 {
 	if (CanUse())
 	{
-		coolDownLeft = maxCoolDown;
-		Ability();
+		if (Ability())
+		{
+			coolDownLeft = maxCoolDown;
+		}
 	}
 }
 bool AAbilityBase::CanUse()

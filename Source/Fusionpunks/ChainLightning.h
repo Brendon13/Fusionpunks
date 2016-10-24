@@ -24,7 +24,7 @@ public:
 
 	void SetBeamPoints(AActor* a, AActor* b);
 	
-	virtual void Ability() override;
+	virtual bool Ability() override;
 
 	void AddAffectedActor(AActor* enemy);
 	

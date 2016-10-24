@@ -9,18 +9,14 @@
 void AAbility_ForcePush::BeginPlay()
 {
 	Super::BeginPlay();
-
-	PushRadius = 500.0f;
-	PushForce = 2000.0f;
-	damage = 10.0f; 
 }
 
-void AAbility_ForcePush::Ability()
+bool AAbility_ForcePush::Ability()
 {
 	//always move this to the actors location
 	SetActorLocation(GetOwner()->GetActorLocation());
 
-	UE_LOG(LogTemp, Warning, TEXT("Using FORCE PUSH!"));
+	//UE_LOG(LogTemp, Warning, TEXT("Using FORCE PUSH!"));
 	FCollisionObjectQueryParams obejctQP;
 
 	obejctQP.AddObjectTypesToQuery(Hero);
@@ -49,11 +45,19 @@ void AAbility_ForcePush::Ability()
 					if (!owner->Tags.Contains(enemyCreep->GetTeam()))
 					{
 						enemyCreep->TakeDamage(damage, FDamageEvent::FDamageEvent(), owner->GetController(), owner);
+						enemyCreep->Stun(1.0f);
+
 						FVector dir = enemyCreep->GetActorLocation() - owner->GetActorLocation();
 						dir.Normalize();
-						dir *= -1 * PushForce;
-						//enemyCreep->GetMesh()->AddForceAtLocation(dir, enemyCreep->GetActorLocation());
-						enemyCreep->GetCharacterMovement()->AddRadialImpulse(owner->GetActorLocation(), PushRadius, PushForce, ERadialImpulseFalloff::RIF_Linear, false);
+						dir *= PushForce;
+						dir.Z += 500.0f;
+						dir += enemyCreep->GetCharacterMovement()->Velocity;
+						
+						UE_LOG(LogTemp, Warning, TEXT("Adding force to enemy creep: %f"), PushForce);
+
+						enemyCreep->GetCharacterMovement()->Launch(dir);
+						//enemyCreep->GetCharacterMovement()->UpdateComponentVelocity();
+
 						continue;
 					}
 				}
@@ -72,4 +76,6 @@ void AAbility_ForcePush::Ability()
 			}
 		}
 	}
+
+	return true; 
 }

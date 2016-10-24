@@ -14,7 +14,7 @@ EBTNodeResult::Type UBTTask_CreepAttack::ExecuteTask(UBehaviorTreeComponent& Own
 	if (blackboardComponent && owner)
 	{
 		AHeroBase* enemy = Cast<AHeroBase>(blackboardComponent->GetValueAsObject("EnemyTarget"));
-
+		ACreep* enemyCreep = Cast<ACreep>(blackboardComponent->GetValueAsObject("EnemyTarget"));
 		if (enemy != nullptr)
 		{
 			/*Brendon - Note: damageEvent can be: FPointDamageEvent, FRadialDamageEvent, FDamageEvent or a custom DamageEvent
@@ -22,6 +22,13 @@ EBTNodeResult::Type UBTTask_CreepAttack::ExecuteTask(UBehaviorTreeComponent& Own
 			FDamageEvent damageEvent;
 			enemy->TakeDamage(owner->MeleeAttack(), damageEvent, owner->GetController(), owner);
 			//UE_LOG(LogTemp, Warning, TEXT("Took Damage From Creep"));
+
+			return EBTNodeResult::Succeeded;
+		}
+		else if (enemyCreep != nullptr)
+		{
+			FDamageEvent damageEvent;
+			enemyCreep->TakeDamage(owner->MeleeAttack(), damageEvent, owner->GetController(), owner);
 
 			return EBTNodeResult::Succeeded;
 		}

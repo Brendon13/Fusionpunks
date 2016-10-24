@@ -2,6 +2,7 @@
 
 #include "Fusionpunks.h"
 #include "FloatingDamageWidget.h"
+#include "HeroBase.h"
 #include "TowerBase.h"
 
 
@@ -72,6 +73,13 @@ float ATowerBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dam
 	UE_LOG(LogTemp, Log, TEXT("Tower took %f damage."), DamageAmount);
 	if (currHP <= 0) 
 	{
+		AHeroBase* hero = Cast<AHeroBase>(DamageCauser);
+		if (hero)
+		{
+			UE_LOG(LogTemp, Log, TEXT("%i experence rewarded"), XPKillReward);
+			hero->AddToExperience(XPKillReward);
+		}
+
 		CleanUp();
 		Destroy();
 	}

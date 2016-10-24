@@ -145,7 +145,10 @@ void ADieselHeroCharacter::LevelUp()
 		if (GetWorld())
 		{
 			AFusionpunksGameState* gameState = Cast<AFusionpunksGameState>(GetWorld()->GetGameState());
-			gameState->DieselLevelUp();
+			if (gameState)
+			{
+				gameState->DieselLevelUp();
+			}	
 		}
 	}
 }

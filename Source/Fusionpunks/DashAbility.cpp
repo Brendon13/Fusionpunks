@@ -5,28 +5,37 @@
 #include "DashAbility.h"
 
 
-
-
-void ADashAbility::Use()
+void ADashAbility::Tick(float DeltaSeconds)
 {
-	Super::Use();
+	Super::Tick(DeltaSeconds);
+	DashTimer -= DeltaSeconds;
 
-	if (CanUse())
+	if (DashTimer <= 0)
 	{
-		Dash();
+		AHeroBase* hero = Cast<AHeroBase>(GetOwner());
+		if (hero)
+		{
+			FVector opposingForce = hero->GetCharacterMovement()->Velocity;
+			hero->GetCharacterMovement()->AddForce(-opposingForce);
+			hero->GetCharacterMovement()->UpdateComponentVelocity();
+			//hero->GetCharacterMovement()->AddForce()
+			hero->GetCharacterMovement()->GroundFriction = 8.0f;
+		}
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Dash Ability on Cooldown!"));
-	}
-	
 }
 
-void ADashAbility::Dash()
+bool ADashAbility::Ability()
 {
 	AHeroBase* hero = Cast<AHeroBase>(GetOwner());
 	if (hero)
 	{
-		hero->GetCapsuleComponent()->AddImpulse(hero->GetActorForwardVector() * DashForce);
+		DashTimer = TargetDashTime;
+		hero->GetCharacterMovement()->GroundFriction = 0.0f;
+		hero->GetCharacterMovement()->AddImpulse(hero->GetActorForwardVector() * DashForce, false);
+		//hero->GetCharacterMovement()->AddForce(hero->GetActorUpVector() * -DashForce);
+		hero->GetCharacterMovement()->UpdateComponentVelocity();
+	
+		return true;
 	}
+	return false; 
 }

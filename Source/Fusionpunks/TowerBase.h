@@ -29,6 +29,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Damage)
 		float damage;
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = Stats)
+		int XPKillReward;
 
 	virtual void CleanUp() { check(0 && "You must override this") };
 
