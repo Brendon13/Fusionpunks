@@ -8,6 +8,8 @@
 /**
  * 
  */
+
+
 UCLASS()
 class FUSIONPUNKS_API UBTTask_MoveInRangeOfEnemy : public UBTTask_MoveTo
 {
@@ -20,5 +22,7 @@ protected:
 	class AHeroBase* hero;
 	class HeroStats* heroStats;
 	AActor* target;
+
+	
 	
 };

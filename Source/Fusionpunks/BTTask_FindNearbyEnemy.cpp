@@ -26,7 +26,7 @@ EBTNodeResult::Type UBTTask_FindNearbyEnemy::ExecuteTask(UBehaviorTreeComponent&
 					OwnerComp.GetBlackboardComponent()->SetValueAsObject("AttackTarget", target);
 					return EBTNodeResult::Succeeded;
 				}
-
+				UE_LOG(LogTemp, Error, TEXT("Cant Find Hero!"));
 				return EBTNodeResult::Failed;
 
 			}
@@ -40,11 +40,11 @@ EBTNodeResult::Type UBTTask_FindNearbyEnemy::ExecuteTask(UBehaviorTreeComponent&
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject("AttackTarget", enemyHero);
 				return EBTNodeResult::Succeeded;
 			}
-
+			UE_LOG(LogTemp, Error, TEXT("No Hero Nearby"));
 			return EBTNodeResult::Failed;
 
 		}
-
+		UE_LOG(LogTemp, Error, TEXT("Cant Find Hero!"));
 		return EBTNodeResult::Failed;
 	}
 	else

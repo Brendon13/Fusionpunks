@@ -384,6 +384,8 @@ void ACreepCamp::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActo
 			
 			if (!OtherActor->Tags.Contains("AI"))
 				heroChar->ShowCampProgress(this);
+
+			heroChar->SetIsCapturing(true);
 		}	
 
 		if (OtherActor->Tags.Contains("CyberPlayer"))
@@ -414,6 +416,8 @@ void ACreepCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 			AHeroBase* heroChar = Cast<AHeroBase>(OtherActor);
 			if (!OtherActor->Tags.Contains("AI"))
 				heroChar->HideCampProgress();
+
+			heroChar->SetIsCapturing(false);
 		}
 
 		if (OtherActor->Tags.Contains("CyberPlayer"))

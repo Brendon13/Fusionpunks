@@ -519,6 +519,7 @@ void AHeroBase::AddToCapturedCamps(ACreepCamp* camp)
 	if (!capturedCamps.Contains(camp)) 
 	{
 		capturedCamps.Add(camp);
+		isCapturing = false;
 	}
 }
 

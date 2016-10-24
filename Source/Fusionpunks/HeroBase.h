@@ -149,7 +149,8 @@ public:
 	FORCEINLINE  float GetAttackDamage() const { return basicAttackDamage; }
 	FORCEINLINE TArray<class ACreepCamp*> GetCapturedCamps() const { return capturedCamps; }
 	FORCEINLINE class HeroStats* GetHeroStats() const { return heroStats; }
-
+	FORCEINLINE bool IsCapturing() const { return isCapturing; }
+	FORCEINLINE void SetIsCapturing(bool status) { isCapturing = status; }
 	void AddToCapturedCamps(class ACreepCamp* camp);
 	void RemoveFromCapturedCamps(class ACreepCamp* camp);
 	void UpdateHeroStats();
@@ -170,7 +171,7 @@ protected:
 
 	class AHeroAIController* heroAI;
 	
-	
+	bool isCapturing = false;
 protected:
 	//function for Trigger Events
 	UFUNCTION()

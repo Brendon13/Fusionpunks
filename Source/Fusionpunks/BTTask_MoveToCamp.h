@@ -21,5 +21,6 @@ protected:
 	class AHeroBase* hero;
 	class AHeroAIController* heroAI;
 	class HeroStats* heroStats;
+	bool neutralCampExists;
 	
 };

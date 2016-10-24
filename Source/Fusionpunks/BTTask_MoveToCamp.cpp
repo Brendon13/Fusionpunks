@@ -15,9 +15,11 @@ EBTNodeResult::Type UBTTask_MoveToCamp::ExecuteTask(UBehaviorTreeComponent& Owne
 	//OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false
 	heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
 	hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
+	neutralCampExists = OwnerComp.GetBlackboardComponent()->GetValueAsBool("NeutralCampsExist");
 
 	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
 		return EBTNodeResult::Succeeded;
+
 
 	if (hero != nullptr)
 	{
@@ -30,7 +32,7 @@ EBTNodeResult::Type UBTTask_MoveToCamp::ExecuteTask(UBehaviorTreeComponent& Owne
 		return EBTNodeResult::Failed;
 	}
 	
-	
+
 }
 
 void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -44,11 +46,13 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 		return FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 
-	if (hero->GetDistanceTo(targetCamp) < 650)
-	{
-		UE_LOG(LogTemp, Error, TEXT("TOO CLOSE TO CAMP"));
+	if (hero->IsCapturing())
+	{ 
+		
+		UE_LOG(LogTemp, Error, TEXT("Capturing Camp"));
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", true);
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		
 	}
 	
 	
@@ -57,7 +61,23 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 		UE_LOG(LogTemp, Display, TEXT("AI HAS LOW HP WHILE HEADING TO CAMP"));
 		heroAI->ResetAITreeTaskStatus();
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+				
+	}
+
+	else if (hero->ActorHasTag("Cyber") && targetCamp->IsDieselCapturing() && neutralCampExists)
+	{
+
+		heroAI->ResetAITreeTaskStatus();
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		
+	}
+
+	else if (hero->ActorHasTag("Diesel") && targetCamp->IsCyberCapturing() && neutralCampExists)
+
+	{
+		UE_LOG(LogTemp, Display, TEXT("ENEMY PLAYER CAPTURING TARGET CAMP"));
+		heroAI->ResetAITreeTaskStatus();
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		
 		
 	}
@@ -65,7 +85,7 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 	else if (hero->CheckForNearbyEnemyCreeps() ||hero->CheckForNearbyEnemyHero())
 	{
 		UE_LOG(LogTemp, Display, TEXT("AI SENSES ENEMY WHILE HEADING TO CAMP"));
-		heroAI->ResetAITreeTaskStatus();
+		//heroAI->ResetAITreeTaskStatus();
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		
 		
