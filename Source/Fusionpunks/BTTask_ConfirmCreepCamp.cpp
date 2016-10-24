@@ -8,6 +8,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BTTask_ConfirmCreepCamp.h"
 
+
 EBTNodeResult::Type UBTTask_ConfirmCreepCamp::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) 
 {
 	 targetCamp = Cast<ACreepCamp> (OwnerComp.GetBlackboardComponent()->GetValueAsObject("CampTarget"));
