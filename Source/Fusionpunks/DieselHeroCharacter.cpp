@@ -86,6 +86,7 @@ void ADieselHeroCharacter::SetupPlayerInputComponent(class UInputComponent* Inpu
 	InputComponent->BindAction(TEXT("Leap"), IE_Pressed, this, &ADieselHeroCharacter::Leap);
 	InputComponent->BindAction(TEXT("ForcePull"), IE_Pressed, this, &ADieselHeroCharacter::ForcePull);
 	InputComponent->BindAction("Dash", IE_Pressed, this, &ADieselHeroCharacter::Dash);
+	InputComponent->BindAction("BasicAttack", IE_Pressed, this, &AHeroBase::StartAttack);
 }
 
 void ADieselHeroCharacter::Leap()

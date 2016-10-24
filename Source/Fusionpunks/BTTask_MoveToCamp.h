@@ -19,6 +19,8 @@ protected:
 	
 	class ACreepCamp* targetCamp;
 	class AHeroBase* hero;
+	class AHeroAIController* heroAI;
 	class HeroStats* heroStats;
+	bool neutralCampExists;
 	
 };

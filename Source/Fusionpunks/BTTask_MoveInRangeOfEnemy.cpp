@@ -17,7 +17,7 @@ EBTNodeResult::Type UBTTask_MoveInRangeOfEnemy::ExecuteTask(UBehaviorTreeCompone
 	if (hero != nullptr)
 	{
 		heroStats = hero->GetHeroStats();
-		target = Cast<ACreep>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("AttackTarget"));
+		target = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("AttackTarget"));
 		if (target != nullptr)
 		{
 			if (hero->GetDistanceTo(target) >= 5)

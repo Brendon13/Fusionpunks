@@ -91,6 +91,7 @@ class FUSIONPUNKS_API AHeroAIController : public AAIController
 
 public:
 	AHeroAIController();
+	class AHeroBase* hero;
 	virtual void Possess(APawn* Pawn) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
@@ -105,9 +106,10 @@ public:
 
 	//UFUNCTION(BlueprintCallable, Category = Components)
 		//UBlackboardComponent* GetBlackboardComponent();
-	
+	void ResetAITreeTaskStatus();
 	void ResetAllCampsSafetyStatus();
 	void ResetAllCampsRecruitStatus();
+	void RestartHeroAITree();
 protected:
 	UPROPERTY(EditDefaultsOnly)
 		UBehaviorTree* BehaviorTreeAsset;

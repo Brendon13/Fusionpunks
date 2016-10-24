@@ -87,9 +87,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = Abilities)
 		TSubclassOf<class AHealOverTime> healOverTimeClass;
-
-protected:
 	void StartAttack();
+protected:
+	
 	
 	void AdjustCameraZoom(float Value);
 	void SwapAICamera();
@@ -142,13 +142,15 @@ public:
 
 	bool bIsRespawning = false;
 
+	
 	FORCEINLINE int32 GetArmySize() const { return CreepArmy.Num(); }
 	FORCEINLINE float GetRespawnTime() const { return respawnTime; }
 	FORCEINLINE  int32 GetLevel() const { return currentLevel; }
 	FORCEINLINE  float GetAttackDamage() const { return basicAttackDamage; }
 	FORCEINLINE TArray<class ACreepCamp*> GetCapturedCamps() const { return capturedCamps; }
 	FORCEINLINE class HeroStats* GetHeroStats() const { return heroStats; }
-
+	FORCEINLINE bool IsCapturing() const { return isCapturing; }
+	FORCEINLINE void SetIsCapturing(bool status) { isCapturing = status; }
 	void AddToCapturedCamps(class ACreepCamp* camp);
 	void RemoveFromCapturedCamps(class ACreepCamp* camp);
 	void UpdateHeroStats();
@@ -167,8 +169,9 @@ protected:
 
 	TArray<class ACreepCamp*> capturedCamps;
 
+	class AHeroAIController* heroAI;
 	
-	
+	bool isCapturing = false;
 protected:
 	//function for Trigger Events
 	UFUNCTION()
@@ -208,6 +211,7 @@ public:
 	bool CheckForNearbyEnemyCreeps();
 	bool CheckForNearbyEnemyHero();
 	FORCEINLINE TArray<class ACreep*> GetNearbyEnemyCreeps() const { return nearbyEnemyCreeps; }
+	FORCEINLINE AHeroBase* GetNearbyEnemyHero() const { return nearbyEnemyHero; }
 private:
 	//AIHERO
 	TArray<class ACreep*> nearbyEnemyCreeps;
@@ -254,10 +258,10 @@ public:
 	FORCEINLINE AAbilityBase* GetAbility(int i) const { return (Abilities.Num() >= i ? Abilities[i] : nullptr); }
 
 protected:
-	void UseAbility0();
-	void UseAbility1();
-	void UseAbility2();
-	void UseAbility3();
+	virtual void UseAbility0();
+	virtual void UseAbility1();
+	virtual void UseAbility2();
+	virtual void UseAbility3();
 
 
 public:

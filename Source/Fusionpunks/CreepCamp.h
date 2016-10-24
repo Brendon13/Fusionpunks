@@ -168,12 +168,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		FORCEINLINE float GetDieselCapturePercentage() const {return captureVariables.dieselCaptureProgress / captureVariables.captureTime;}
 
+		//AI HERO CAMP SEARCH STUFF
 		FORCEINLINE int32 GetNumOfCreepsAtCamp() const { return spawningVariables.creepCount; }
-		FORCEINLINE const bool GetCampSafety() const { return bSafeToCapture; }
-		FORCEINLINE void SetCampSafety(bool status) { bSafeToCapture = status; }
-		FORCEINLINE void SetCampRecruitedStatus(bool status) { bRecruitedByFromAI = status; }
-		FORCEINLINE const bool HasBeenRecruitedFrom() { return bRecruitedByFromAI; }
-
+		FORCEINLINE  bool GetCampSafety() const { return bSafeToCapture; }
+		FORCEINLINE  void SetCampSafety(bool status) { bSafeToCapture = status; }
+		FORCEINLINE  void SetCampRecruitedStatus(bool status) { bRecruitedByFromAI = status; }
+		FORCEINLINE  bool HasBeenRecruitedFrom()const { return bRecruitedByFromAI; }
+		FORCEINLINE  bool IsDieselCapturing()const { return captureVariables.bDieselIsCapturing; }
+		FORCEINLINE bool IsCyberCapturing() const { return captureVariables.bCyberIsCapturing; }
+		FORCEINLINE  TArray<ACreep*> GetCreepArray() const { return creepArray; }
 //Creep Spawning Functions
 public:
 	void RemoveCreep(ACreep* CreepInCamp);
@@ -181,7 +184,6 @@ public:
 
 	FORCEINLINE const float GetDistanceValue() const { return distanceValue; }
 	FORCEINLINE void SetDistanceValue(float value) { distanceValue = value; }
-
 	FORCEINLINE const ECampType GetCampType() const {return campType;}
 
 //Creep Spawn Locations
@@ -203,7 +205,7 @@ protected:
 	//FOR HERO AI CAMP SEARCH 
 	bool bSafeToCapture = true;
 	bool bRecruitedByFromAI = false;
-
+	
 protected:
 	UFUNCTION(BlueprintCallable, Category = CampFunctions)
 		void SetToDieselCamp();

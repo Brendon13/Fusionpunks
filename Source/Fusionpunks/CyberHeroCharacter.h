@@ -33,9 +33,8 @@ private:
 
 public:
 	void DetermineClickEvent();
-	void OnSkillPressed();
+	virtual void UseAbility1() override;
 	void UseSkill(AActor* enemy);
-	
 	void AddAffectedActor(AActor* enemy);
 	bool IsAffected(AActor* enemy);
 	void HighlightTarget(AActor* enemy, TArray<FOverlapResult> enemies);

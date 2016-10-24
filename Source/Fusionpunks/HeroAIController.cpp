@@ -58,16 +58,32 @@ void AHeroAIController::BeginPlay()
 	}
 	BlackboardComponent->SetValueAsBool("ReachedCamp", false);
 	BlackboardComponent->SetValueAsBool("CapturedCamp", true);
+	hero = Cast<AHeroBase>(GetPawn());
 	
 }
 
+void AHeroAIController::RestartHeroAITree()
+{
+	
+	BehaviorTreeComponent->RestartTree();
+}
+
+void AHeroAIController::ResetAITreeTaskStatus() 
+{
+	BlackboardComponent->SetValueAsBool("ReachedCamp", false);
+	BlackboardComponent->SetValueAsBool("CapturedCamp", true);
+	ResetAllCampsRecruitStatus();
+	ResetAllCampsSafetyStatus();
+}
 
 
 void AHeroAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	
 	//UpdateControlRotation(DeltaTime, false);
+	
 }
 
 TArray<ACreepCamp*> AHeroAIController::GetCreepCampList() 

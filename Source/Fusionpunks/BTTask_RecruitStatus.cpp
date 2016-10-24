@@ -17,6 +17,7 @@ EBTNodeResult::Type UBTTask_RecruitStatus::ExecuteTask(UBehaviorTreeComponent& O
 		heroAI->ResetAllCampsRecruitStatus();
 		heroAI->ResetAllCampsSafetyStatus();
 		recruitCamp->SetCampRecruitedStatus(true);
+		UE_LOG(LogTemp, Error, TEXT("Reset After Recruting!"));
 		return EBTNodeResult::Succeeded;
 	}
 

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
-#include "AIController.h"
+#include "HeroAIController.h"
 #include "HeroBase.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BTTask_RecruitCreeps.h"
@@ -11,13 +11,15 @@ EBTNodeResult::Type UBTTask_RecruitCreeps::ExecuteTask(UBehaviorTreeComponent& O
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 	hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
+	heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
 	if (hero != nullptr)
 	{
 		numCreepsToRecruit = OwnerComp.GetBlackboardComponent()->GetValueAsInt("NumCreepsToRecruit");
-		bNotifyTick = true;
+		
 		numCreepsRecruited = 0;
 		finishedRecruiting = false;
 		isRecruiting = false;
+		bNotifyTick = true;
 		return EBTNodeResult::InProgress;
 		
 	}
@@ -40,17 +42,12 @@ void UBTTask_RecruitCreeps::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 	}
 	else if (finishedRecruiting)
 	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		UE_LOG(LogTemp, Error, TEXT("Finished Recruiting!"));
+		heroAI->ResetAITreeTaskStatus();
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	}
 
-	if (hero->IsActorBeingDestroyed()) 
-	{
-		if (recruitTimerHandle.IsValid())
-			GetWorld()->GetTimerManager().ClearTimer(recruitTimerHandle);
-		
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	
-	}
 
 }
 void UBTTask_RecruitCreeps::RecruitOnTimer()

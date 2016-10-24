@@ -18,5 +18,5 @@
 #define CreepCampTrigger	   ECC_GameTraceChannel3
 #define PlayerAgroRadius	   ECC_GameTraceChannel4
 #define DamageableStructures   ECC_GameTraceChannel2
-#define AIHero                 ECC_GameTraceChannel5
+#define Hero                 ECC_GameTraceChannel5
 #endif
