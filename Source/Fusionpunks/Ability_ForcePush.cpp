@@ -19,7 +19,7 @@ bool AAbility_ForcePush::Ability()
 	//UE_LOG(LogTemp, Warning, TEXT("Using FORCE PUSH!"));
 	FCollisionObjectQueryParams obejctQP;
 
-	obejctQP.AddObjectTypesToQuery(AIHero);
+	obejctQP.AddObjectTypesToQuery(Hero);
 	obejctQP.AddObjectTypesToQuery(Creeps);
 
 	FCollisionQueryParams QueryParameters;

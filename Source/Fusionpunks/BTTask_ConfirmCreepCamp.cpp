@@ -11,10 +11,9 @@
 EBTNodeResult::Type UBTTask_ConfirmCreepCamp::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) 
 {
 	 targetCamp = Cast<ACreepCamp> (OwnerComp.GetBlackboardComponent()->GetValueAsObject("CampTarget"));
-	 OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", true);
 	 heroAICont = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
 	 //OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
- hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
+    hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
 	if (hero != nullptr && targetCamp != nullptr)
 	{
 		heroStats = hero->GetHeroStats();
@@ -39,8 +38,12 @@ void UBTTask_ConfirmCreepCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
 
 	if (targetCamp->GetCampType() == teamCampType)
 	{
-		bNotifyTaskFinished = true;
+		//bNotifyTaskFinished = true;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		UE_LOG(LogTemp, Warning, TEXT("AI Successfully Captured Camp."));
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);
+		heroAICont->ResetAllCampsSafetyStatus();
 	}
 
 	else if (heroStats->GetHealthPercent() < 0.15f)
@@ -64,10 +67,7 @@ void UBTTask_ConfirmCreepCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
 void UBTTask_ConfirmCreepCamp::OnTaskFinished(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, EBTNodeResult::Type TaskResult)
 {
 	Super::OnTaskFinished(OwnerComp, NodeMemory, TaskResult);
-	UE_LOG(LogTemp, Warning, TEXT("AI Successfully Captured Camp."));
-	OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
-	OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);
-	heroAICont->ResetAllCampsSafetyStatus();
+	
 	
 
 }

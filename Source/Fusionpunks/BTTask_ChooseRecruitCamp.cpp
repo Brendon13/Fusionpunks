@@ -19,7 +19,7 @@ EBTNodeResult::Type UBTTask_ChooseRecruitCamp::ExecuteTask(UBehaviorTreeComponen
 		{
 			TArray<ACreepCamp*> ownedCreepCamps = heroAI->GetSortedOwnedCampList();
 			
-			if (ownedCreepCamps.Num() > 0)
+			if (ownedCreepCamps.Num() > 0 && ownedCreepCamps.Num() != 5)
 			{
 				for (int32 i = 0; i < ownedCreepCamps.Num(); i++)
 				{

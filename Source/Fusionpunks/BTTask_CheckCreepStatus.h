@@ -3,18 +3,19 @@
 #pragma once
 
 #include "BehaviorTree/BTTaskNode.h"
-#include "BTTask_NearbyCreeps.generated.h"
+#include "BTTask_CheckCreepStatus.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class FUSIONPUNKS_API UBTTask_NearbyCreeps : public UBTTaskNode
+class FUSIONPUNKS_API UBTTask_CheckCreepStatus : public UBTTaskNode
 {
 	GENERATED_BODY()
 	
-protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	class ACreep* creepTarget;
+	class ACreepCamp* campTarget;
 	
 	
 };

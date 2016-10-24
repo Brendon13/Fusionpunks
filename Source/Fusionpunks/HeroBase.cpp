@@ -6,6 +6,7 @@
 #include "Creep.h"
 #include "HeroStats.h"
 #include "Base.h"
+#include "HeroAIController.h"
 #include "RespawnOverTime.h"
 #include "PlayerCompassWidget.h"
 #include "CreepFormation.h"
@@ -122,6 +123,11 @@ void AHeroBase::BeginPlay()
 	heroStats->DisplayStats();
 	LinkToCreepCamps();
 
+	if (ActorHasTag("AI")) 
+	{
+		heroAI = Cast<AHeroAIController>(GetController());
+	}
+
 }
 
 // Called every frame
@@ -161,7 +167,7 @@ void AHeroBase::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 	InputComponent->BindAxis("MoveRight", this, &AHeroBase::MoveRight);
 
 	//Attack
-	InputComponent->BindAction("BasicAttack", IE_Pressed, this, &AHeroBase::StartAttack);
+	
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
@@ -281,7 +287,7 @@ bool AHeroBase::CheckForNearbyEnemyHero()
 {
 	FCollisionObjectQueryParams obejctQP;
 
-	obejctQP.AddObjectTypesToQuery(AIHero);
+	obejctQP.AddObjectTypesToQuery(Hero);
 
 	//Overlap multi by channel as a sphere (for pick ups?)
 	FCollisionQueryParams QueryParameters;
@@ -293,7 +299,7 @@ bool AHeroBase::CheckForNearbyEnemyHero()
 		GetActorLocation(),
 		FQuat(),
 		obejctQP,
-		FCollisionShape::MakeSphere(300.f),
+		FCollisionShape::MakeSphere(800),
 		QueryParameters);
 
 	if (Results.Num() == 1)
@@ -311,7 +317,7 @@ void AHeroBase::StartAttack()
 	AActor *closestEnemy;
 
 	FCollisionObjectQueryParams obejctQP;
-	obejctQP.AddObjectTypesToQuery(AIHero);
+	obejctQP.AddObjectTypesToQuery(Hero);
 	obejctQP.AddObjectTypesToQuery(Creeps);
 	obejctQP.AddObjectTypesToQuery(DamageableStructures);
 	//Overlap multi by channel as a sphere (for pick ups?)
@@ -367,7 +373,7 @@ void AHeroBase::Attack(AActor* enemy)
 	FDamageEvent DamageEvent;
 
 	
-	float damage = enemy->TakeDamage(basicAttackDamage, DamageEvent, Cast<APlayerController>(GetController()), this);
+	float damage = enemy->TakeDamage(basicAttackDamage, DamageEvent,GetController(), this);
 }
 
 void AHeroBase::AdjustCameraZoom(float Value)
@@ -435,6 +441,12 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 		SetActorEnableCollision(false);
 		bIsRespawning = true;
 		respawnEffect->StartTimer(respawnTime, this);
+		if (ActorHasTag("AI")) {
+			
+			heroAI->ResetAITreeTaskStatus();
+			heroAI->RestartHeroAITree();
+		}
+
 	}
 	return DamageAmount;
 
@@ -524,6 +536,7 @@ void AHeroBase::AddToCapturedCamps(ACreepCamp* camp)
 	if (!capturedCamps.Contains(camp)) 
 	{
 		capturedCamps.Add(camp);
+		isCapturing = false;
 	}
 }
 

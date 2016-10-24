@@ -126,7 +126,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = CampVariables)
 		FORCEINLINE float GetPatrolRadius() const { return patrolRadius; }
 
-
 	UFUNCTION(BlueprintCallable, Category = CampVariables)
 		FORCEINLINE ACreepCamp* GetCreepCampHome() const { return (creepCampHome ? creepCampHome : nullptr);}
 

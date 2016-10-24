@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
-
+#
 #include "ChainLightning.h"
 
 
@@ -33,14 +33,18 @@ void AChainLightning::BeginPlay()
 void AChainLightning::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
+
 	if (target) 
 	{
-		FVector newLocation = FMath::Lerp(GetActorLocation(), target->GetActorLocation(), 5.0f * DeltaTime);
+		FVector newLocation = FMath::Lerp(GetActorLocation(), target->GetActorLocation(), 15.0f * DeltaTime);
 		SetActorLocation(newLocation);
 		beam->SetBeamSourcePoint(0,source->GetActorLocation(),0);
+		beam->SetBeamTargetPoint(0, target->GetActorLocation(), 0);
 	}
 
-	if (startDestroyTimer) {
+
+	if (startDestroyTimer) 
+	{
 		destroyTimer += DeltaTime;
 
 		if (destroyTimer >= 1.5f)
@@ -51,10 +55,9 @@ void AChainLightning::Tick( float DeltaTime )
 	}
 	
 	
-
 }
 
-void AChainLightning::Use() 
+void AChainLightning::Ability() 
 {
 
 	beam->SetBeamSourcePoint(0, source->GetActorLocation(), 0);
@@ -71,12 +74,14 @@ void AChainLightning::SetBeamPoints(AActor* a, AActor* b)
 void AChainLightning::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, 
 									int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-	if (OtherActor->IsA(ATestCreep::StaticClass()))
+	if (OtherActor->IsA(ACharacter::StaticClass()))
 	{
 		if (!hasBeenTriggered) {
 			UE_LOG(LogTemp, Display, TEXT("Chain Lightning Trigger"));
 			CheckForNearbyEnemies();
 			hasBeenTriggered = true;
+			FDamageEvent DamageEvent;
+			OtherActor->TakeDamage(20, DamageEvent, NULL, this);
 		}
 	}	
 }
@@ -87,7 +92,7 @@ void AChainLightning::CheckForNearbyEnemies()
 	FCollisionObjectQueryParams obejctQP;
 
 	obejctQP.AddObjectTypesToQuery(Creeps);
-	//obejctQP.AddObjectTypesToQuery()
+	obejctQP.AddObjectTypesToQuery(Hero);
 	//Overlap multi by channel as a sphere (for pick ups?)
 	FCollisionQueryParams QueryParameters;
 	QueryParameters.AddIgnoredActor(target);
@@ -99,7 +104,7 @@ void AChainLightning::CheckForNearbyEnemies()
 		target->GetActorLocation(),
 		FQuat(),
 		obejctQP,
-		FCollisionShape::MakeSphere(300.f),
+		FCollisionShape::MakeSphere(750),
 		QueryParameters);
 
 	if (Results.Num() == 0) {
@@ -128,8 +133,6 @@ void AChainLightning::CheckForNearbyEnemies()
 				<AChainLightning>(chainLightningAbility,
 					spawnLoc,
 					FRotator::ZeroRotator);
-
-			
 			for (int i = 0; i < affectedActors.Num(); i++)
 			{
 				lightning->AddAffectedActor(affectedActors[i]);
