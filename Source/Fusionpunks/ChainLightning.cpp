@@ -57,12 +57,12 @@ void AChainLightning::Tick( float DeltaTime )
 	
 }
 
-void AChainLightning::Ability() 
+bool AChainLightning::Ability() 
 {
-
 	beam->SetBeamSourcePoint(0, source->GetActorLocation(), 0);
-	beam->SetBeamTargetPoint(0, target->GetActorLocation(), 0);	
+	beam->SetBeamTargetPoint(0, target->GetActorLocation(), 0);
 	
+	return true; 
 }
 
 void AChainLightning::SetBeamPoints(AActor* a, AActor* b)
