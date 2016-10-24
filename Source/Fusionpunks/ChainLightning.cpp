@@ -58,8 +58,7 @@ void AChainLightning::Use()
 {
 
 	beam->SetBeamSourcePoint(0, source->GetActorLocation(), 0);
-	beam->SetBeamTargetPoint(0, target->GetActorLocation(), 0);
-	
+	beam->SetBeamTargetPoint(0, target->GetActorLocation(), 0);	
 	
 }
 

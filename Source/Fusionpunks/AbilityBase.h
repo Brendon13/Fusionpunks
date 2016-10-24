@@ -31,7 +31,8 @@ protected:
 	UPROPERTY(EditDefaultsonly, Category = Cooldown)
 	float maxCoolDown;
 
-	virtual void Ability() { check(0 && "You must override this") };
+	//if ability is successful return true to start cooldown 
+	virtual bool Ability() { check(0 && "You must override this") return true; }
 
 private:
 	float coolDownLeft;

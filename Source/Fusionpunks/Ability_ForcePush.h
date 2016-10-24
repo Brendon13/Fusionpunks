@@ -17,7 +17,7 @@ public:
 	virtual void BeginPlay() override;
 
 protected:
-	virtual void Ability() override;
+	virtual bool Ability() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = ForcePushAbility)
 		float PushRadius;

@@ -18,7 +18,16 @@ protected:
 	
 public:
 	UFUNCTION(BlueprintCallable, Category = Player)
+		ACyberHeroCharacter* GetOwningCharacter() const { return(owningCharacter ? owningCharacter : nullptr); }
+
+	UFUNCTION(BlueprintCallable, Category = Player)
 	FText GetArmySize() const;
+
+	UFUNCTION(BlueprintCallable, Category = Player)
+	FText GetCurrentLevel() const;
+
+	UFUNCTION(BlueprintCallable, Category = Player)
+	float GetCurrentExperience() const;
 
 	FORCEINLINE void SetOwningCharacter(ACyberHeroCharacter* cyberCharacter) { owningCharacter = cyberCharacter; }
 

@@ -28,6 +28,7 @@ void ACreepAIController::Possess(APawn* Pawn)
 		BlackboardComponent->InitializeBlackboard(*BehaviorTreeAsset->BlackboardAsset);
 		//UseBlackboard(BehaviorTreeAsset->BlackboardAsset, BlackboardComponent);
 		BlackboardComponent->SetValueAsObject("SelfPawn", Pawn);
+		BlackboardComponent->SetValueAsBool("bIsStunned", false);
 		BlackboardComponent->SetValueAsBool("AtTargetPosition", true);
 		BehaviorTreeComponent->StartTree(*BehaviorTreeAsset);
 	}

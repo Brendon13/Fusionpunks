@@ -60,9 +60,9 @@ void ACreepCamp::BeginPlay()
 	sphereTrigger->OnComponentEndOverlap.AddDynamic(this, &ACreepCamp::OnOverlapEnd);
 	
 	//set locations for initial spawning 
-	creep1SpawnLocation = FVector(this->GetActorLocation().X + 500, this->GetActorLocation().Y, this->GetActorLocation().Z + 50);
-	creep2SpawnLocation = FVector(this->GetActorLocation().X - 500, this->GetActorLocation().Y, this->GetActorLocation().Z + 50);
-	creep3SpawnLocation = FVector(this->GetActorLocation().X, this->GetActorLocation().Y + 500, this->GetActorLocation().Z + 50);
+	creep1SpawnLocation = FVector(this->GetActorLocation().X + 500, this->GetActorLocation().Y, this->GetActorLocation().Z + 125);
+	creep2SpawnLocation = FVector(this->GetActorLocation().X - 500, this->GetActorLocation().Y, this->GetActorLocation().Z + 125);
+	creep3SpawnLocation = FVector(this->GetActorLocation().X, this->GetActorLocation().Y + 500, this->GetActorLocation().Z + 125);
 	creepSpawnArray.Add(creep1SpawnLocation);
 	creepSpawnArray.Add(creep2SpawnLocation);
 	creepSpawnArray.Add(creep3SpawnLocation);
@@ -195,7 +195,6 @@ void ACreepCamp::Tick( float DeltaTime )
 		////set ring material to fade in and out
 		//if (ringMesh != nullptr)
 		//	ringMesh->SetScalarParameterValueOnMaterials(TEXT("Transparency"), ringMaterialAlpha);
-
 		//check capture progress
 		if (captureVariables.dieselCaptureProgress >= 0)
 		{
@@ -278,6 +277,8 @@ void ACreepCamp::Tick( float DeltaTime )
 				neutralCreep->SetCreepCampHome(this, true);
 				creepArray.Add(neutralCreep);
 				spawningVariables.creepCount++;
+				neutralCreep->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				neutralCreep->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			}
 
 			spawningVariables.creepSpawnTimer = spawningVariables.creepSpawnTimerTarget;
@@ -307,11 +308,12 @@ void ACreepCamp::Tick( float DeltaTime )
 					cyberCreep->SetCreepCampHome(this, true);
 					creepArray.Add(cyberCreep);
 					spawningVariables.creepCount++;
+					cyberCreep->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					cyberCreep->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 				}
 			}
 			spawningVariables.creepSpawnTimer = spawningVariables.creepSpawnTimerTarget;
 		}
-		
 	}
 	//if diesel camp
 	else if (campType == ECampType::CT_Diesel && spawningVariables.creepCount < spawningVariables.dieselCreepLimit)
@@ -335,6 +337,8 @@ void ACreepCamp::Tick( float DeltaTime )
 				dieselCreep->SetCreepCampHome(this, true);
 				creepArray.Add(dieselCreep);
 				spawningVariables.creepCount++;
+				dieselCreep->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				dieselCreep->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			}
 
 			spawningVariables.creepSpawnTimer = spawningVariables.creepSpawnTimerTarget;
