@@ -15,16 +15,38 @@ void AHealOverTime::ApplyEffect()
 	//UE_LOG(LogTemp, Log, TEXT("Healing Hero!"));
 	
 	AHeroBase* heroBase = Cast<AHeroBase>(effectTarget);
-	if (heroBase)
+	
+	
+	if (GetOwner()->IsA(AHeroBase::StaticClass()))
 	{
-		heroBase->Heal(tickHealAmount);
+		if (heroBase)
+		{
+			heroBase->Heal(tickHealAmount);
+		}
+
+		amountHealed += tickHealAmount;
+		if (amountHealed > totalHealthValue)
+		{
+			StopTimer();
+			Destroy();
+		}
 	}
 
-	amountHealed += tickHealAmount;
-	if (amountHealed > totalHealthValue)
+	else 
 	{
-		StopTimer();
-		Destroy();
+		if (heroBase->GetCurrentHealth() < heroBase->GetMaxHealth() )
+		{
+			if (heroBase)
+			{
+				heroBase->Heal(tickHealAmount);
+			}
+		}
+
+		else
+		{
+			heroBase->ResetHealth();
+			StopTimer();
+		}
 	}
 
 	//call function to heal hero

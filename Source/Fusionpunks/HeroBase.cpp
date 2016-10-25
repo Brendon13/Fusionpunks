@@ -684,6 +684,7 @@ void AHeroBase::HealOverTime()
 {
 	FActorSpawnParameters spawnParameters;
 	spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	spawnParameters.Owner = this;
 	AHealOverTime* healOverTime = GetWorld()->SpawnActor<AHealOverTime>(healOverTimeClass, FVector::ZeroVector, FRotator::ZeroRotator, spawnParameters);
 	healOverTime->SetTotalHealthValue(10, 0.1f);
 	healOverTime->StartTimer(0.1f, this);
