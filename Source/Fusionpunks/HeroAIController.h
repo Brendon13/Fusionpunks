@@ -98,6 +98,7 @@ public:
 	TArray<ACreepCamp*> GetCreepCampList();
 	TArray<ACreepCamp*> GetSortedOwnedCampList();
 
+	
 
 
 
@@ -110,6 +111,7 @@ public:
 	void ResetAllCampsSafetyStatus();
 	void ResetAllCampsRecruitStatus();
 	void RestartHeroAITree();
+	
 protected:
 	UPROPERTY(EditDefaultsOnly)
 		UBehaviorTree* BehaviorTreeAsset;
@@ -129,11 +131,12 @@ protected:
 		FPriorityList campPriorityList;
 		FPriorityList campOwnedPriorityList;
 		
+
 	UPROPERTY(EditDefaultsOnly)
 			TSubclassOf<ACreepCamp> creepCampClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category = HomeBase)
-		TSubclassOf<class ABase> baseClass;
+		TSubclassOf<class AHealingWell> baseClass;
 
 
 	

@@ -5,6 +5,7 @@
 #include "HeroBase.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Creep.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "BTTask_AttackCreeps.h"
 
 EBTNodeResult::Type UBTTask_AttackCreeps::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -12,7 +13,7 @@ EBTNodeResult::Type UBTTask_AttackCreeps::ExecuteTask(UBehaviorTreeComponent& Ow
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 	
 	hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
-
+	isAttacking = false;
 	if (hero != nullptr)
 	{
 		heroStats = hero->GetHeroStats();
@@ -28,7 +29,7 @@ EBTNodeResult::Type UBTTask_AttackCreeps::ExecuteTask(UBehaviorTreeComponent& Ow
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Cant Find Hero"));
+		UE_LOG(LogTemp, Error, TEXT("Cant Find Hero In Attack Creep Task"));
 		return EBTNodeResult::Failed;
 	}
 }
@@ -43,13 +44,21 @@ void UBTTask_AttackCreeps::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 				isAttacking = true;
 				UE_LOG(LogTemp, Error, TEXT("Starting Attack Timer!"));
 		}
-
-		if (isAttacking && target->IsActorBeingDestroyed())
+		if (isAttacking)
 		{
+				FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), target->GetActorLocation());
+				lookAtTargetRotation.Pitch = 0;
+				hero->SetActorRotation(lookAtTargetRotation);
+		}
+		
+		if (target->GetHealthAsDecimal()<=0 || hero->GetPlayerHealthAsDecimal() <= healthPercentageAbort || hero->GetDistanceTo(target) > 300 )
+		{
+			UE_LOG(LogTemp, Error, TEXT("STOP ATTACK TIMER"));
+			target = nullptr;
+
 			if (attackTimerHandle.IsValid())
 			{
 				GetWorld()->GetTimerManager().ClearTimer(attackTimerHandle);
-				isAttacking = false;
 				FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 			}
 		}
@@ -64,6 +73,6 @@ void UBTTask_AttackCreeps::OnTaskFinished(UBehaviorTreeComponent & OwnerComp, ui
 }
 void UBTTask_AttackCreeps::AttackOnTimer() 
 {
-	
-	hero->Attack(target);
+	if(target!= nullptr)
+		hero->Attack(target);
 }

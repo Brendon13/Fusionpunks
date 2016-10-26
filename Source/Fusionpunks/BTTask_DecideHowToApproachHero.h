@@ -13,7 +13,8 @@ enum class EApproachStatus : uint8
 {
 	AS_DefendingCamp UMETA(DisplayName = "DefendingCamp"),
 	AS_AgressiveChase UMETA(DisplayName = "AgressiveChase"),
-	AS_Escaping UMETA(DisplayName = "Escaping")
+	AS_EscapingToBase UMETA(DisplayName = "EscapingToBase"),
+	AS_EscapingToNextCamp UMETA(DisplayName = "EscapingToNextCamp")
 };
 
 
@@ -28,12 +29,19 @@ class FUSIONPUNKS_API UBTTask_DecideHowToApproachHero : public UBTTaskNode
 	class HeroStats* heroStats;
 	class AHeroBase* attackTarget;
 	class ACreepCamp* campTarget;
+	class AHeroAIController* heroAI;
+	AActor* healingWell;
 	UPROPERTY(EditAnywhere)
 		EApproachStatus approachStatus;
 	UPROPERTY(EditAnywhere)
 		int32 creepDifferenceAllowed = 3;
 	UPROPERTY(EditAnywhere)
 		float healthPercentRequired = 0.15f;
+	UPROPERTY(EditAnywhere)
+		float healthPercentDifferenceAllowed = 0.35f;
+	UPROPERTY(EditAnywhere)
+		int32  levelDifferenceAllowed = 5;
+
 	
 
 	
