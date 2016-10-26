@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
+#include "HeroBase.h"
 #include "FusionpunksGameState.h"
 
 
@@ -21,12 +22,46 @@ void AFusionpunksGameState::DieselLevelUp()
 	DieselLevel++;
 }
 
-int AFusionpunksGameState::GetCyberLevel() const
+void AFusionpunksGameState::DieselWins()
 {
-	return CyberLevel;
+	UE_LOG(LogTemp, Warning, TEXT("Diesel Wins!"));
+
+	//DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+	for (int i = 0; i < Players.Num(); i++)
+	{
+		APlayerController* playerController = Cast<APlayerController>(Players[i]->GetController());
+		if (playerController)
+		{
+			Players[i]->DisableInput(playerController);
+		}
+	
+		//for each AI controlled hero... unpossess it 
+		/*if (Players[i]->Tags.Contains("AI"))
+		{
+			Players[i]->GetController()->UnPossess();
+		}*/
+	}
 }
 
-int AFusionpunksGameState::GetDieselLevel() const
+void AFusionpunksGameState::CyberWins()
 {
-	return DieselLevel;
+	UE_LOG(LogTemp, Warning, TEXT("Cyber Wins!"));
+
+	//DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+	for (int i = 0; i < Players.Num(); i++)
+	{
+		APlayerController* playerController = Cast<APlayerController>(Players[i]->GetController());
+		if (playerController)
+		{
+			Players[i]->DisableInput(playerController);
+		}
+
+		//for each AI controlled hero... unpossess it 
+		/*if (Players[i]->Tags.Contains("AI"))
+		{
+		Players[i]->GetController()->UnPossess();
+		}*/
+	}
 }

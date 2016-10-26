@@ -4,6 +4,7 @@
 
 #include "HealthBarWidgetComponent.h"
 #include "GameFramework/Actor.h"
+#include "Runtime/LevelSequence/Public/LevelSequencePlayer.h"
 #include <Classes/Kismet/KismetMathLibrary.h>
 #include "Base.generated.h"
 
@@ -20,9 +21,9 @@ public:
 
 	float GetHpPercent();
 	
-private:
-	UPROPERTY(EditDefaultsOnly)
-		UShapeComponent* rootCldr;
+protected:
+	/*UPROPERTY(EditDefaultsOnly)
+		UShapeComponent* rootCldr;*/
 
 	UPROPERTY(EditDefaultsOnly)
 		UStaticMeshComponent* baseMesh;
@@ -48,5 +49,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Widgets)
 	TSubclassOf<class UFloatingDamageWidget> FloatingDamageWidgetClass;
 	
+	UPROPERTY(EditAnywhere, Category = Cutscenes)
+		class ULevelSequencePlayer* sequencePlayer;
 	
+	UPROPERTY(EditAnywhere, Category = Cutscenes)
+		class ALevelSequenceActor* sequenceActor;
 };

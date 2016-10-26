@@ -44,6 +44,7 @@ protected:
 
 public:
 	void RestartBehaviorTree();
+	void StopBehaviorTree();
 
 private:
 

@@ -12,6 +12,8 @@
 #include "CreepFormation.h"
 #include "HealOverTime.h"
 #include "AbilityBase.h"
+#include "FusionpunksGameState.h"
+#include "BulletBase.h"
 #include "HeroBase.h"
 
 
@@ -94,12 +96,22 @@ AHeroBase::AHeroBase()
 	bIsAttacking = false; 
 
 	currentExperience = 0;
+	currentHealth = maxHealth;
 }
 
 // Called when the game starts or when spawned
 void AHeroBase::BeginPlay()
 {
 	Super::BeginPlay();
+	currentHealth = maxHealth;
+	if (GetWorld())
+	{
+		AFusionpunksGameState* gameState = Cast<AFusionpunksGameState>(GetWorld()->GetGameState());
+		if (gameState)
+		{
+			gameState->Players.Add(this);
+		}
+	}
 
 	compassDecalMaterialDynamic = compassDecalComponent->CreateDynamicMaterialInstance();
 
@@ -108,6 +120,7 @@ void AHeroBase::BeginPlay()
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHeroBase::OnOverlapBegin);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHeroBase::OnOverlapEnd);
+	//GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AHeroBase::OnCapsuleComponentHit);
 	
 	GetWorld()->GetAuthGameMode()->Children.Add(this);
 	respawnEffect = GetWorld()->SpawnActor<ARespawnOverTime>(respawnClass, FVector::ZeroVector, FRotator::ZeroRotator);
@@ -135,10 +148,10 @@ void AHeroBase::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
-	if (Tags.Contains("Cyber"))
+	/*if (Tags.Contains("Cyber"))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("current experience is: %i"), currentExperience);
-	}
+	}*/
 	//UMaterialInstance* material = Cast<UMaterialInstance>(compassDecalComponent->GetDecalMaterial());
 	//if (material)
 	//{
@@ -189,6 +202,9 @@ void AHeroBase::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 	InputComponent->BindAction("Ability2", IE_Pressed, this, &AHeroBase::UseAbility1);
 	InputComponent->BindAction("Ability3", IE_Pressed, this, &AHeroBase::UseAbility2);
 	InputComponent->BindAction("Ability4", IE_Pressed, this, &AHeroBase::UseAbility3);
+	InputComponent->BindAction("Ability5", IE_Pressed, this, &AHeroBase::UseAbility4);
+
+	//InputComponent->BindAction("RangedAttack", IE_Pressed, this, &AHeroBase::RangedAttack);
 }
 void AHeroBase::TurnAtRate(float Rate)
 {
@@ -367,11 +383,12 @@ void AHeroBase::StartAttack()
 void AHeroBase::ResetHealth()
 {
 	currentHealth = maxHealth;
+	FLinearColor materialColor = FLinearColor::FLinearColor(1 - GetPlayerHealthAsDecimal(), GetPlayerHealthAsDecimal(), 0, 1.0f);
+	compassDecalMaterialDynamic->SetVectorParameterValue("Base_Colour", materialColor);
 }
 void AHeroBase::Attack(AActor* enemy)
 {
 	FDamageEvent DamageEvent;
-
 	
 	float damage = enemy->TakeDamage(basicAttackDamage, DamageEvent,GetController(), this);
 }
@@ -407,6 +424,11 @@ void AHeroBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* O
 	}
 }
 
+void AHeroBase::OnCapsuleComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Hero was hit by something"));
+}
+
 void AHeroBase::LevelUp()
 {
 	currentLevel++;
@@ -422,6 +444,15 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	currentHealth -= DamageAmount;
 	//UE_LOG(LogTemp, Log, TEXT("Hero took %f damage."), DamageAmount);
+
+	if (!DamageCauser->ActorHasTag("AI") && !DamageCauser->ActorHasTag("Creep") && FloatingDamageWidgetClass)
+	{
+		UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
+		floatingDamageWidget->SetAlignmentInViewport(FVector2D::FVector2D(0.5f, 0.5f));
+		floatingDamageWidget->SetIncDamage(DamageAmount);
+		floatingDamageWidget->SetOwningActor(this);
+		floatingDamageWidget->AddToViewport();
+	}
 
 	FLinearColor materialColor = FLinearColor::FLinearColor(1 - GetPlayerHealthAsDecimal(), GetPlayerHealthAsDecimal(), 0, 1.0f);
 	compassDecalMaterialDynamic->SetVectorParameterValue("Base_Colour", materialColor);
@@ -441,7 +472,7 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 		SetActorEnableCollision(false);
 		bIsRespawning = true;
 		respawnEffect->StartTimer(respawnTime, this);
-		if (ActorHasTag("AI")) {
+		if (ActorHasTag("AI")){
 			
 			heroAI->ResetAITreeTaskStatus();
 			heroAI->RestartHeroAITree();
@@ -528,7 +559,6 @@ void AHeroBase::LinkToCreepCamps()
 		creepCamps.Add(Cast<ACreepCamp>(actorList[i]));
 		creepCamps[i]->LinkToHeroes(this);
 	}
-
 }
 
 void AHeroBase::AddToCapturedCamps(ACreepCamp* camp) 
@@ -685,7 +715,7 @@ void AHeroBase::HealOverTime()
 	FActorSpawnParameters spawnParameters;
 	spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	AHealOverTime* healOverTime = GetWorld()->SpawnActor<AHealOverTime>(healOverTimeClass, FVector::ZeroVector, FRotator::ZeroRotator, spawnParameters);
-	healOverTime->SetTotalHealthValue(10, 0.1f);
+	healOverTime->SetTotalHealthValue(maxHealth * 0.5f, 0.1f);
 	healOverTime->StartTimer(0.1f, this);
 }
 
@@ -704,7 +734,7 @@ bool AHeroBase::SacrificeCreep()
 	if (CreepArmy.Num() > 0 && currentHealth < maxHealth)
 	{
 		ACreep* creep = CreepArmy.Pop();
-		creep->Destroy();
+		creep->TakeDamage(10000000, FDamageEvent::FDamageEvent(), GetController(), this);
 		HealOverTime();
 		return true;
 	}
@@ -713,10 +743,10 @@ bool AHeroBase::SacrificeCreep()
 
 void AHeroBase::UseAbility0()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Using Ability 1"));
+	UE_LOG(LogTemp, Warning, TEXT("Using Ability 0"));
 	if (AbilitiesClass[0] != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 1"));
+		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 0"));
 		//spawn the ability
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
@@ -731,7 +761,7 @@ void AHeroBase::UseAbility0()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Ability 1 is Unassigned!"))
+		UE_LOG(LogTemp, Warning, TEXT("Ability 0 is Unassigned!"))
 	}
 }
 
@@ -762,10 +792,10 @@ void AHeroBase::UseAbility1()
 
 void AHeroBase::UseAbility2()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Using Ability 1"));
+	UE_LOG(LogTemp, Warning, TEXT("Using Ability 2"));
 	if (AbilitiesClass[2] != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 1"));
+		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 2"));
 		//spawn the ability
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
@@ -780,16 +810,16 @@ void AHeroBase::UseAbility2()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Ability 1 is Unassigned!"))
+		UE_LOG(LogTemp, Warning, TEXT("Ability 2 is Unassigned!"))
 	}
 }
 
 void AHeroBase::UseAbility3()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Using Ability 1"));
+	UE_LOG(LogTemp, Warning, TEXT("Using Ability 3"));
 	if (AbilitiesClass[3] != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 1"));
+		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 3"));
 		//spawn the ability
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
@@ -804,7 +834,31 @@ void AHeroBase::UseAbility3()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Ability 1 is Unassigned!"))
+		UE_LOG(LogTemp, Warning, TEXT("Ability 3 is Unassigned!"))
+	}
+}
+
+void AHeroBase::UseAbility4()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Using Ability 4"));
+	if (AbilitiesClass[4] != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawning Ability 4"));
+		//spawn the ability
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+
+		if (Abilities[4] == nullptr)
+		{
+			Abilities[4] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[4], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+			Abilities[4]->Use();
+			return;
+		}
+		Abilities[4]->Use();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Ability 4 is Unassigned!"))
 	}
 }
 
@@ -844,4 +898,23 @@ void AHeroBase::CreepArmyChangeTeam(bool Attack)
 			CreepArmy[i]->AttackLeader();
 		}
 	}
+}
+
+void AHeroBase::MeleeAttack()
+{
+
+}
+
+void AHeroBase::RangedAttack()
+{
+	if (BulletClass)
+	{
+		FActorSpawnParameters spawnParameters;
+		spawnParameters.Owner = this;
+		spawnParameters.Instigator = this; 
+		spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		GetWorld()->SpawnActor<ABulletBase>(BulletClass, GetActorLocation() + GetActorForwardVector() * 100, FRotator::ZeroRotator, spawnParameters);
+	}
+	
 }

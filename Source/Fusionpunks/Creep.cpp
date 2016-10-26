@@ -40,7 +40,7 @@ ACreep::ACreep()
 	agroRadiusSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AgroRadius"));
 	agroRadiusSphere->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
-	AIControllerClass = ACreepAIController::StaticClass();
+	//AIControllerClass = ACreepAIController::StaticClass();
 	GetMesh()->bReceivesDecals = false; 
 	GetCapsuleComponent()->SetCanEverAffectNavigation(true);
 
@@ -138,7 +138,11 @@ void ACreep::Tick( float DeltaTime )
 	if (!bBelongsToCamp && playerToFollow)
 	{
 		ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
-		AiController->GetBlackboardComponent()->SetValueAsVector("FormationPosition", playerToFollow->GetSlotPosition(slotAssignment));
+		if (AiController)
+		{
+			AiController->GetBlackboardComponent()->SetValueAsVector("FormationPosition", playerToFollow->GetSlotPosition(slotAssignment));
+		}
+			
 	}
 }
 
@@ -163,6 +167,15 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 {
 	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
+	//Play Take Damage Aniamtion
+	UBoolProperty* boolProp = FindField<UBoolProperty>(GetMesh()->GetAnimInstance()->GetClass(), TEXT("IsDamaged?"));
+	if (boolProp)
+	{
+		boolProp->SetPropertyValue_InContainer(GetMesh()->GetAnimInstance(), true);
+		//bool meleeAttack = boolProp->GetPropertyValue_InContainer(GetMesh()->GetAnimInstance());
+		GetWorld()->GetTimerManager().SetTimer(takeDamageTimerHandle, this, &ACreep::StopTakingDamageAnim, 0.2f, false);
+	}
+
 	if (EnemyTarget == nullptr)
 	{
 		EnemyTarget = DamageCauser;
@@ -182,18 +195,31 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 	}
 	currentHealth -= Damage;
 
-	if (!DamageCauser->ActorHasTag("AI") && !DamageCauser->ActorHasTag("Creep") && FloatingDamageWidgetClass)
+	if (Damage < 10000000 && !DamageCauser->ActorHasTag("AI") && !DamageCauser->ActorHasTag("Creep") && FloatingDamageWidgetClass)
 	{
 		UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
-		//floatingDamageWidget->SetVisibility(ESlateVisibility::Hidden);
 		floatingDamageWidget->SetAlignmentInViewport(FVector2D::FVector2D(0.5f, 0.5f));
 		floatingDamageWidget->SetIncDamage(Damage);
-		floatingDamageWidget->SetOwningPawn(this);
+		floatingDamageWidget->SetOwningActor(this);
 		floatingDamageWidget->AddToViewport();
 	}
 	
 	if (currentHealth <= 0)
 	{
+		bIsDead = true; 
+		GetCapsuleComponent()->bGenerateOverlapEvents = false; 
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		agroRadiusSphere->bGenerateOverlapEvents = false; 
+		widgetComponent->SetVisibility(false);
+
+		ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
+		if (IsValid(AiController))
+		{
+			AiController->StopBehaviorTree();
+		}
+		GetMesh()->SetSimulatePhysics(true);
+		GetWorld()->GetTimerManager().SetTimer(destroyCreepTimerHandle, this, &ACreep::KillCreep, 5.0f, false);
+
 		AHeroBase* hero = Cast<AHeroBase>(DamageCauser);
 		if (hero)
 		{
@@ -209,7 +235,7 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 		{
 			playerToFollow->RemoveCreepFromArmy(this);
 		}
-		this->Destroy();
+		//this->Destroy();
 	}
 	return Damage;
 }
@@ -462,4 +488,24 @@ void ACreep::AttackLeader()
 		}
 		
 	}
+}
+
+void ACreep::StopTakingDamageAnim()
+{
+	if (takeDamageTimerHandle.IsValid())
+		GetWorld()->GetTimerManager().ClearTimer(takeDamageTimerHandle);
+
+	UBoolProperty* boolProp = FindField<UBoolProperty>(GetMesh()->GetAnimInstance()->GetClass(), TEXT("IsDamaged?"));
+	if (boolProp)
+	{
+		boolProp->SetPropertyValue_InContainer(GetMesh()->GetAnimInstance(), false);
+	}
+}
+
+void ACreep::KillCreep()
+{
+	if(destroyCreepTimerHandle.IsValid())
+		GetWorld()->GetTimerManager().ClearTimer(destroyCreepTimerHandle);
+
+	this->Destroy();
 }

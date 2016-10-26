@@ -59,3 +59,8 @@ void ACreepAIController::RestartBehaviorTree()
 {
 	BehaviorTreeComponent->RestartTree();
 }
+
+void ACreepAIController::StopBehaviorTree()
+{
+	BehaviorTreeComponent->StopTree();
+}

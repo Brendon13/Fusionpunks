@@ -42,5 +42,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = WidgetFunctions)
 		float GetAbility3CD() const;
+
+	UFUNCTION(BlueprintCallable, Category = WidgetFunctions)
+		float GetAbility4CD() const;
 	
 };

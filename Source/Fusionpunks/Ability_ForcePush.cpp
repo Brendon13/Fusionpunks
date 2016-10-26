@@ -23,7 +23,7 @@ bool AAbility_ForcePush::Ability()
 	obejctQP.AddObjectTypesToQuery(Creeps);
 
 	FCollisionQueryParams QueryParameters;
-	QueryParameters.AddIgnoredActor(this);
+	QueryParameters.AddIgnoredActor(GetOwner());
 	QueryParameters.OwnerTag = TEXT("Player");
 
 	TArray<FOverlapResult> Results;
@@ -61,7 +61,7 @@ bool AAbility_ForcePush::Ability()
 						continue;
 					}
 				}
-				else if(enemyHero)
+				else if (enemyHero)
 				{
 					enemyHero->TakeDamage(damage, FDamageEvent::FDamageEvent(), owner->GetController(), owner);
 					FVector dir = enemyHero->GetActorLocation() - owner->GetActorLocation();

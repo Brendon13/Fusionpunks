@@ -12,6 +12,9 @@
 
 ACyberHeroCharacter::ACyberHeroCharacter()
 {
+	SwordMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SwordSkeletalMeshComp"));
+	SwordMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("Sword_socket"));
+
 	maxHealth = 250;
 	currentHealth = maxHealth;
 
@@ -19,42 +22,11 @@ ACyberHeroCharacter::ACyberHeroCharacter()
 	team = FName::FName(TEXT("Cyber"));
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Input
-
-void ACyberHeroCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
-{
-	// Set up gameplay key bindings
-	Super::SetupPlayerInputComponent(InputComponent);
-	check(InputComponent);
-	
-	InputComponent->BindAction("BasicAttack", IE_Pressed, this, &ACyberHeroCharacter::DetermineClickEvent);
-	//InputComponent->BindAction("Skill1", IE_Pressed, this, &ACyberHeroCharacter::OnSkillPressed);
-}
-
-
-void ACyberHeroCharacter::DetermineClickEvent()
-{
-	if (skillSelected)
-	{
-		AActor* currentTarget = UpdateTarget();
-		if (currentTarget != NULL) 
-		{
-			UseSkill(currentTarget);
-			UnHighlightTarget(currentTarget);
-			skillSelected = false;
-		}
-	}
-	else
-	{
-		StartAttack();
-	}
-}
-
-
 void ACyberHeroCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SwordMeshComp->OnComponentBeginOverlap.AddDynamic(this, &ACyberHeroCharacter::OnSwordComponentOverlap);
 
 	if (UIWidgetClass && ActorHasTag(TEXT("AI")) == false)
 	{
@@ -71,6 +43,38 @@ void ACyberHeroCharacter::Tick(float DeltaTime)
 	if (skillSelected) 
 	{
 		UpdateTarget();
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Input
+
+void ACyberHeroCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
+{
+	// Set up gameplay key bindings
+	Super::SetupPlayerInputComponent(InputComponent);
+	check(InputComponent);
+
+	InputComponent->BindAction("BasicAttack", IE_Pressed, this, &ACyberHeroCharacter::DetermineClickEvent);
+	//InputComponent->BindAction("Skill1", IE_Pressed, this, &ACyberHeroCharacter::OnSkillPressed);
+}
+
+
+void ACyberHeroCharacter::DetermineClickEvent()
+{
+	if (skillSelected)
+	{
+		AActor* currentTarget = UpdateTarget();
+		if (currentTarget != NULL)
+		{
+			UseSkill(currentTarget);
+			UnHighlightTarget(currentTarget);
+			skillSelected = false;
+		}
+	}
+	else
+	{
+		MeleeAttack();
 	}
 }
 
@@ -246,3 +250,30 @@ void ACyberHeroCharacter::LevelUp()
 	}
 }
 
+void ACyberHeroCharacter::OnSwordComponentOverlap(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("Sword Component Hit!"));
+
+	//if creep and not on our team OR is an AI enemy
+	if (bIsAttacking && !OtherActor->Tags.Contains(team))
+	{
+		OtherActor->TakeDamage(basicAttackDamage, FDamageEvent::FDamageEvent(), GetController(), this);
+	}
+}
+
+void ACyberHeroCharacter::MeleeAttack()
+{
+	//UE_LOG(LogTemp, Warning, TEXT("Prophet Melee Attack!"));
+
+	if (!bIsAttacking)
+	{
+		UBoolProperty* boolProp = FindField<UBoolProperty>(GetMesh()->GetAnimInstance()->GetClass(), TEXT("MeleeAttacking"));
+		if (boolProp)
+		{
+			bIsAttacking = true;
+			boolProp->SetPropertyValue_InContainer(GetMesh()->GetAnimInstance(), true);
+			//bool meleeAttack = boolProp->GetPropertyValue_InContainer(GetMesh()->GetAnimInstance());
+			GetWorld()->GetTimerManager().SetTimer(attackTimerHandle, this, &ACyberHeroCharacter::StopAttacking, 1.25f, false);
+		}
+	}
+}

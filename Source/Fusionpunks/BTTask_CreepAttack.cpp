@@ -20,12 +20,14 @@ EBTNodeResult::Type UBTTask_CreepAttack::ExecuteTask(UBehaviorTreeComponent& Own
 			/*Brendon - Note: damageEvent can be: FPointDamageEvent, FRadialDamageEvent, FDamageEvent or a custom DamageEvent
 			more info @ https://www.unrealengine.com/blog/damage-in-ue4*/
 			FDamageEvent damageEvent;
-			enemy->TakeDamage(owner->MeleeAttack(), damageEvent, owner->GetController(), owner);
+			float damage = owner->MeleeAttack();
+			if(damage > 0)
+				enemy->TakeDamage(damage, damageEvent, owner->GetController(), owner);
 			//UE_LOG(LogTemp, Warning, TEXT("Took Damage From Creep"));
 
 			return EBTNodeResult::Succeeded;
 		}
-		else if (enemyCreep != nullptr)
+		else if (enemyCreep != nullptr && !enemyCreep->GetBIsDead())
 		{
 			FDamageEvent damageEvent;
 			enemyCreep->TakeDamage(owner->MeleeAttack(), damageEvent, owner->GetController(), owner);
