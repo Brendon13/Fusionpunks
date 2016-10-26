@@ -47,6 +47,7 @@ void UBTTask_AttackCreeps::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 		if (isAttacking)
 		{
 				FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), target->GetActorLocation());
+				lookAtTargetRotation.Pitch = 0;
 				hero->SetActorRotation(lookAtTargetRotation);
 		}
 		

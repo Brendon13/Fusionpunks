@@ -299,7 +299,7 @@ bool AHeroBase::CheckForNearbyEnemyHero()
 		GetActorLocation(),
 		FQuat(),
 		obejctQP,
-		FCollisionShape::MakeSphere(1000),
+		FCollisionShape::MakeSphere(1300),
 		QueryParameters);
 
 	if (Results.Num() == 1)
