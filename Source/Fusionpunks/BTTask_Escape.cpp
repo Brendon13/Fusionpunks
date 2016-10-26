@@ -12,16 +12,27 @@ EBTNodeResult::Type UBTTask_Escape::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
 	hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
-
 	if (hero != nullptr)
-	{
-		heroStats = hero->GetHeroStats();
-
-		
+	{		
+		healingWell = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("HealingWell"));
 		bNotifyTick = true;
 		return EBTNodeResult::InProgress;
 	}
 		return EBTNodeResult::Failed;
+}
+
+void UBTTask_Escape::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+	if (!hero->InsideHealingWell())
+	{
+		OwnerComp.GetAIOwner()->MoveToActor(healingWell, 50, true, true, false);
+	}
+	else 
+	{
+		UE_LOG(LogTemp, Error, TEXT("MADE IT TO HEALING WELL"));
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
 }
 
 

@@ -135,6 +135,7 @@ protected:
 
 	int currentExperience;
 
+	bool bInsideHealingWell = false;
 public:
 	void AddToExperience(int experience);
 	float GetCurrentExperienceAsDecimal() const { return (float)currentExperience / (float)experienceGoal; }
@@ -155,7 +156,7 @@ public:
 
 	bool bIsRespawning = false;
 
-	
+	FORCEINLINE bool IsRespawning() const { return bIsRespawning; }
 	FORCEINLINE int32 GetArmySize() const { return CreepArmy.Num(); }
 	FORCEINLINE float GetRespawnTime() const { return respawnTime; }
 	FORCEINLINE  int32 GetLevel() const { return currentLevel; }
@@ -164,6 +165,8 @@ public:
 	FORCEINLINE class HeroStats* GetHeroStats() const { return heroStats; }
 	FORCEINLINE bool IsCapturing() const { return isCapturing; }
 	FORCEINLINE void SetIsCapturing(bool status) { isCapturing = status; }
+	FORCEINLINE void SetInsideHealingWell(bool status) { bInsideHealingWell = status; }
+	FORCEINLINE bool InsideHealingWell() { return bInsideHealingWell; }
 	void AddToCapturedCamps(class ACreepCamp* camp);
 	void RemoveFromCapturedCamps(class ACreepCamp* camp);
 	void UpdateHeroStats();

@@ -25,6 +25,8 @@ protected:
 	FTimerHandle attackTimerHandle;
 	UPROPERTY(EditAnywhere)
 		float attackSpeed = 0.35f;
+	UPROPERTY(EditAnywhere)
+		float healthPercentageAbort = 0.2f;
 	UFUNCTION()
 		void AttackOnTimer();
 
