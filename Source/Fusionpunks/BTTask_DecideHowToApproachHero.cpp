@@ -2,7 +2,7 @@
 
 #include "Fusionpunks.h"
 #include "HeroBase.h"
-#include "AIController.h"
+#include "HeroAIController.h"
 #include "CreepCamp.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Creep.h"
@@ -13,40 +13,39 @@ EBTNodeResult::Type UBTTask_DecideHowToApproachHero::ExecuteTask(UBehaviorTreeCo
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 	hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
-
-	if (hero != nullptr)
+	heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
+	if (hero != nullptr && heroAI != nullptr)
 	{
 		heroStats = hero->GetHeroStats();
 		attackTarget = Cast<AHeroBase>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("AttackTarget"));
 		campTarget = Cast<ACreepCamp>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("CampTarget"));
-
+		healingWell = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("HealingWell"));
 		if (attackTarget != nullptr && campTarget!= nullptr)
 		{
-
 			if (hero->GetCurrentHealth() <= healthPercentRequired)
 			{
-				approachStatus = EApproachStatus::AS_Escaping;
+				approachStatus = EApproachStatus::AS_EscapingToBase;
 			
 			}
 
-
-			else if (hero->IsCapturing() || hero->GetDistanceTo(campTarget) <= 700)
+			else if (hero->IsCapturing() || hero->GetDistanceTo(campTarget) <= 1200)
 			{	
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject("HeroAttackSituationTarget", campTarget);
+				//OwnerComp.GetBlackboardComponent()->SetValueAsObject("HeroAttackSituationTarget", campTarget);
 				approachStatus = EApproachStatus::AS_DefendingCamp;
+				UE_LOG(LogTemp, Error, TEXT("Defensive State"));
 				
 			}
-
-
-			else if (attackTarget->GetArmySize() - hero->GetArmySize() <= creepDifferenceAllowed)
-			{
-				approachStatus = EApproachStatus::AS_AgressiveChase;
-				
+			else if ( attackTarget->GetArmySize() - hero->GetArmySize() <= creepDifferenceAllowed
+				&& attackTarget->GetPlayerHealthAsDecimal() - hero->GetPlayerHealthAsDecimal() <= healthPercentDifferenceAllowed
+				&& attackTarget->GetLevel() - hero->GetLevel() <= levelDifferenceAllowed )
+			{			
+				approachStatus = EApproachStatus::AS_AgressiveChase;	
+				UE_LOG(LogTemp, Error, TEXT("Agressive State"));
 			}
 
 			else
 			{
-				approachStatus = EApproachStatus::AS_Escaping;
+				approachStatus = EApproachStatus::AS_EscapingToNextCamp;
 				
 			}
 			bNotifyTick = true;
@@ -58,7 +57,7 @@ EBTNodeResult::Type UBTTask_DecideHowToApproachHero::ExecuteTask(UBehaviorTreeCo
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Cant Find Hero"));
+		UE_LOG(LogTemp, Error, TEXT("Cant Find Hero/Hero AI in Decide how to approach"));
 		return EBTNodeResult::Failed;
 	}
 
@@ -69,11 +68,25 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
-	if (approachStatus == EApproachStatus::AS_DefendingCamp) 
+	if (approachStatus == EApproachStatus::AS_DefendingCamp)
 	{
-		if (attackTarget->IsCapturing())
+		if (hero->GetPlayerHealthAsDecimal() <= healthPercentRequired)
 		{
-			OwnerComp.GetAIOwner()->MoveToActor(attackTarget, 50, false, true, false);
+			UE_LOG(LogTemp, Error, TEXT("Health to low to engage"));
+			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		}
+		
+		else if (attackTarget->IsCapturing() || attackTarget->GetDistanceTo(campTarget)<=1000 || attackTarget->GetPlayerHealthAsDecimal() <= 0.2f)
+		{
+			if (hero->GetDistanceTo(attackTarget) >= 300)
+			{
+				OwnerComp.GetAIOwner()->MoveToActor(attackTarget, 50, false, true, false);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("IN RANGE OF ENEMY HERO"));
+				FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+			}
 		}
 		else
 		{
@@ -81,15 +94,45 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 			{
 				OwnerComp.GetAIOwner()->MoveToActor(campTarget, 500, true, true, false);
 			}
-			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("IN RANGE OF DEFENSIVE CAMP"));
+				FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+			}
 			
 		}
-	
 	
 	}
 
 	else if (approachStatus == EApproachStatus::AS_AgressiveChase)
 	{
 
+		if (attackTarget->GetPlayerHealthAsDecimal() <= healthPercentRequired)
+		{
+			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		}
+		
+
+		else if (hero->GetDistanceTo(attackTarget) >= 300)
+		{
+			OwnerComp.GetAIOwner()->MoveToActor(attackTarget, 50, false, true, false);
+		}
+		else
+		{
+			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		}
+	}
+
+	else if (approachStatus == EApproachStatus::AS_EscapingToNextCamp)
+	{
+		if(hero->CheckForNearbyEnemyHero())
+			OwnerComp.GetAIOwner()->MoveToActor(healingWell, 50, false, true, false);
+		else
+		{
+			heroAI->ResetAllCampsSafetyStatus();
+			campTarget->SetCampSafety(false);
+			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+
+		}
 	}
 }

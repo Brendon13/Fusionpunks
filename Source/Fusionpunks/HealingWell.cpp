@@ -14,9 +14,9 @@ AHealingWell::AHealingWell()
 	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = meshComp;
 	decalComp = CreateDefaultSubobject<UDecalComponent>(TEXT("Decal"));
-	decalComp->AttachTo(RootComponent);
+	decalComp->AttachToComponent(RootComponent,FAttachmentTransformRules::KeepRelativeTransform);
 	healRadius = CreateDefaultSubobject<USphereComponent>(TEXT("Healing Radius"));
-	healRadius->AttachTo(RootComponent);
+	healRadius->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	healRadius->bGenerateOverlapEvents = true;
 	healRadius->OnComponentBeginOverlap.AddDynamic(this, &AHealingWell::TriggerEnter);
 	healRadius->OnComponentEndOverlap.AddDynamic(this, &AHealingWell::TriggerExit);
@@ -45,18 +45,23 @@ void AHealingWell::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActo
 {
 	if (OtherActor->IsA(AHeroBase::StaticClass()))
 	{
+		AHeroBase* hero = Cast<AHeroBase>(OtherActor);
+	
 		if (ActorHasTag("Diesel") && OtherActor->ActorHasTag("Diesel"))
 		{
-			healingEffect->SetTotalHealthValue(50,0.25);
+			hero->SetInsideHealingWell(true);
+			healingEffect->SetTotalHealthValue(20,0.1);
 			healingEffect->StartTimer(0.1, OtherActor);
 		}
 
 		else if (ActorHasTag("Cyber") && OtherActor->ActorHasTag("Cyber"))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("CYBER HEALING WELL ACTIVATED"))
-			healingEffect->SetTotalHealthValue(10,0.20);
+			hero->SetInsideHealingWell(true);
+			UE_LOG(LogTemp, Error, TEXT("CYBER HEALING WELL ACTIVATED"))
+			healingEffect->SetTotalHealthValue(20,0.1);
 			healingEffect->StartTimer(0.1, OtherActor);
 		}
+	
 	}
 }
 void AHealingWell::TriggerExit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -64,15 +69,26 @@ void AHealingWell::TriggerExit(UPrimitiveComponent* OverlappedComponent, AActor*
   
 	if (OtherActor->IsA(AHeroBase::StaticClass()))
 	{
+		AHeroBase* hero = Cast<AHeroBase>(OtherActor);
 		if (ActorHasTag("Diesel") && OtherActor->ActorHasTag("Diesel"))
 		{
-			
+			hero->SetInsideHealingWell(false);
 			healingEffect->StopTimer();
+			if (hero->GetCurrentHealth() >= hero->GetMaxHealth())
+			{
+				hero->ResetHealth();
+			}
+		
 		}
 
 		else if (ActorHasTag("Cyber") && OtherActor->ActorHasTag("Cyber"))
 		{
+			hero->SetInsideHealingWell(false);
 			healingEffect->StopTimer();
+			if (hero->GetCurrentHealth() >= hero->GetMaxHealth())
+			{
+				hero->ResetHealth();
+			}
 		}
 	}
 }

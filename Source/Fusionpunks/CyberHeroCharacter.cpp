@@ -162,15 +162,15 @@ void ACyberHeroCharacter::UseSkill(AActor* enemy)
 {
 
 	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
 	spawnParams.Instigator = this;
-
 	FVector spawnLoc;
 	spawnLoc = GetActorLocation();
 	spawnLoc.Z = spawnLoc.Z + 200;
    	AChainLightning* lightning =  GetWorld()->SpawnActor
 		<AChainLightning>(chainLightningAbility,
 		spawnLoc,
-		FRotator::ZeroRotator);
+		FRotator::ZeroRotator, spawnParams);
 	lightning->AddAffectedActor(enemy);
 	lightning->SetBeamPoints(Cast<AActor>(this), enemy);
 	lightning->Use();

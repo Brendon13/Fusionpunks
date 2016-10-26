@@ -20,16 +20,13 @@ EBTNodeResult::Type UBTTask_MoveInRangeOfEnemy::ExecuteTask(UBehaviorTreeCompone
 		target = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("AttackTarget"));
 		if (target != nullptr)
 		{
-			if (hero->GetDistanceTo(target) >= 5)
+			if (hero->GetDistanceTo(target) >= 300)
 			{
 				bNotifyTick = true;
 				return EBTNodeResult::InProgress;
 			}
 
-			return EBTNodeResult::Failed;
-			
-			bNotifyTick = true;
-		    return EBTNodeResult::InProgress;
+			return EBTNodeResult::Succeeded;
 		}
 		return EBTNodeResult::Failed;
 	}
@@ -48,7 +45,7 @@ void UBTTask_MoveInRangeOfEnemy::TickTask(UBehaviorTreeComponent& OwnerComp, uin
 
 	if(target != NULL)
 	{
-		if (hero->GetDistanceTo(target) < 100)
+		if (hero->GetDistanceTo(target) < 300)
 		{
 			UE_LOG(LogTemp, Error, TEXT("TOO CLOSE TO TARGET"));
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
