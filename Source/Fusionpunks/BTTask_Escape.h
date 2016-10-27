@@ -2,21 +2,22 @@
 
 #pragma once
 
-#include "BehaviorTree/Tasks/BTTask_MoveTo.h"
+#include "BehaviorTree/BTTaskNode.h"
 #include "BTTask_Escape.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class FUSIONPUNKS_API UBTTask_Escape : public UBTTask_MoveTo
+class FUSIONPUNKS_API UBTTask_Escape : public UBTTaskNode
 {
 	GENERATED_BODY()
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-	
+	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 	class AHeroBase* hero;
-	class HeroStats* heroStats;
+	AActor* healingWell;
+	
 	
 	
 	

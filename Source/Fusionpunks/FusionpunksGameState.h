@@ -20,17 +20,25 @@ public:
 	void CyberLevelUp();
 
 	UFUNCTION(BlueprintCallable, Category = GameStatistics)
-		void DieselLevelUp();
+	void DieselLevelUp();
 
 	UFUNCTION(BlueprintCallable, Category = GameStatistics)
-		int GetCyberLevel() const;
+		FORCEINLINE	int GetCyberLevel() const { return CyberLevel; }
 
 	UFUNCTION(BlueprintCallable, Category = GameStatistics)
-		int GetDieselLevel() const;
+		FORCEINLINE int GetDieselLevel() const { return DieselLevel; }
+
+	TArray<class AHeroBase*> Players;
+
+	void DieselWins();
+	void CyberWins();
 
 private:
 	int CyberLevel;
 	int DieselLevel;
+
+
 	
+
 	
 };

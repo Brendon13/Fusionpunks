@@ -76,3 +76,17 @@ float UProphetUIWidget::GetAbility3CD() const
 	return 0.0f;
 }
 
+float UProphetUIWidget::GetAbility4CD() const
+{
+	if (owningCharacter)
+	{
+		AAbilityBase* ability = owningCharacter->GetAbility(4);
+		if (ability)
+		{
+			return 1 - ability->GetCoolDownRemainingAsDecimal();
+		}
+		return 1.0f;
+	}
+	return 0.0f;
+}
+

@@ -128,6 +128,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Appearance)
 		class UStaticMeshComponent* campMesh; 
 
+	//index for the flag material = 1
+	UPROPERTY(EditDefaultsOnly, Category = Appearance)
+		class UStaticMeshComponent* lampPostMesh;
+
+	UPROPERTY(EditDefaultsOnly, Category = Appearance)
+		UMaterial* lampPostMaterial;
+
+	//0 is neutral, 1 is cyber, 2 is diesel
+	UPROPERTY(EditDefaultsOnly, Category = Appearance)
+		TArray<UMaterialInstance*> FlagMaterials; 
+	const int NUMFLAGS = 3; 
+
 	UPROPERTY(EditDefaultsOnly, Category = CollisionComponents)
 		class USphereComponent* sphereTrigger;
 

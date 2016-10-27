@@ -66,9 +66,14 @@ float ATowerBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dam
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	currHP -= DamageAmount;
 
-	UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
-	floatingDamageWidget->SetIncDamage(DamageAmount);
-	floatingDamageWidget->AddToViewport();
+	if (!DamageCauser->ActorHasTag("AI") && !DamageCauser->ActorHasTag("Creep") && FloatingDamageWidgetClass)
+	{
+		UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
+		floatingDamageWidget->SetAlignmentInViewport(FVector2D::FVector2D(0.5f, 0.5f));
+		floatingDamageWidget->SetIncDamage(DamageAmount);
+		floatingDamageWidget->SetOwningActor(this);
+		floatingDamageWidget->AddToViewport();
+	}
 
 	UE_LOG(LogTemp, Log, TEXT("Tower took %f damage."), DamageAmount);
 	if (currHP <= 0) 

@@ -6,25 +6,44 @@
 
 void AHealOverTime::StartTimer(float time, AActor* target)
 {
+	UE_LOG(LogTemp, Error, TEXT("Started Healing Timer"));
 	GetWorld()->GetTimerManager().SetTimer(applyEffectHandle, this, &AHealOverTime::ApplyEffect, time, true);
 	effectTarget = target;
 	amountHealed = 0;
 }
 void AHealOverTime::ApplyEffect()
 {
-	//UE_LOG(LogTemp, Log, TEXT("Healing Hero!"));
-	
 	AHeroBase* heroBase = Cast<AHeroBase>(effectTarget);
-	if (heroBase)
+	
+	if (GetOwner()->IsA(AHeroBase::StaticClass()))
 	{
-		heroBase->Heal(tickHealAmount);
-	}
+		if (heroBase)
+		{
+			heroBase->Heal(tickHealAmount);
+		}
 
-	amountHealed += tickHealAmount;
-	if (amountHealed > totalHealthValue)
+		amountHealed += tickHealAmount;
+		if (amountHealed > totalHealthValue)
+		{
+			StopTimer();
+			Destroy();
+		}
+	}
+	else 
 	{
-		StopTimer();
-		Destroy();
+		if (heroBase->GetCurrentHealth() < heroBase->GetMaxHealth() )
+		{
+			if (heroBase)
+			{
+				heroBase->Heal(tickHealAmount);
+			}
+		}
+
+		else
+		{
+			heroBase->ResetHealth();
+			StopTimer();
+		}
 	}
 
 	//call function to heal hero

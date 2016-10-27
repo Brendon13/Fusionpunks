@@ -2,6 +2,7 @@
 
 #include "Fusionpunks.h"
 #include "HeroBase.h"
+#include "HealingWell.h"
 #include "HeroAIController.h"
 
 AHeroAIController::AHeroAIController()
@@ -48,12 +49,15 @@ void AHeroAIController::BeginPlay()
 
 	
 	
-	TArray<AActor*> bases;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), baseClass, bases);
-	if (bases.Num() > 0)
+	TArray<AActor*> healingWells;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), baseClass,healingWells );
+	if (healingWells.Num() > 0)
 	{
-		UE_LOG(LogTemp, Display, TEXT("BASE FOUND"));
-		BlackboardComponent->SetValueAsObject("Home", bases[0]);
+		UE_LOG(LogTemp, Display, TEXT("Healing Well FOUND"));
+		if(GetPawn()->ActorHasTag("Cyber") && healingWells[0]->ActorHasTag("Cyber"))
+			BlackboardComponent->SetValueAsObject("HealingWell", healingWells[0]);
+		else
+			BlackboardComponent->SetValueAsObject("HealingWell", healingWells[1]);
 		
 	}
 	BlackboardComponent->SetValueAsBool("ReachedCamp", false);

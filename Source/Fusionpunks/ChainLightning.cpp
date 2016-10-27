@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
-#
+#include "HeroBase.h"
 #include "ChainLightning.h"
 
 
@@ -90,11 +90,15 @@ void AChainLightning::CheckForNearbyEnemies()
 
 	AActor *closestEnemy;
 	FCollisionObjectQueryParams obejctQP;
-
 	obejctQP.AddObjectTypesToQuery(Creeps);
 	obejctQP.AddObjectTypesToQuery(Hero);
 	//Overlap multi by channel as a sphere (for pick ups?)
 	FCollisionQueryParams QueryParameters;
+	if (GetOwner() != nullptr)
+	{
+		if (GetOwner()->IsA(AHeroBase::StaticClass()))
+			QueryParameters.AddIgnoredActor(GetOwner());
+	}
 	QueryParameters.AddIgnoredActor(target);
 	QueryParameters.OwnerTag = TEXT("Player");
 	FCollisionResponseParams ResponseParameters;
@@ -151,5 +155,10 @@ void AChainLightning::CheckForNearbyEnemies()
 
 void AChainLightning::AddAffectedActor(AActor* enemy)
 {
+	if (GetOwner() != nullptr)
+	{
+		if (GetOwner()->IsA(AHeroBase::StaticClass()))
+			affectedActors.Add(GetOwner());
+	}
 	affectedActors.Add(enemy);
 }

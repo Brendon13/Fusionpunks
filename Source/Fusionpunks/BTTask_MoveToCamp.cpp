@@ -17,8 +17,11 @@ EBTNodeResult::Type UBTTask_MoveToCamp::ExecuteTask(UBehaviorTreeComponent& Owne
 	hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
 	neutralCampExists = OwnerComp.GetBlackboardComponent()->GetValueAsBool("NeutralCampsExist");
 
-	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
-		return EBTNodeResult::Succeeded;
+	if (campGoal == EReasonForGoingToCamp::RGC_Capturing)
+	{
+		if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
+			return EBTNodeResult::Succeeded;
+	}
 
 
 	if (hero != nullptr)
@@ -40,59 +43,70 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
 	heroStats->UpdateStats();
-
-	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
-	{
-		return FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-	}
-
-	if (hero->IsCapturing())
-	{ 
-		
-		UE_LOG(LogTemp, Error, TEXT("Capturing Camp"));
-		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", true);
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-		
-	}
 	
-	
-	else if (heroStats->GetHealthPercent() < 0.15f)
+
+	if (heroStats->GetHealthPercent() < healthPercentageAbort)
 	{
 		UE_LOG(LogTemp, Display, TEXT("AI HAS LOW HP WHILE HEADING TO CAMP"));
 		heroAI->ResetAITreeTaskStatus();
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-				
+
 	}
 
-	else if (hero->ActorHasTag("Cyber") && targetCamp->IsDieselCapturing() && neutralCampExists)
+	else if (hero->IsCapturing())
 	{
 
-		heroAI->ResetAITreeTaskStatus();
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-		
+		UE_LOG(LogTemp, Error, TEXT("Capturing Camp"));
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", true);
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+
 	}
 
-	else if (hero->ActorHasTag("Diesel") && targetCamp->IsCyberCapturing() && neutralCampExists)
 
+	if (campGoal == EReasonForGoingToCamp::RGC_Capturing)
 	{
-		UE_LOG(LogTemp, Display, TEXT("ENEMY PLAYER CAPTURING TARGET CAMP"));
-		heroAI->ResetAITreeTaskStatus();
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-		
-		
+		if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
+		{
+			return FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		}
+
+
+		else if (hero->ActorHasTag("Cyber") && targetCamp->IsDieselCapturing() && neutralCampExists)
+		{
+
+			heroAI->ResetAITreeTaskStatus();
+			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+
+		}
+
+		else if (hero->ActorHasTag("Diesel") && targetCamp->IsCyberCapturing() && neutralCampExists)
+
+		{
+			UE_LOG(LogTemp, Display, TEXT("ENEMY PLAYER CAPTURING TARGET CAMP"));
+			heroAI->ResetAITreeTaskStatus();
+			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+
+
+		}
+
+		else if (hero->CheckForNearbyEnemyCreeps() || hero->CheckForNearbyEnemyHero())
+		{
+			UE_LOG(LogTemp, Display, TEXT("AI SENSES ENEMY WHILE HEADING TO CAPTURE CAMP"));
+			//heroAI->ResetAITreeTaskStatus();
+			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+
+		}
 	}
+
+	else if (campGoal == EReasonForGoingToCamp::RGC_Recruiting)
+	{
 	
-	else if (hero->CheckForNearbyEnemyCreeps() ||hero->CheckForNearbyEnemyHero())
-	{
-		UE_LOG(LogTemp, Display, TEXT("AI SENSES ENEMY WHILE HEADING TO CAMP"));
-		//heroAI->ResetAITreeTaskStatus();
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-		
-		
-
+		if (hero->CheckForNearbyEnemyHero())
+		{
+			UE_LOG(LogTemp, Display, TEXT("AI SENSES ENEMY WHILE HEADING TO RECURIT CAMP"));
+			//heroAI->ResetAITreeTaskStatus();
+			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		}
 	}
-
-
-
 	
 }

@@ -106,9 +106,15 @@ protected:
 public:
 	virtual float MeleeAttack();
 	virtual void StopMeleeAttack();
+
 protected:
 	FTimerHandle attackTimerHandle;
 	FTimerHandle stunTimerHandle;
+	FTimerHandle takeDamageTimerHandle;
+	FTimerHandle destroyCreepTimerHandle;
+
+	void StopTakingDamageAnim();
+	void KillCreep();
 
 protected:
 //AISTUFF
@@ -179,4 +185,8 @@ private:
 public:
 	void Stun(float Duration);
 	void EndStun();
+protected:
+	bool bIsDead;
+public:
+	FORCEINLINE bool GetBIsDead() const { return bIsDead; }
 };

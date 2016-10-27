@@ -21,7 +21,7 @@ public:
 	/*UFUNCTION(BlueprintCallable, Category = Animations)
 		void PlayTextFloatUpAnimation();*/
 	UFUNCTION(BlueprintCallable, Category = WidgtFunctions)
-		void SetOwningPawn(AActor* Owner) { OwningActor = Owner; }
+		void SetOwningActor(AActor* Owner) { OwningActor = Owner; }
 
 	UFUNCTION(BlueprintCallable, Category = WidgtFunctions)
 		AActor* GetOwningActor() const { return OwningActor; }

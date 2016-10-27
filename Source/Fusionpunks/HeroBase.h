@@ -30,13 +30,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
-	virtual float TakeDamage
-	(
-		float DamageAmount,
-		struct FDamageEvent const & DamageEvent,
-		class AController * EventInstigator,
-		AActor * DamageCauser
-	) override;
+	virtual float TakeDamage(float DamageAmount,struct FDamageEvent const & DamageEvent,class AController * EventInstigator,AActor * DamageCauser) override;
+	
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseTurnRate;
@@ -81,16 +76,16 @@ public:
 
 	FORCEINLINE float GetMaxHealth() const { return maxHealth; }
 
-
 	void HealOverTime();
 	void Heal(float amount);
 
 	UPROPERTY(EditDefaultsOnly, Category = Abilities)
 		TSubclassOf<class AHealOverTime> healOverTimeClass;
 	void StartAttack();
+
+	virtual void MeleeAttack();
+
 protected:
-	
-	
 	void AdjustCameraZoom(float Value);
 	void SwapAICamera();
 
@@ -101,9 +96,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		int maxLevel;
-
-	UPROPERTY(EditAnywhere, Category = Stats)
-		float movementSpeed;
 
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float basicAttackDamage;
@@ -134,6 +126,8 @@ protected:
 		int experienceGoal;
 
 	int currentExperience;
+	
+	bool bInsideHealingWell = false; 
 
 public:
 	void AddToExperience(int experience);
@@ -148,14 +142,11 @@ public:
 		void HideCampProgress();
 
 
-
 	void ResetHealth();
-
 	FVector startingLocation;
-
 	bool bIsRespawning = false;
 
-	
+	FORCEINLINE bool IsRespawning() const { return bIsRespawning; }
 	FORCEINLINE int32 GetArmySize() const { return CreepArmy.Num(); }
 	FORCEINLINE float GetRespawnTime() const { return respawnTime; }
 	FORCEINLINE  int32 GetLevel() const { return currentLevel; }
@@ -164,6 +155,9 @@ public:
 	FORCEINLINE class HeroStats* GetHeroStats() const { return heroStats; }
 	FORCEINLINE bool IsCapturing() const { return isCapturing; }
 	FORCEINLINE void SetIsCapturing(bool status) { isCapturing = status; }
+	FORCEINLINE void SetInsideHealingWell(bool status) {bInsideHealingWell = status;}
+	FORCEINLINE bool InsideHealingWell() {return bInsideHealingWell;}
+	
 	void AddToCapturedCamps(class ACreepCamp* camp);
 	void RemoveFromCapturedCamps(class ACreepCamp* camp);
 	void UpdateHeroStats();
@@ -185,6 +179,8 @@ protected:
 	class AHeroAIController* heroAI;
 	
 	bool isCapturing = false;
+
+
 protected:
 	//function for Trigger Events
 	UFUNCTION()
@@ -194,10 +190,14 @@ protected:
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UFUNCTION()
+		void OnCapsuleComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
 	UPROPERTY(EditDefaultsOnly, Category = CollisionComponents)
 		USphereComponent* sphereTrigger;
 
 	void LinkToCreepCamps();
+
 
 protected:
 	 FName team;
@@ -260,7 +260,7 @@ protected:
 
 	TArray<AAbilityBase*> Abilities;
 
-	const int8 NUMBEROFABILITIES = 4;
+	const int8 NUMBEROFABILITIES = 5;
 
 public:
 	FORCEINLINE AAbilityBase* GetAbility(int i) const { return (Abilities.Num() >= i ? Abilities[i] : nullptr); }
@@ -271,6 +271,11 @@ protected:
 	virtual void UseAbility1();
 	virtual void UseAbility2();
 	virtual void UseAbility3();
+	virtual void UseAbility4();
+
+	virtual void RangedAttack();
+	UPROPERTY(EditDefaultsOnly, Category = Projectiles)
+		TSubclassOf<class ABulletBase> BulletClass; 
 
 	bool bIsAttacking;
 	bool bIsCasting;
@@ -286,9 +291,14 @@ public:
 protected:
 	void StopAttacking();
 
+	UPROPERTY(EditDefaultsOnly, Category = Widgets)
+	TSubclassOf<class UFloatingDamageWidget> FloatingDamageWidgetClass;
 
+protected:
+	UPROPERTY(EditAnywhere, Category = Cameras)
+	class UCineCameraComponent* cyberWinCineCamera; 
 
-
+	
 
 //protected:
 ////Creep Command Functions

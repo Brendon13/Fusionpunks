@@ -2,6 +2,7 @@
 
 #include "Fusionpunks.h"
 #include "FloatingDamageWidget.h"
+#include "FusionpunksGameState.h"
 #include "Base.h"
 
 
@@ -11,8 +12,8 @@ ABase::ABase()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	rootCldr = CreateDefaultSubobject<UBoxComponent>(TEXT("Root"));
-	RootComponent = rootCldr;
+	//rootCldr = CreateDefaultSubobject<UBoxComponent>(TEXT("BaseCollider"));
+	//rootCldr->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	baseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
 	baseMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	healthBar = CreateDefaultSubobject<UHealthBarWidgetComponent>(TEXT("HealthBar"));
@@ -54,13 +55,12 @@ float ABase::TakeDamage(float DamageAmount,struct FDamageEvent const & DamageEve
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	currHP -= DamageAmount;
 
-	if(FloatingDamageWidgetClass)
+	if (!DamageCauser->ActorHasTag("AI") && !DamageCauser->ActorHasTag("Creep") && FloatingDamageWidgetClass)
 	{
 		UFloatingDamageWidget* floatingDamageWidget = CreateWidget<UFloatingDamageWidget>(GetWorld()->GetFirstPlayerController(), FloatingDamageWidgetClass);
-		//floatingDamageWidget->SetVisibility(ESlateVisibility::Hidden);
 		floatingDamageWidget->SetAlignmentInViewport(FVector2D::FVector2D(0.5f, 0.5f));
 		floatingDamageWidget->SetIncDamage(DamageAmount);
-		floatingDamageWidget->SetOwningPawn(this);
+		floatingDamageWidget->SetOwningActor(this);
 		floatingDamageWidget->AddToViewport();
 	}
 	
@@ -68,15 +68,26 @@ float ABase::TakeDamage(float DamageAmount,struct FDamageEvent const & DamageEve
     
 	if (currHP <= 0)
 	{
-		Destroy();
+		//Destroy();
 
 		if (Tags.Contains("CyberBase"))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Diesel Wins!"));
+			//UE_LOG(LogTemp, Warning, TEXT("Diesel Wins!"));
+			AFusionpunksGameState* gameState = Cast<AFusionpunksGameState>(GetWorld()->GetGameState());
+			if (gameState)
+			{
+				gameState->DieselWins();
+			}
+
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Cyber Wins!"));
+			//UE_LOG(LogTemp, Warning, TEXT("Cyber Wins!"));
+			AFusionpunksGameState* gameState = Cast<AFusionpunksGameState>(GetWorld()->GetGameState());
+			if (gameState)
+			{
+				gameState->CyberWins();
+			}
 		}
 	}
 	return DamageAmount;

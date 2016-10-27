@@ -16,5 +16,4 @@ class FUSIONPUNKS_API AAbility_SacrificeCreep : public AAbilityBase
 protected:
 	virtual bool Ability() override;
 	
-	
 };

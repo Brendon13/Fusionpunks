@@ -8,6 +8,14 @@
 /**
  * 
  */
+UENUM(BlueprintType)		//"BlueprintType" is essential to include
+enum class EReasonForGoingToCamp : uint8
+{
+	RGC_Capturing UMETA(DisplayName = "CapturingCamp"),
+	RGC_Recruiting UMETA(DisplayName = "RecruitingCamp"),
+
+};
+
 UCLASS()
 class FUSIONPUNKS_API UBTTask_MoveToCamp : public UBTTask_MoveTo
 {
@@ -22,5 +30,10 @@ protected:
 	class AHeroAIController* heroAI;
 	class HeroStats* heroStats;
 	bool neutralCampExists;
+
+	UPROPERTY(EditAnywhere)
+		EReasonForGoingToCamp campGoal;
+	UPROPERTY(EditAnywhere)
+		float healthPercentageAbort = 0.2f;
 	
 };

@@ -2,6 +2,7 @@
 
 #include "Fusionpunks.h"
 #include "FusionpunksGameMode.h"
+#include "FusionpunksGameState.h"
 #include "PlayerHUD.h"
 #include "DieselHeroCharacter.h"
 
@@ -15,5 +16,6 @@ AFusionpunksGameMode::AFusionpunksGameMode()
 	}*/
 
 	HUDClass = APlayerHUD::StaticClass();
+	GameStateClass = AFusionpunksGameState::StaticClass();
 }
 
