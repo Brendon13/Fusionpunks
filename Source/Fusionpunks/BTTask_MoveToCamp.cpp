@@ -24,7 +24,15 @@ EBTNodeResult::Type UBTTask_MoveToCamp::ExecuteTask(UBehaviorTreeComponent& Owne
 	}
 
 
-	if (hero != nullptr)
+	if (hero->CheckForNearbyInteractions())
+	{
+		//UE_LOG(LogTemp, Display, TEXT("AI SENSES ENEMY WHILE HEADING TO CAPTURE CAMP"));
+		//heroAI->ResetAITreeTaskStatus();
+		return EBTNodeResult::Failed;
+	}
+
+
+	else if (hero != nullptr)
 	{
 		heroStats = hero->GetHeroStats();
 		return EBTNodeResult::InProgress;	
@@ -47,7 +55,7 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 	if (heroStats->GetHealthPercent() < healthPercentageAbort)
 	{
-		UE_LOG(LogTemp, Display, TEXT("AI HAS LOW HP WHILE HEADING TO CAMP"));
+		//UE_LOG(LogTemp, Display, TEXT("AI HAS LOW HP WHILE HEADING TO CAMP"));
 		heroAI->ResetAITreeTaskStatus();
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 
@@ -82,16 +90,16 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 		else if (hero->ActorHasTag("Diesel") && targetCamp->IsCyberCapturing() && neutralCampExists)
 
 		{
-			UE_LOG(LogTemp, Display, TEXT("ENEMY PLAYER CAPTURING TARGET CAMP"));
+			//UE_LOG(LogTemp, Display, TEXT("ENEMY PLAYER CAPTURING TARGET CAMP"));
 			heroAI->ResetAITreeTaskStatus();
 			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 
 
 		}
 
-		else if (hero->CheckForNearbyEnemyCreeps() || hero->CheckForNearbyEnemyHero())
+		else if (hero->CheckForNearbyInteractions())
 		{
-			UE_LOG(LogTemp, Display, TEXT("AI SENSES ENEMY WHILE HEADING TO CAPTURE CAMP"));
+			//UE_LOG(LogTemp, Display, TEXT("AI SENSES ENEMY WHILE HEADING TO CAPTURE CAMP"));
 			//heroAI->ResetAITreeTaskStatus();
 			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 
@@ -103,7 +111,7 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 	
 		if (hero->CheckForNearbyEnemyHero())
 		{
-			UE_LOG(LogTemp, Display, TEXT("AI SENSES ENEMY WHILE HEADING TO RECURIT CAMP"));
+			//UE_LOG(LogTemp, Display, TEXT("AI SENSES ENEMY WHILE HEADING TO RECURIT CAMP"));
 			//heroAI->ResetAITreeTaskStatus();
 			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		}

@@ -39,6 +39,28 @@ EBTNodeResult::Type UBTTask_ChooseRecruitCamp::ExecuteTask(UBehaviorTreeComponen
 		}
 		return EBTNodeResult::Failed;
 	}
+
+	else if (currSituation == ESituation::SE_NearbyCamp)
+	{
+		if (hero->CheckForNearbyOnwedCreepCamps())
+		{
+			TArray<ACreepCamp*> ownedCreepCamps = hero->GetNearbyOwnedCreepCamps();
+			for (int32 i = 0; i < ownedCreepCamps.Num(); i++)
+			{
+				if (!ownedCreepCamps[i]->HasBeenRecruitedFrom() && ownedCreepCamps[i]->GetNumOfCreepsAtCamp() - allowedNumCreepsLeftAtCamp > 0)
+				{
+					OwnerComp.GetBlackboardComponent()->SetValueAsInt("NumCreepsToRecruit",
+						ownedCreepCamps[i]->GetNumOfCreepsAtCamp() - allowedNumCreepsLeftAtCamp);
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject("RecruitCamp", ownedCreepCamps[i]);
+					return EBTNodeResult::Succeeded;
+				}
+
+			}
+
+		}
+	}
+
+
 	return EBTNodeResult::Failed;
 }
 

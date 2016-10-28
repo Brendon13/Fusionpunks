@@ -40,11 +40,12 @@ void UBTTask_ConfirmCreepCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
 	if (targetCamp->GetCampType() == teamCampType)
 	{
 		//bNotifyTaskFinished = true;
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-		UE_LOG(LogTemp, Warning, TEXT("AI Successfully Captured Camp."));
+		
+		UE_LOG(LogTemp, Error, TEXT("AI Successfully Captured Camp."));
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);
 		heroAICont->ResetAllCampsSafetyStatus();
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 
 	else if (heroStats->GetHealthPercent() < 0.15f)
@@ -54,7 +55,7 @@ void UBTTask_ConfirmCreepCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
 
 	}
 
-	else if (hero->CheckForNearbyEnemyCreeps() || hero->CheckForNearbyEnemyHero())
+	else if (hero->CheckForNearbyInteractions())
 	{
 		UE_LOG(LogTemp, Display, TEXT("AI SENSES ENEMY WHILE Capturing Camp"));
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);

@@ -217,13 +217,17 @@ public:
 	// USE ONLY WITH AI HERO TASKS!!
 	bool CheckForNearbyEnemyCreeps();
 	bool CheckForNearbyEnemyHero();
+	bool CheckForNearbyOnwedCreepCamps();
+	bool CheckForNearbyInteractions();
 	FORCEINLINE TArray<class ACreep*> GetNearbyEnemyCreeps() const { return nearbyEnemyCreeps; }
 	FORCEINLINE AHeroBase* GetNearbyEnemyHero() const { return nearbyEnemyHero; }
+	FORCEINLINE TArray<class ACreepCamp*> GetNearbyOwnedCreepCamps() const { return nearbyOwnedCreepCamps; }
+
 private:
 	//AIHERO
 	TArray<class ACreep*> nearbyEnemyCreeps;
 	AHeroBase* nearbyEnemyHero;
-
+	TArray<class ACreepCamp*> nearbyOwnedCreepCamps;
 public:
 	TArray<ACreep*> AHeroBase::GetCreepArmyArray();
 	void UpdateCreepArmy();

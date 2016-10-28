@@ -49,7 +49,7 @@ EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent&
 				{
 					OwnerComp.GetBlackboardComponent()->SetValueAsObject("CampTarget", targetCamp);
 					OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", false);
-					UE_LOG(LogTemp, Error, TEXT("Found A Safe Camp!"));
+				//	UE_LOG(LogTemp, Error, TEXT("Found A Safe Camp!"));
 					return EBTNodeResult::Succeeded;
 				}
 

@@ -50,7 +50,7 @@ void AHealingWell::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActo
 		if (ActorHasTag("Diesel") && OtherActor->ActorHasTag("Diesel"))
 		{
 			hero->SetInsideHealingWell(true);
-			healingEffect->SetTotalHealthValue(20,0.1);
+			healingEffect->SetTotalHealthValue(50,0.1);
 			healingEffect->StartTimer(0.1, OtherActor);
 		}
 
@@ -58,7 +58,7 @@ void AHealingWell::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActo
 		{
 			hero->SetInsideHealingWell(true);
 			UE_LOG(LogTemp, Error, TEXT("CYBER HEALING WELL ACTIVATED"))
-			healingEffect->SetTotalHealthValue(20,0.1);
+			healingEffect->SetTotalHealthValue(50,0.1);
 			healingEffect->StartTimer(0.1, OtherActor);
 		}
 	
