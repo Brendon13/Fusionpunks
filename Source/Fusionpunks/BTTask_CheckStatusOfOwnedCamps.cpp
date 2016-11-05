@@ -28,7 +28,6 @@ EBTNodeResult::Type UBTTask_CheckStatusOfOwnedCamps::ExecuteTask(UBehaviorTreeCo
 
 			if (campBeingAttacked != nullptr)
 			{
-
 				if (hero->ActorHasTag("Cyber"))
 					enemyHero = campBeingAttacked->GetDieselHero();
 				else

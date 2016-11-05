@@ -7,6 +7,14 @@
 #include "AbilityBase.h"
 #include "HeroBase.generated.h"
 
+UENUM(BlueprintType)
+enum class ETeam : uint8
+{
+	Team_Neutral    UMETA(DisplayName = "Neutral"),
+	Team_Cyber      UMETA(DisplayName = "Cyber"),
+	Team_Diesel	    UMETA(DisplayName = "Diesel")
+};
+
 UCLASS(abstract)
 class FUSIONPUNKS_API AHeroBase : public ACharacter
 {
@@ -83,8 +91,6 @@ public:
 		TSubclassOf<class AHealOverTime> healOverTimeClass;
 	void StartAttack();
 
-	virtual void MeleeAttack();
-
 protected:
 	void AdjustCameraZoom(float Value);
 	void SwapAICamera();
@@ -153,10 +159,9 @@ public:
 	FORCEINLINE  float GetAttackDamage() const { return basicAttackDamage; }
 	FORCEINLINE TArray<class ACreepCamp*> GetCapturedCamps() const { return capturedCamps; }
 	FORCEINLINE class HeroStats* GetHeroStats() const { return heroStats; }
-	FORCEINLINE bool IsCapturing() { return isCapturing; }
+	FORCEINLINE void SetIsCapturing(bool status) { isCapturing = status; }
+	FORCEINLINE bool IsCapturing() const { return isCapturing; }
 	FORCEINLINE  ACreepCamp* GetCampBeingCaptured() const { return campBeingCaptured; }
-
-
 	FORCEINLINE void SetInsideHealingWell(bool status) {bInsideHealingWell = status;}
 	FORCEINLINE bool InsideHealingWell() {return bInsideHealingWell;}
 	
@@ -164,7 +169,6 @@ public:
 	void RemoveFromCapturedCamps(class ACreepCamp* camp);
 	void UpdateHeroStats();
 	void SetIsCapturing(bool status, class ACreepCamp* camp);
-
 protected:
 	class ACreepCamp* campBeingCaptured;
 
@@ -183,7 +187,7 @@ protected:
 	class AHeroAIController* heroAI;
 	
 	bool isCapturing = false;
-	
+
 
 protected:
 	//function for Trigger Events
@@ -222,16 +226,16 @@ public:
 	bool CheckForNearbyEnemyCreeps();
 	bool CheckForNearbyEnemyHero();
 	bool CheckForNearbyOnwedCreepCamps();
-	bool CheckForNearbyInteractions();
+ 	bool CheckForNearbyInteractions();
 	FORCEINLINE TArray<class ACreep*> GetNearbyEnemyCreeps() const { return nearbyEnemyCreeps; }
 	FORCEINLINE AHeroBase* GetNearbyEnemyHero() const { return nearbyEnemyHero; }
 	FORCEINLINE TArray<class ACreepCamp*> GetNearbyOwnedCreepCamps() const { return nearbyOwnedCreepCamps; }
-
 private:
 	//AIHERO
 	TArray<class ACreep*> nearbyEnemyCreeps;
 	AHeroBase* nearbyEnemyHero;
 	TArray<class ACreepCamp*> nearbyOwnedCreepCamps;
+
 public:
 	TArray<ACreep*> AHeroBase::GetCreepArmyArray();
 	void UpdateCreepArmy();
@@ -285,7 +289,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Projectiles)
 		TSubclassOf<class ABulletBase> BulletClass; 
 
-	bool bIsAttacking;
+	UPROPERTY(BlueprintReadWrite, Category = ProphetVariables)
+		bool bIsAttacking;
+
 	bool bIsCasting;
 	FTimerHandle attackTimerHandle; 
 
@@ -305,6 +311,25 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, Category = Cameras)
 	class UCineCameraComponent* cyberWinCineCamera; 
+
+
+	//Stuff for Melee Attack
+protected:
+	UPROPERTY(BlueprintReadWrite, Category = HeroCombatVariables)
+	bool bIsMeleeAttacking = false;
+	UPROPERTY(BlueprintReadWrite, Category = HeroCombatVariables)
+		int MeleeCombo = 0; 
+	virtual void MeleeAttack();
+	UPROPERTY(EditDefaultsOnly, Category = MeleeAnimations)
+		TArray<UAnimMontage*> MeleeAnimSequenceArray;
+	FTimerHandle stopMovementTimerHandle;
+	float DefaultMaxWalkSpeed;
+	float DefaultTurnRate;
+	UPROPERTY(EditDefaultsOnly, Category = MeleeAttributes)
+		float MeleeAttackSlowSpeed;
+	void RestoreTurnRate();
+	void RestoreWalkSpeed();
+	void ResetMeleeAttackCombo();
 
 	
 

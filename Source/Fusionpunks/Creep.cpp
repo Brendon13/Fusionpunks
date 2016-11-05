@@ -130,7 +130,10 @@ void ACreep::Tick( float DeltaTime )
 		{
 			EnemyTarget = nullptr;
 			ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
-			AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", nullptr);
+			if (AiController)
+			{
+				AiController->GetBlackboardComponent()->SetValueAsObject("EnemyTarget", nullptr);
+			}
 			SetToWalk();
 		}
 	}
@@ -215,7 +218,9 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 		ACreepAIController* AiController = Cast<ACreepAIController>(GetController());
 		if (IsValid(AiController))
 		{
-			AiController->StopBehaviorTree();
+			//Unpossess and destroy the controller
+			AiController->UnPossess();
+			AiController->Destroy();
 		}
 		GetMesh()->SetSimulatePhysics(true);
 		GetWorld()->GetTimerManager().SetTimer(destroyCreepTimerHandle, this, &ACreep::KillCreep, 5.0f, false);

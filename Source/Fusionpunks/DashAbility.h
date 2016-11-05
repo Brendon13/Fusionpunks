@@ -26,5 +26,5 @@ protected:
 		float TargetDashTime;
 
 	float DashTimer;
-	bool bStopped;
+	bool bHasDashed;
 };

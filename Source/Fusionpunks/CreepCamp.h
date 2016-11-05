@@ -97,8 +97,10 @@ public:
 
 	FName team;
 	FORCEINLINE FName GetTeam() const { return team; }
+
 	FORCEINLINE class AHeroBase* GetCyberHero() const { return cyberHero; }
 	FORCEINLINE class AHeroBase* GetDieselHero() const { return dieselHero; }
+
 //enum, captureStruct, variablesStruct 
 private:
 	UPROPERTY(EditAnywhere, Category = Stats)
@@ -198,7 +200,7 @@ public:
 	FORCEINLINE const float GetDistanceValue() const { return distanceValue; }
 	FORCEINLINE void SetDistanceValue(float value) { distanceValue = value; }
 	FORCEINLINE const ECampType GetCampType() const {return campType;}
-	FORCEINLINE bool AIAbondonedCamp() const {return bAIAbondonedCamp;}
+	FORCEINLINE bool AIAbondonedCamp() const { return bAIAbondonedCamp; }
 	FORCEINLINE void SetAIAbondonedCamp(bool status) { bAIAbondonedCamp = status; }
 
 //Creep Spawn Locations

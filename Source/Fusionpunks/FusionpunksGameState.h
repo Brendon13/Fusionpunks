@@ -37,6 +37,13 @@ private:
 	int CyberLevel;
 	int DieselLevel;
 
+	UPROPERTY(EditDefaultsOnly, Category = Widgets)
+		TSubclassOf<class UUserWidget> CyberWinsWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = Widgets)
+		TSubclassOf<class UUserWidget> DieselWinsWidgetClass;
+
+
 
 	
 

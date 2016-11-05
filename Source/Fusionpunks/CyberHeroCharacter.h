@@ -59,7 +59,5 @@ protected:
 
 	UFUNCTION()
 		void OnSwordComponentOverlap(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
-
-	virtual void MeleeAttack() override; 
 };
 

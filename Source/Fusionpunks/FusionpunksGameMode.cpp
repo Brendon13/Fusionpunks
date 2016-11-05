@@ -16,6 +16,6 @@ AFusionpunksGameMode::AFusionpunksGameMode()
 	}*/
 
 	HUDClass = APlayerHUD::StaticClass();
-	GameStateClass = AFusionpunksGameState::StaticClass();
+	//GameStateClass = AFusionpunksGameState::StaticClass();
 }
 

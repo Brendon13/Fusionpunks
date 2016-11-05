@@ -261,21 +261,3 @@ void ACyberHeroCharacter::OnSwordComponentOverlap(class UPrimitiveComponent* Thi
 		OtherActor->TakeDamage(basicAttackDamage, FDamageEvent::FDamageEvent(), GetController(), this);
 	}
 }
-
-void ACyberHeroCharacter::MeleeAttack()
-{
-	//UE_LOG(LogTemp, Warning, TEXT("Prophet Melee Attack!"));
-
-	if (!bIsAttacking)
-	{
-		UBoolProperty* boolProp = FindField<UBoolProperty>(GetMesh()->GetAnimInstance()->GetClass(), TEXT("MeleeAttacking"));
-		if (boolProp)
-		{
-			GetCharacterMovement()->MaxWalkSpeed = 300.0f;
-			bIsAttacking = true;
-			boolProp->SetPropertyValue_InContainer(GetMesh()->GetAnimInstance(), true);
-			//bool meleeAttack = boolProp->GetPropertyValue_InContainer(GetMesh()->GetAnimInstance());
-			GetWorld()->GetTimerManager().SetTimer(attackTimerHandle, this, &ACyberHeroCharacter::StopAttacking, 1.25f, false);
-		}
-	}
-}

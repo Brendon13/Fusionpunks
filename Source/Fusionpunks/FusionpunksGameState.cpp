@@ -24,44 +24,72 @@ void AFusionpunksGameState::DieselLevelUp()
 
 void AFusionpunksGameState::DieselWins()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Diesel Wins!"));
-
-	//DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-
 	for (int i = 0; i < Players.Num(); i++)
 	{
 		APlayerController* playerController = Cast<APlayerController>(Players[i]->GetController());
 		if (playerController)
 		{
+			//disable user input
 			Players[i]->DisableInput(playerController);
+
+			//show mouse
+			playerController->bShowMouseCursor = true;
+			playerController->bEnableClickEvents = true; 
+			playerController->bEnableMouseOverEvents = true; 
+
+			//remove all previous widgets from viewport
+			GetWorld()->GetGameViewport()->RemoveAllViewportWidgets();
+
+			//add team that won widget
+			UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), DieselWinsWidgetClass);
+			widget->AddToViewport();
+			continue;
 		}
 	
 		//for each AI controlled hero... unpossess it 
-		/*if (Players[i]->Tags.Contains("AI"))
+		if (Players[i]->Tags.Contains("AI"))
 		{
-			Players[i]->GetController()->UnPossess();
-		}*/
+			AController* AIController = Players[i]->GetController();
+			if (AIController)
+			{
+				AIController->UnPossess();
+			}
+		}
 	}
 }
 
 void AFusionpunksGameState::CyberWins()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Cyber Wins!"));
-
-	//DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-
 	for (int i = 0; i < Players.Num(); i++)
 	{
 		APlayerController* playerController = Cast<APlayerController>(Players[i]->GetController());
 		if (playerController)
 		{
+			//disable user input
 			Players[i]->DisableInput(playerController);
+
+			//show mouse
+			playerController->bShowMouseCursor = true;
+			playerController->bEnableClickEvents = true;
+			playerController->bEnableMouseOverEvents = true;
+
+			//remove all previous widgets from viewport
+			GetWorld()->GetGameViewport()->RemoveAllViewportWidgets();
+
+			//add team that won widget
+			UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), CyberWinsWidgetClass);
+			widget->AddToViewport();
+			continue;
 		}
 
 		//for each AI controlled hero... unpossess it 
-		/*if (Players[i]->Tags.Contains("AI"))
+		if (Players[i]->Tags.Contains("AI"))
 		{
-		Players[i]->GetController()->UnPossess();
-		}*/
+			AController* AIController = Players[i]->GetController();
+			if (AIController)
+			{
+				AIController->UnPossess();
+			}
+		}
 	}
 }

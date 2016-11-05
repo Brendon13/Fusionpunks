@@ -26,7 +26,7 @@ AHeroBase::AHeroBase()
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
 	// set our turn rates for input
-	BaseTurnRate = 360.0f;
+	BaseTurnRate = 45.0f;
 	BaseLookUpRate = 45.f;
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
@@ -97,13 +97,18 @@ AHeroBase::AHeroBase()
 
 	currentExperience = 0;
 	currentHealth = maxHealth;
+
 }
 
 // Called when the game starts or when spawned
 void AHeroBase::BeginPlay()
 {
 	Super::BeginPlay();
+
 	currentHealth = maxHealth;
+	DefaultTurnRate = BaseTurnRate;
+	DefaultMaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+
 	if (GetWorld())
 	{
 		AFusionpunksGameState* gameState = Cast<AFusionpunksGameState>(GetWorld()->GetGameState());
@@ -317,8 +322,9 @@ bool AHeroBase::CheckForNearbyEnemyHero()
 		obejctQP,
 		FCollisionShape::MakeSphere(1300),
 		QueryParameters);
-	
+		
 	nearbyEnemyHero = nullptr;
+
 	if (Results.Num() == 1)
 	{
 		nearbyEnemyHero = Cast<AHeroBase>(Results[0].GetActor());
@@ -439,7 +445,6 @@ bool AHeroBase::CheckForNearbyOnwedCreepCamps()
 	return nearbyOwnedCreepCamps.Num() > 0;
 }
 
-
 void AHeroBase::StartAttack()
 {
 	//UE_LOG(LogTemp, Display, TEXT("Basic Attack PRESSED"));
@@ -485,15 +490,34 @@ void AHeroBase::StartAttack()
 		}
 	}
 
-	UBoolProperty* boolProp = FindField<UBoolProperty>(GetMesh()->GetAnimInstance()->GetClass(), TEXT("MeleeAttacking"));
-	if (boolProp)
-	{
-		bIsAttacking = true;
-		boolProp->SetPropertyValue_InContainer(GetMesh()->GetAnimInstance(), true);
-		//bool meleeAttack = boolProp->GetPropertyValue_InContainer(GetMesh()->GetAnimInstance());
-		GetWorld()->GetTimerManager().SetTimer(attackTimerHandle, this, &AHeroBase::StopAttacking, 1.0f, false);
-	}
+	//UBoolProperty* boolProp = FindField<UBoolProperty>(GetMesh()->GetAnimInstance()->GetClass(), TEXT("MeleeAttacking"));
+	//if (boolProp)
+	//{
+	//	bIsAttacking = true;
+	//	boolProp->SetPropertyValue_InContainer(GetMesh()->GetAnimInstance(), true);
+	//	//bool meleeAttack = boolProp->GetPropertyValue_InContainer(GetMesh()->GetAnimInstance());
+	//	GetWorld()->GetTimerManager().SetTimer(attackTimerHandle, this, &AHeroBase::StopAttacking, 1.0f, false);
+	//}
 }
+
+void AHeroBase::SetIsCapturing(bool status, class ACreepCamp* camp)
+ {
+ 	if (status)
+ 	{
+ 		campBeingCaptured = camp;
+ 		
+ 
+ 	}
+ 	else
+ 	{
+ 		campBeingCaptured = nullptr;
+ 
+ 	}
+ 	isCapturing = status;
+ 
+ 
+ }
+
 void AHeroBase::ResetHealth()
 {
 	currentHealth = maxHealth;
@@ -1016,9 +1040,107 @@ void AHeroBase::CreepArmyChangeTeam(bool Attack)
 	}
 }
 
+void AHeroBase::RestoreTurnRate()
+{
+	BaseTurnRate = DefaultTurnRate;
+}
+
+void AHeroBase::RestoreWalkSpeed()
+{
+	GetCharacterMovement()->MaxWalkSpeed = DefaultMaxWalkSpeed;
+}
+
+void AHeroBase::ResetMeleeAttackCombo()
+{
+	bIsMeleeAttacking = false; 
+	GetCharacterMovement()->MaxWalkSpeed = DefaultMaxWalkSpeed;
+	BaseTurnRate = DefaultTurnRate;
+}
+
 void AHeroBase::MeleeAttack()
 {
+	//bIsAttacking = true; 
+	//GetWorld()->GetTimerManager().SetTimer(attackTimerHandle, this, &AHeroBase::StopAttacking, 1.25f, false);
 
+	//if (!bIsAttacking)
+	//{
+	//	UBoolProperty* boolProp = FindField<UBoolProperty>(GetMesh()->GetAnimInstance()->GetClass(), TEXT("MeleeAttacking"));
+	//	if (boolProp)
+	//	{
+	//		GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+	//		bIsAttacking = true;
+	//		boolProp->SetPropertyValue_InContainer(GetMesh()->GetAnimInstance(), true);
+	//		//bool meleeAttack = boolProp->GetPropertyValue_InContainer(GetMesh()->GetAnimInstance());
+	//		GetWorld()->GetTimerManager().SetTimer(attackTimerHandle, this, &AHeroBase::StopAttacking, 1.66f, false);
+	//	}
+	//}
+
+	//if (!bIsMeleeAttacking)
+	//{
+	//	bIsMeleeAttacking = true; 
+	//	if (MeleeAnimSequenceArray.Num() > 0)
+	//	{
+	//		//random animation to play 
+	//		int random = FMath::RandRange(0, MeleeAnimSequenceArray.Num() - 1);
+	//		//MeleeAnimSequenceArray[random]->Play
+	//	}
+	//}
+
+	////if we are attacking for the first time
+	//if (!bIsMeleeAttacking)
+	//{
+	//	bIsMeleeAttacking = true; 
+	//	MeleeCombo = 1; 
+	//	if (MeleeAnimSequenceArray.Num() > 0)
+	//	{
+	//		float length = MeleeAnimSequenceArray[0]->GetPlayLength();
+	//		//Disable Turn rate && slow movementspeed
+	//		//BaseTurnRate = 0;
+	//		GetCharacterMovement()->MaxWalkSpeed = MeleeAttackSlowSpeed;
+	//	}
+	//	
+	//	//Play first animation
+	//	//Get length of first animation and pause movement until it has finished playing?
+	//}
+	////we must be in the middle of a combo
+	//else
+	//{
+	//	switch (MeleeCombo)
+	//	{
+	//		case 1:
+	//		{
+	//			MeleeCombo = 2;
+	//			if (MeleeAnimSequenceArray.Num() > 1)
+	//			{
+	//				float length = MeleeAnimSequenceArray[1]->GetPlayLength();
+	//				//start timer for hit next combo
+	//			}
+	//		}break;
+	//		case 2:
+	//		{
+	//			MeleeCombo = 3;
+	//			if (MeleeAnimSequenceArray.Num() > 2)
+	//			{
+	//				float length = MeleeAnimSequenceArray[2]->GetPlayLength();
+	//				//start timer for hit next combo
+	//			}
+	//		}break;
+	//		case 3:
+	//		{
+	//			//hit last combo, reset melee combo
+	//			MeleeCombo = 0;
+	//			if (MeleeAnimSequenceArray.Num() > 1)
+	//			{
+	//				float length = MeleeAnimSequenceArray[1]->GetPlayLength();
+	//				//start timer for hit next combo
+	//			}
+	//		}break;
+	//			
+	//	}
+
+	//}
+
+	
 }
 
 void AHeroBase::RangedAttack()
@@ -1034,25 +1156,3 @@ void AHeroBase::RangedAttack()
 	}
 	
 }
-
-void AHeroBase::SetIsCapturing(bool status, class ACreepCamp* camp)
-{
-	if (status)
-	{
-		campBeingCaptured = camp;
-		
-
-	}
-	else
-	{
-		campBeingCaptured = nullptr;
-
-	}
-	isCapturing = status;
-
-
-}
-
-
-
-

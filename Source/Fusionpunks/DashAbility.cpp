@@ -10,7 +10,7 @@ void ADashAbility::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	DashTimer -= DeltaSeconds;
 
-	if (DashTimer <= 0)
+	if (DashTimer <= 0 && bHasDashed)
 	{
 		AHeroBase* hero = Cast<AHeroBase>(GetOwner());
 		if (hero)
@@ -20,6 +20,7 @@ void ADashAbility::Tick(float DeltaSeconds)
 			hero->GetCharacterMovement()->UpdateComponentVelocity();
 			//hero->GetCharacterMovement()->AddForce()
 			hero->GetCharacterMovement()->GroundFriction = 8.0f;
+			bHasDashed = false; 
 		}
 	}
 }
@@ -29,6 +30,7 @@ bool ADashAbility::Ability()
 	AHeroBase* hero = Cast<AHeroBase>(GetOwner());
 	if (hero)
 	{
+		bHasDashed = true; 
 		DashTimer = TargetDashTime;
 		hero->GetCharacterMovement()->GroundFriction = 0.0f;
 		hero->GetCharacterMovement()->AddImpulse(hero->GetActorForwardVector() * DashForce, false);

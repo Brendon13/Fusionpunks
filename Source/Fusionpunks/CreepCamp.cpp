@@ -191,7 +191,8 @@ void ACreepCamp::Tick( float DeltaTime )
 	ringMesh->SetRelativeRotation(ringRotation);*/
 
 	//if cyber is capturing
-	if (spawningVariables.creepCount == 0 && !captureVariables.bDieselIsCapturing && captureVariables.bCyberIsCapturing)
+	if (spawningVariables.creepCount == 0 && !captureVariables.bDieselIsCapturing && captureVariables.bCyberIsCapturing
+		|| !captureVariables.bDieselIsCapturing && captureVariables.bCyberIsCapturing && campType == ECampType::CT_Cyber)
 	{
 		////Note: Make this better
 		//if (ringMaterialAlpha >= 1)
@@ -225,14 +226,15 @@ void ACreepCamp::Tick( float DeltaTime )
 			captureVariables.cyberCaptureProgress += DeltaTime;
 		}
 
-		if (captureVariables.cyberCaptureProgress >= captureVariables.captureTime)
+		if (campType != ECampType::CT_Cyber && captureVariables.cyberCaptureProgress >= captureVariables.captureTime)
 		{
 			SetToCyberCamp();
 			DestroyAllCreeps();
 		}
 	}
 	//is Diesel capturing?
-	else if (spawningVariables.creepCount == 0 && !captureVariables.bCyberIsCapturing && captureVariables.bDieselIsCapturing)
+	else if (spawningVariables.creepCount == 0 && !captureVariables.bCyberIsCapturing && captureVariables.bDieselIsCapturing 
+		|| captureVariables.bDieselIsCapturing && !captureVariables.bCyberIsCapturing && campType == ECampType::CT_Diesel)
 	{
 		//if (ringMaterialAlpha >= 1)
 		//{
@@ -266,7 +268,7 @@ void ACreepCamp::Tick( float DeltaTime )
 			captureVariables.dieselCaptureProgress += DeltaTime;
 		}
 
-		if (captureVariables.dieselCaptureProgress >= captureVariables.captureTime)
+		if (campType != ECampType::CT_Diesel && captureVariables.dieselCaptureProgress >= captureVariables.captureTime)
 		{
 			SetToDieselCamp();
 			DestroyAllCreeps();

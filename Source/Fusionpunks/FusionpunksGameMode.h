@@ -10,7 +10,6 @@ class AFusionpunksGameMode : public AGameMode
 
 public:
 	AFusionpunksGameMode();
-
 };
 
 
