@@ -111,8 +111,19 @@ public:
 	void ResetAllCampsSafetyStatus();
 	void ResetAllCampsRecruitStatus();
 	void RestartHeroAITree();
+	bool CheckCampBeingAttacked();
+	FORCEINLINE class ACreepCamp* GetCampBeingAttacked() const  { return campBeingAttacked; }
 	
 protected:
+
+	
+
+	class AHeroBase* enemyHero;
+
+
+
+	class ACreepCamp* campBeingAttacked;
+
 	UPROPERTY(EditDefaultsOnly)
 		UBehaviorTree* BehaviorTreeAsset;
 
@@ -131,6 +142,7 @@ protected:
 		FPriorityList campPriorityList;
 		FPriorityList campOwnedPriorityList;
 		
+
 
 	UPROPERTY(EditDefaultsOnly)
 			TSubclassOf<ACreepCamp> creepCampClass;

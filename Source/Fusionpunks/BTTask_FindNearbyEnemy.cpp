@@ -20,36 +20,39 @@ EBTNodeResult::Type UBTTask_FindNearbyEnemy::ExecuteTask(UBehaviorTreeComponent&
 			if (hero->CheckForNearbyEnemyCreeps())
 			{
 				TArray<ACreep*> enemyCreeps = hero->GetNearbyEnemyCreeps();
+				
 				if (enemyCreeps.Num() > 0)
 				{
+					//UE_LOG(LogTemp, Error, TEXT("Found A Creep Target"));
 					ACreep* target = enemyCreeps[0];
 					OwnerComp.GetBlackboardComponent()->SetValueAsObject("AttackTarget", target);
 					return EBTNodeResult::Succeeded;
 				}
-				UE_LOG(LogTemp, Error, TEXT("Cant Find Hero!"));
-				return EBTNodeResult::Failed;
-
 			}
+
+			//UE_LOG(LogTemp, Error, TEXT("No Creeps Nearby"));
+			return EBTNodeResult::Failed;
 		}
 
 		else if (enemyType == ETargetEnemyType::TE_Hero)
 		{
 			if (hero->CheckForNearbyEnemyHero())
 			{
+				UE_LOG(LogTemp, Error, TEXT("Found Enemy Hero Target"));
 				AHeroBase* enemyHero = hero->GetNearbyEnemyHero();
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject("AttackTarget", enemyHero);
 				return EBTNodeResult::Succeeded;
 			}
-			UE_LOG(LogTemp, Error, TEXT("No Hero Nearby"));
+			//UE_LOG(LogTemp, Error, TEXT("No Hero Nearby"));
 			return EBTNodeResult::Failed;
 
 		}
-		UE_LOG(LogTemp, Error, TEXT("Cant Find Hero!"));
+		UE_LOG(LogTemp, Error, TEXT("werid shit happenin"));
 		return EBTNodeResult::Failed;
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Cant Find Hero!"));
+		UE_LOG(LogTemp, Error, TEXT("Cant Find Hero! Find Nearby Enemy Task"));
 		return EBTNodeResult::Failed;
 	}
 

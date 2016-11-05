@@ -9,6 +9,14 @@
 /**
  * 
  */
+UENUM(BlueprintType)		//"BlueprintType" is essential to include
+enum class ETypeOfCamp : uint8
+{
+	TC_CaptureCamp UMETA(DisplayName = "CaptureCamp"),
+	TC_DefendCamp UMETA(DisplayName = "DefendCamp")
+
+
+};
 UCLASS()
 class FUSIONPUNKS_API UBTTask_ConfirmCreepCamp : public UBTTaskNode
 {
@@ -24,5 +32,7 @@ protected:
 	class AHeroAIController* heroAICont;
 	class AHeroBase* hero;
 	class HeroStats* heroStats;
-	
+
+	UPROPERTY(EditAnywhere)
+		ETypeOfCamp campType;
 };

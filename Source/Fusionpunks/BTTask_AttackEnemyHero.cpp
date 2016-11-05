@@ -39,6 +39,7 @@ void UBTTask_AttackEnemyHero::TickTask(UBehaviorTreeComponent& OwnerComp, uint8*
 	if (isAttacking)
 	{
 		FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), target->GetActorLocation());
+		lookAtTargetRotation.Pitch = 0;
 		hero->SetActorRotation(lookAtTargetRotation);
 	}
 	

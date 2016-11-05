@@ -62,6 +62,7 @@ void AHeroAIController::BeginPlay()
 	}
 	BlackboardComponent->SetValueAsBool("ReachedCamp", false);
 	BlackboardComponent->SetValueAsBool("CapturedCamp", true);
+	BlackboardComponent->SetValueAsBool("IsDefendingCamp", false);
 	hero = Cast<AHeroBase>(GetPawn());
 	
 }
@@ -76,6 +77,7 @@ void AHeroAIController::ResetAITreeTaskStatus()
 {
 	BlackboardComponent->SetValueAsBool("ReachedCamp", false);
 	BlackboardComponent->SetValueAsBool("CapturedCamp", true);
+	BlackboardComponent->SetValueAsBool("IsDefendingCamp", false);
 	ResetAllCampsRecruitStatus();
 	ResetAllCampsSafetyStatus();
 }
@@ -110,4 +112,43 @@ TArray<ACreepCamp*> AHeroAIController::GetSortedOwnedCampList()
 void AHeroAIController::ResetAllCampsRecruitStatus()
 {
 	campPriorityList.ResetCampsRecruitedStatus();
+}
+
+
+bool AHeroAIController::CheckCampBeingAttacked()
+{
+
+	campBeingAttacked = nullptr;
+	campOwnedPriorityList.EmptyList();
+	campOwnedPriorityList.GeneratePriorityList(Cast<AHeroBase>(GetPawn())->GetCapturedCamps(), GetPawn());
+	if (campOwnedPriorityList.creepCampList.Num() > 0)
+	{
+
+		if (enemyHero == nullptr)
+		{
+			if (hero->ActorHasTag("Cyber"))
+				enemyHero = campOwnedPriorityList.creepCampList[0]->GetDieselHero();
+			else
+				enemyHero = campOwnedPriorityList.creepCampList[0]->GetCyberHero();
+
+		}
+
+		for (int i = 0; i <campOwnedPriorityList.creepCampList.Num(); i++)
+		{
+			if (enemyHero->IsCapturing() && 
+				enemyHero->GetCampBeingCaptured() == campOwnedPriorityList.creepCampList[i])
+			{
+				campBeingAttacked = campOwnedPriorityList.creepCampList[i];
+				break;
+			}
+		
+
+		}
+
+		return campBeingAttacked != nullptr;
+		
+
+	}
+	//no owned camps
+	return false;
 }

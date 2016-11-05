@@ -153,16 +153,20 @@ public:
 	FORCEINLINE  float GetAttackDamage() const { return basicAttackDamage; }
 	FORCEINLINE TArray<class ACreepCamp*> GetCapturedCamps() const { return capturedCamps; }
 	FORCEINLINE class HeroStats* GetHeroStats() const { return heroStats; }
-	FORCEINLINE bool IsCapturing() const { return isCapturing; }
-	FORCEINLINE void SetIsCapturing(bool status) { isCapturing = status; }
+	FORCEINLINE bool IsCapturing() { return isCapturing; }
+	FORCEINLINE  ACreepCamp* GetCampBeingCaptured() const { return campBeingCaptured; }
+
+
 	FORCEINLINE void SetInsideHealingWell(bool status) {bInsideHealingWell = status;}
 	FORCEINLINE bool InsideHealingWell() {return bInsideHealingWell;}
 	
 	void AddToCapturedCamps(class ACreepCamp* camp);
 	void RemoveFromCapturedCamps(class ACreepCamp* camp);
 	void UpdateHeroStats();
+	void SetIsCapturing(bool status, class ACreepCamp* camp);
+
 protected:
-	class ACreepCamp* CurrentCreepCamp;
+	class ACreepCamp* campBeingCaptured;
 
 	UPROPERTY(EditDefaultsOnly, Category = Respawn)
 		TSubclassOf<class ARespawnOverTime> respawnClass;
@@ -179,7 +183,7 @@ protected:
 	class AHeroAIController* heroAI;
 	
 	bool isCapturing = false;
-
+	
 
 protected:
 	//function for Trigger Events
@@ -217,13 +221,17 @@ public:
 	// USE ONLY WITH AI HERO TASKS!!
 	bool CheckForNearbyEnemyCreeps();
 	bool CheckForNearbyEnemyHero();
+	bool CheckForNearbyOnwedCreepCamps();
+	bool CheckForNearbyInteractions();
 	FORCEINLINE TArray<class ACreep*> GetNearbyEnemyCreeps() const { return nearbyEnemyCreeps; }
 	FORCEINLINE AHeroBase* GetNearbyEnemyHero() const { return nearbyEnemyHero; }
+	FORCEINLINE TArray<class ACreepCamp*> GetNearbyOwnedCreepCamps() const { return nearbyOwnedCreepCamps; }
+
 private:
 	//AIHERO
 	TArray<class ACreep*> nearbyEnemyCreeps;
 	AHeroBase* nearbyEnemyHero;
-
+	TArray<class ACreepCamp*> nearbyOwnedCreepCamps;
 public:
 	TArray<ACreep*> AHeroBase::GetCreepArmyArray();
 	void UpdateCreepArmy();

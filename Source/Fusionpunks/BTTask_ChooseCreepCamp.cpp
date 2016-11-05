@@ -8,12 +8,24 @@
 EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
-	
-	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp")== true)
+
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp") == true)
 		return EBTNodeResult::Succeeded;
+
+
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp") == true)
+	{	
+		UE_LOG(LogTemp, Error, TEXT("Hero is defending a camp"));
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject("CampTarget", OwnerComp.GetBlackboardComponent()->GetValueAsObject("DefendCampTarget"));
+		return EBTNodeResult::Succeeded;
+	}
+
+
 
 	AHeroAIController* heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
 	
+
+
 	
 	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("CapturedCamp"))
 	{	
@@ -49,7 +61,7 @@ EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent&
 				{
 					OwnerComp.GetBlackboardComponent()->SetValueAsObject("CampTarget", targetCamp);
 					OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", false);
-					UE_LOG(LogTemp, Error, TEXT("Found A Safe Camp!"));
+				//	UE_LOG(LogTemp, Error, TEXT("Found A Safe Camp!"));
 					return EBTNodeResult::Succeeded;
 				}
 

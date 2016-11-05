@@ -277,7 +277,7 @@ bool AHeroBase::CheckForNearbyEnemyCreeps()
 		GetActorLocation(),
 		FQuat(),
 		obejctQP,
-		FCollisionShape::MakeSphere(600.f),
+		FCollisionShape::MakeSphere(1000.f),
 		QueryParameters);
 
 	nearbyEnemyCreeps.Empty();
@@ -317,14 +317,128 @@ bool AHeroBase::CheckForNearbyEnemyHero()
 		obejctQP,
 		FCollisionShape::MakeSphere(1300),
 		QueryParameters);
-
+	
+	nearbyEnemyHero = nullptr;
 	if (Results.Num() == 1)
 	{
 		nearbyEnemyHero = Cast<AHeroBase>(Results[0].GetActor());
 
 	}
-	return Results.Num() > 0;
+	return nearbyEnemyHero != nullptr;
 }
+
+bool AHeroBase::CheckForNearbyInteractions()
+{
+	FCollisionObjectQueryParams obejctQP;
+
+	obejctQP.AddObjectTypesToQuery(Hero);
+	obejctQP.AddObjectTypesToQuery(CreepCampTrigger);
+	obejctQP.AddObjectTypesToQuery(Creeps);
+	//Overlap multi by channel as a sphere (for pick ups?)
+	FCollisionQueryParams QueryParameters;
+	QueryParameters.AddIgnoredActor(this);
+	QueryParameters.OwnerTag = TEXT("Player");
+
+	TArray<FOverlapResult> Results;
+	GetWorld()->OverlapMultiByObjectType(Results,
+		GetActorLocation(),
+		FQuat(),
+		obejctQP,
+		FCollisionShape::MakeSphere(1000.f),
+		QueryParameters);
+
+	nearbyEnemyCreeps.Empty();
+	nearbyOwnedCreepCamps.Empty();
+	nearbyEnemyHero = nullptr;
+	if (Results.Num() > 0)
+	{
+		for (int32 i = 0; i < Results.Num(); i++)
+		{
+
+			if (Results[i].GetActor()->IsA(AHeroBase::StaticClass()))
+			{
+				nearbyEnemyHero = Cast<AHeroBase>(Results[i].GetActor());
+			}
+					
+			else if (Results[i].GetActor()->IsA(ACreepCamp::StaticClass()))
+			{
+
+				ACreepCamp* currCamp = Cast<ACreepCamp>(Results[i].GetActor());
+				if (team.Compare("Diesel") == 0 && currCamp->GetCampType() == ECampType::CT_Diesel)
+				{
+					nearbyOwnedCreepCamps.Add(currCamp);
+				}
+
+				else if (team.Compare("Cyber") == 0 && currCamp->GetCampType() == ECampType::CT_Cyber)
+				{
+					nearbyOwnedCreepCamps.Add(currCamp);
+				}
+			}
+
+			else if (Results[i].GetActor()->IsA(ACreep::StaticClass()))
+			{
+
+
+				if (team.Compare("Diesel") == 0 && !Results[i].GetActor()->ActorHasTag("Diesel"))
+				{
+					nearbyEnemyCreeps.Add(Cast<ACreep>(Results[i].GetActor()));
+				}
+
+				else if (team.Compare("Cyber") == 0 && !Results[i].GetActor()->ActorHasTag("Cyber"))
+				{
+					nearbyEnemyCreeps.Add(Cast<ACreep>(Results[i].GetActor()));
+				}
+			}
+
+
+		}
+
+	}
+	return nearbyOwnedCreepCamps.Num() > 0 || nearbyEnemyHero != nullptr  || nearbyEnemyCreeps.Num() > 0;
+}
+
+bool AHeroBase::CheckForNearbyOnwedCreepCamps()
+{
+	FCollisionObjectQueryParams obejctQP;
+	obejctQP.AddObjectTypesToQuery(CreepCampTrigger);	
+	//Overlap multi by channel as a sphere (for pick ups?)
+	FCollisionQueryParams QueryParameters;
+	QueryParameters.AddIgnoredActor(this);
+	QueryParameters.OwnerTag = TEXT("Player");
+
+	TArray<FOverlapResult> Results;
+	GetWorld()->OverlapMultiByObjectType(Results,
+		GetActorLocation(),
+		FQuat(),
+		obejctQP,
+		FCollisionShape::MakeSphere(1000.f),
+		QueryParameters);
+
+	nearbyOwnedCreepCamps.Empty();	
+	if (Results.Num() > 0)
+	{
+		for (int32 i = 0; i < Results.Num(); i++)
+		{
+	
+			ACreepCamp* currCamp = Cast<ACreepCamp>(Results[i].GetActor());
+			if (team.Compare("Diesel") == 0 && currCamp->GetCampType() == ECampType::CT_Diesel)
+			{
+				nearbyOwnedCreepCamps.Add(currCamp);
+			}
+
+			else if (team.Compare("Cyber") == 0 && currCamp->GetCampType() == ECampType::CT_Cyber)
+			{
+				nearbyOwnedCreepCamps.Add(currCamp);
+			}
+			
+			
+		}
+
+	}
+
+	return nearbyOwnedCreepCamps.Num() > 0;
+}
+
 
 void AHeroBase::StartAttack()
 {
@@ -920,3 +1034,25 @@ void AHeroBase::RangedAttack()
 	}
 	
 }
+
+void AHeroBase::SetIsCapturing(bool status, class ACreepCamp* camp)
+{
+	if (status)
+	{
+		campBeingCaptured = camp;
+		
+
+	}
+	else
+	{
+		campBeingCaptured = nullptr;
+
+	}
+	isCapturing = status;
+
+
+}
+
+
+
+

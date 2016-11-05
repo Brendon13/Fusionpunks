@@ -44,20 +44,20 @@ EBTNodeResult::Type UBTTask_DetermineCampSafety::ExecuteTask(UBehaviorTreeCompon
 					return EBTNodeResult::Succeeded;
 				}
 				
-				else if (hero->ActorHasTag("Cyber") && targetCamp->IsDieselCapturing() && neutralCampExists)
+				else if (hero->ActorHasTag("Cyber") && targetCamp->IsDieselCapturing() && neutralCampExists && !OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp"))
 				{
 
-					UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));
+					//UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));
 					targetCamp->SetCampSafety(false);
 					OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
 					OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);
 					return EBTNodeResult::Failed;
 				}
 			
-				else if (hero->ActorHasTag("Diesel") && targetCamp->IsCyberCapturing() && neutralCampExists)
+				else if (hero->ActorHasTag("Diesel") && targetCamp->IsCyberCapturing() && neutralCampExists  && !OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp"))
 				
 				{
-					UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));
+					//UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));
 					targetCamp->SetCampSafety(false);
 					OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
 					OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);
@@ -65,14 +65,14 @@ EBTNodeResult::Type UBTTask_DetermineCampSafety::ExecuteTask(UBehaviorTreeCompon
 				}
 				else
 				{
-					UE_LOG(LogTemp, Error, TEXT("Camp Flagged as SAFE!"));
+					//UE_LOG(LogTemp, Error, TEXT("Camp Flagged as SAFE!"));
 					return EBTNodeResult::Succeeded;
 				}
 			}
 			return EBTNodeResult::Failed;
 		
 		}
-		UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));
+		//UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));
 		targetCamp->SetCampSafety(false);
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);

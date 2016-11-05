@@ -3,6 +3,7 @@
 #pragma once
 
 #include "BehaviorTree/BTTaskNode.h"
+#include "CreepCamp.h"
 #include "BTTask_DecideHowToApproachHero.generated.h"
 
 /**
@@ -30,6 +31,7 @@ class FUSIONPUNKS_API UBTTask_DecideHowToApproachHero : public UBTTaskNode
 	class AHeroBase* attackTarget;
 	class ACreepCamp* campTarget;
 	class AHeroAIController* heroAI;
+	ECampType teamCampType;
 	AActor* healingWell;
 	UPROPERTY(EditAnywhere)
 		EApproachStatus approachStatus;
