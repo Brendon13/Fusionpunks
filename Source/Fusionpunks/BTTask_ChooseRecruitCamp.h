@@ -12,7 +12,7 @@ UENUM(BlueprintType)		//"BlueprintType" is essential to include
 enum class ESituation : uint8
 {
 	SE_CapturingUnsafeCamp UMETA(DisplayName = "CapturingUnsafeCamp"),
-	SE_EngagingEnemyHero UMETA(DisplayName = "EngagingEnemyHero"),
+	SE_EngagingEnemyHero UMETA(DisplayName = "JustCause"),
 	SE_NearbyCamp UMETA(DisplayName = "NearbyCamp")
 };
 

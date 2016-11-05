@@ -44,7 +44,7 @@ EBTNodeResult::Type UBTTask_DetermineCampSafety::ExecuteTask(UBehaviorTreeCompon
 					return EBTNodeResult::Succeeded;
 				}
 				
-				else if (hero->ActorHasTag("Cyber") && targetCamp->IsDieselCapturing() && neutralCampExists)
+				else if (hero->ActorHasTag("Cyber") && targetCamp->IsDieselCapturing() && neutralCampExists && !OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp"))
 				{
 
 					//UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));
@@ -54,7 +54,7 @@ EBTNodeResult::Type UBTTask_DetermineCampSafety::ExecuteTask(UBehaviorTreeCompon
 					return EBTNodeResult::Failed;
 				}
 			
-				else if (hero->ActorHasTag("Diesel") && targetCamp->IsCyberCapturing() && neutralCampExists)
+				else if (hero->ActorHasTag("Diesel") && targetCamp->IsCyberCapturing() && neutralCampExists  && !OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp"))
 				
 				{
 					//UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));

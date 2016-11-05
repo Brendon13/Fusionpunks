@@ -28,6 +28,7 @@ EBTNodeResult::Type UBTTask_ChooseRecruitCamp::ExecuteTask(UBehaviorTreeComponen
 						OwnerComp.GetBlackboardComponent()->SetValueAsInt("NumCreepsToRecruit",
 							ownedCreepCamps[i]->GetNumOfCreepsAtCamp() - allowedNumCreepsLeftAtCamp);
 						OwnerComp.GetBlackboardComponent()->SetValueAsObject("RecruitCamp", ownedCreepCamps[i]);
+						
 						return EBTNodeResult::Succeeded;
 					}
 
@@ -52,6 +53,7 @@ EBTNodeResult::Type UBTTask_ChooseRecruitCamp::ExecuteTask(UBehaviorTreeComponen
 					OwnerComp.GetBlackboardComponent()->SetValueAsInt("NumCreepsToRecruit",
 						ownedCreepCamps[i]->GetNumOfCreepsAtCamp() - allowedNumCreepsLeftAtCamp);
 					OwnerComp.GetBlackboardComponent()->SetValueAsObject("RecruitCamp", ownedCreepCamps[i]);
+					
 					return EBTNodeResult::Succeeded;
 				}
 

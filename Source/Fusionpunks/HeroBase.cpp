@@ -1035,6 +1035,24 @@ void AHeroBase::RangedAttack()
 	
 }
 
+void AHeroBase::SetIsCapturing(bool status, class ACreepCamp* camp)
+{
+	if (status)
+	{
+		campBeingCaptured = camp;
+		
+
+	}
+	else
+	{
+		campBeingCaptured = nullptr;
+
+	}
+	isCapturing = status;
+
+
+}
+
 
 
 

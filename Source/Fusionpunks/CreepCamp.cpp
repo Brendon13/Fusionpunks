@@ -191,7 +191,7 @@ void ACreepCamp::Tick( float DeltaTime )
 	ringMesh->SetRelativeRotation(ringRotation);*/
 
 	//if cyber is capturing
-	if (campType != ECampType::CT_Cyber && spawningVariables.creepCount == 0 && !captureVariables.bDieselIsCapturing && captureVariables.bCyberIsCapturing)
+	if (spawningVariables.creepCount == 0 && !captureVariables.bDieselIsCapturing && captureVariables.bCyberIsCapturing)
 	{
 		////Note: Make this better
 		//if (ringMaterialAlpha >= 1)
@@ -220,7 +220,7 @@ void ACreepCamp::Tick( float DeltaTime )
 			captureVariables.dieselCaptureProgress -= DeltaTime;
 		}
 		
-		if (captureVariables.dieselCaptureProgress <= 0)
+		else if (captureVariables.dieselCaptureProgress <= 0)
 		{
 			captureVariables.cyberCaptureProgress += DeltaTime;
 		}
@@ -232,7 +232,7 @@ void ACreepCamp::Tick( float DeltaTime )
 		}
 	}
 	//is Diesel capturing?
-	else if (campType != ECampType::CT_Diesel && spawningVariables.creepCount == 0 && !captureVariables.bCyberIsCapturing && captureVariables.bDieselIsCapturing)
+	else if (spawningVariables.creepCount == 0 && !captureVariables.bCyberIsCapturing && captureVariables.bDieselIsCapturing)
 	{
 		//if (ringMaterialAlpha >= 1)
 		//{
@@ -261,7 +261,7 @@ void ACreepCamp::Tick( float DeltaTime )
 			captureVariables.cyberCaptureProgress -= DeltaTime;
 		}
 
-		if (captureVariables.cyberCaptureProgress <= 0)
+		else if (captureVariables.cyberCaptureProgress <= 0)
 		{
 			captureVariables.dieselCaptureProgress += DeltaTime;
 		}
@@ -410,7 +410,7 @@ void ACreepCamp::OnOverlapBegin(class UPrimitiveComponent* ThisComp, class AActo
 			if (!OtherActor->Tags.Contains("AI"))
 				heroChar->ShowCampProgress(this);
 
-			heroChar->SetIsCapturing(true);
+			heroChar->SetIsCapturing(true, this);
 		}	
 
 		if (OtherActor->Tags.Contains("CyberPlayer"))
@@ -442,7 +442,7 @@ void ACreepCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 			if (!OtherActor->Tags.Contains("AI"))
 				heroChar->HideCampProgress();
 
-			heroChar->SetIsCapturing(false);
+			heroChar->SetIsCapturing(false, this);
 		}
 
 		if (OtherActor->Tags.Contains("CyberPlayer"))

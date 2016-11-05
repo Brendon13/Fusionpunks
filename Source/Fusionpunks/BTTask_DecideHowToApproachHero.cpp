@@ -41,9 +41,10 @@ EBTNodeResult::Type UBTTask_DecideHowToApproachHero::ExecuteTask(UBehaviorTreeCo
 				UE_LOG(LogTemp, Error, TEXT("Defensive State"));
 				
 			}
-			else if ( attackTarget->GetArmySize() - hero->GetArmySize() <= creepDifferenceAllowed
+			else if ( (attackTarget->GetArmySize() - hero->GetArmySize() <= creepDifferenceAllowed
 				&& attackTarget->GetPlayerHealthAsDecimal() - hero->GetPlayerHealthAsDecimal() <= healthPercentDifferenceAllowed
-				&& attackTarget->GetLevel() - hero->GetLevel() <= levelDifferenceAllowed )
+				&& attackTarget->GetLevel() - hero->GetLevel() <= levelDifferenceAllowed) || 
+				attackTarget->GetPlayerHealthAsDecimal() <= healthPercentRequired)
 			{			
 				approachStatus = EApproachStatus::AS_AgressiveChase;	
 				UE_LOG(LogTemp, Error, TEXT("Agressive State"));
@@ -75,16 +76,19 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
+
+
+	if (hero->GetPlayerHealthAsDecimal() <= healthPercentRequired &&
+		attackTarget->GetPlayerHealthAsDecimal() - hero->GetPlayerHealthAsDecimal() > healthPercentDifferenceAllowed)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Health to low to engage"));
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+	}
+
 	if (approachStatus == EApproachStatus::AS_DefendingCamp)
 	{
-		if (hero->GetPlayerHealthAsDecimal() <= healthPercentRequired)
-		{
-			UE_LOG(LogTemp, Error, TEXT("Health to low to engage"));
-			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-		}
 		
-
-		else if (campTarget->GetCampType() == teamCampType)
+	/* if (campTarget->GetCampType() == teamCampType)
 		{
 			//bNotifyTaskFinished = true;
 			
@@ -93,9 +97,9 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 			OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);
 			heroAI->ResetAllCampsSafetyStatus();
 			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-		}
+		}*/
 
-		else if (attackTarget->IsCapturing() || attackTarget->GetDistanceTo(campTarget)<=1000 || attackTarget->GetPlayerHealthAsDecimal() <= 0.2f)
+		if (attackTarget->IsCapturing() || attackTarget->GetDistanceTo(campTarget)<=1000 || attackTarget->GetPlayerHealthAsDecimal() <= 0.2f)
 		{
 			if (hero->CheckForNearbyEnemyHero())
 			{
@@ -119,12 +123,12 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 				else
 				{
 					//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF DEFENSIVE CAMP"));
-					if (hero->CheckForNearbyEnemyHero())
+				/*	if (hero->CheckForNearbyEnemyHero())
 					{
 						FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), attackTarget->GetActorLocation());
 						lookAtTargetRotation.Pitch = 0;
 						hero->SetActorRotation(lookAtTargetRotation);
-					}
+					} */
 					FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 				}
 
@@ -138,12 +142,12 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 			}
 			else
 			{
-				if (hero->CheckForNearbyEnemyHero())
+				/*	if (hero->CheckForNearbyEnemyHero())
 				{
-					FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), attackTarget->GetActorLocation());
-					lookAtTargetRotation.Pitch = 0;
-					hero->SetActorRotation(lookAtTargetRotation);
-				}
+				FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), attackTarget->GetActorLocation());
+				lookAtTargetRotation.Pitch = 0;
+				hero->SetActorRotation(lookAtTargetRotation);
+				} */
 				//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF DEFENSIVE CAMP"));
 				FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 			}

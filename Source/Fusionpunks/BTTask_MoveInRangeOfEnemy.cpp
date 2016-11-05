@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Fusionpunks.h"
-#include "AIController.h"
+#include "HeroAIController.h"
 #include "HeroBase.h"
 #include "Creep.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -13,8 +13,8 @@ EBTNodeResult::Type UBTTask_MoveInRangeOfEnemy::ExecuteTask(UBehaviorTreeCompone
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
 	hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
-
-	if (hero != nullptr)
+	heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
+	if (hero != nullptr && heroAI !=nullptr)
 	{
 		heroStats = hero->GetHeroStats();
 		target = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("AttackTarget"));
@@ -50,6 +50,26 @@ void UBTTask_MoveInRangeOfEnemy::TickTask(UBehaviorTreeComponent& OwnerComp, uin
 			UE_LOG(LogTemp, Error, TEXT("TOO CLOSE TO TARGET"));
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		}
+
+		else if (hero->CheckForNearbyEnemyHero())
+		{
+			//ENEMY HERO NEARBY
+			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		}
+
+
+		else if (heroAI->CheckCampBeingAttacked() && !heroAI->GetCampBeingAttacked()->AIAbondonedCamp())
+		{
+			UE_LOG(LogTemp, Error, TEXT("Senses Camp Being Attacked"));
+			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		}
+
+
+
+
+
+
+
 	}
 		
 	else 
