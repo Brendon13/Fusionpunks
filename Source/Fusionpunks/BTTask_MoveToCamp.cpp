@@ -80,7 +80,8 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 		}
 
-		else if (hero->ActorHasTag("Cyber") && targetCamp->IsDieselCapturing() && neutralCampExists)
+		else if (hero->ActorHasTag("Cyber") && targetCamp->IsDieselCapturing() && neutralCampExists && !OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp")
+			&& !OwnerComp.GetBlackboardComponent()->GetValueAsBool("FoundNearbyEnemyCamp"))
 		{
 
 			//heroAI->ResetAITreeTaskStatus();
@@ -88,7 +89,8 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 		}
 
-		else if (hero->ActorHasTag("Diesel") && targetCamp->IsCyberCapturing() && neutralCampExists)
+		else if (hero->ActorHasTag("Diesel") && targetCamp->IsCyberCapturing() && neutralCampExists && !OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp")
+			&& !OwnerComp.GetBlackboardComponent()->GetValueAsBool("FoundNearbyEnemyCamp"))
 
 		{
 			//UE_LOG(LogTemp, Display, TEXT("ENEMY PLAYER CAPTURING TARGET CAMP"));
@@ -102,6 +104,13 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 		{
 			//UE_LOG(LogTemp, Display, TEXT("AI SENSES ENEMY WHILE HEADING TO CAPTURE CAMP"));
 			//heroAI->ResetAITreeTaskStatus();
+			OwnerComp.GetBlackboardComponent()->SetValueAsBool("FoundNearbyEnemyCamp", hero->GetNearbyEnemyCamp() != nullptr);
+			
+			if (hero->GetNearbyEnemyCamp() != nullptr)
+			{
+				
+				OwnerComp.GetBlackboardComponent()->SetValueAsObject("NearbyEnemyCamp", hero->GetNearbyEnemyCamp());
+			}
 			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 
 		}

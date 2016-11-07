@@ -63,6 +63,8 @@ void AHeroAIController::BeginPlay()
 	BlackboardComponent->SetValueAsBool("ReachedCamp", false);
 	BlackboardComponent->SetValueAsBool("CapturedCamp", true);
 	BlackboardComponent->SetValueAsBool("IsDefendingCamp", false);
+	BlackboardComponent->SetValueAsBool("FoundNearbyEnemyCamp", false);
+	BlackboardComponent->SetValueAsBool("ShouldRecruit", false);
 	hero = Cast<AHeroBase>(GetPawn());
 	
 }

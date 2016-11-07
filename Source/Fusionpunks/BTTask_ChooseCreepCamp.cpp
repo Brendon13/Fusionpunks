@@ -9,11 +9,19 @@ EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent&
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp") == true)
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("FoundNearbyEnemyCamp"))
+	{
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject("CampTarget", OwnerComp.GetBlackboardComponent()->GetValueAsObject("NearbyEnemyCamp"));
+		return EBTNodeResult::Succeeded;
+	}
+	
+
+
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
 		return EBTNodeResult::Succeeded;
 
 
-	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp") == true)
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp"))
 	{	
 		UE_LOG(LogTemp, Error, TEXT("Hero is defending a camp"));
 		OwnerComp.GetBlackboardComponent()->SetValueAsObject("CampTarget", OwnerComp.GetBlackboardComponent()->GetValueAsObject("DefendCampTarget"));

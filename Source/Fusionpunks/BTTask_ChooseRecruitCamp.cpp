@@ -13,7 +13,7 @@ EBTNodeResult::Type UBTTask_ChooseRecruitCamp::ExecuteTask(UBehaviorTreeComponen
 	AHeroAIController* heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
 	AHeroBase* hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
 
-	if (currSituation == ESituation::SE_CapturingUnsafeCamp)
+	if (currSituation == ESituation::SE_CapturingUnsafeCamp || (currSituation == ESituation::SE_EngagingEnemyHero && OwnerComp.GetBlackboardComponent()->GetValueAsObject("ShouldRecruit")))
 	{
 		if (heroAI != nullptr && hero != nullptr)
 		{

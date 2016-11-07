@@ -52,8 +52,8 @@ EBTNodeResult::Type UBTTask_DecideHowToApproachHero::ExecuteTask(UBehaviorTreeCo
 
 			else
 			{
-				approachStatus = EApproachStatus::AS_EscapingToNextCamp;
-				UE_LOG(LogTemp, Error, TEXT("Escaping to next camp State"));
+				approachStatus = EApproachStatus::AS_EscapingToRecruitCreeps;
+				UE_LOG(LogTemp, Error, TEXT("Escaping to recruit creeps"));
 				
 			}
 			bNotifyTick = true;
@@ -178,16 +178,10 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 	
 	}
 
-	else if (approachStatus == EApproachStatus::AS_EscapingToNextCamp)
+	else if (approachStatus == EApproachStatus::AS_EscapingToRecruitCreeps)
 	{
-		if(hero->CheckForNearbyEnemyHero())
-			OwnerComp.GetAIOwner()->MoveToActor(healingWell, 50, false, true, false);
-		else
-		{
-			heroAI->ResetAllCampsSafetyStatus();
-			campTarget->SetCampSafety(false);
-			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-
-		}
+		//heroAI->GetSortedOwnedCampList();
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ShouldRecruit", true);
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	}
 }

@@ -44,7 +44,8 @@ EBTNodeResult::Type UBTTask_DetermineCampSafety::ExecuteTask(UBehaviorTreeCompon
 					return EBTNodeResult::Succeeded;
 				}
 				
-				else if (hero->ActorHasTag("Cyber") && targetCamp->IsDieselCapturing() && neutralCampExists && !OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp"))
+				else if (hero->ActorHasTag("Cyber") && targetCamp->IsDieselCapturing() && neutralCampExists && !OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp")
+					&& !OwnerComp.GetBlackboardComponent()->GetValueAsBool("FoundNearbyEnemyCamp"))
 				{
 
 					//UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));
@@ -54,7 +55,8 @@ EBTNodeResult::Type UBTTask_DetermineCampSafety::ExecuteTask(UBehaviorTreeCompon
 					return EBTNodeResult::Failed;
 				}
 			
-				else if (hero->ActorHasTag("Diesel") && targetCamp->IsCyberCapturing() && neutralCampExists  && !OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp"))
+				else if (hero->ActorHasTag("Diesel") && targetCamp->IsCyberCapturing() && neutralCampExists  && !OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp") &&
+					!OwnerComp.GetBlackboardComponent()->GetValueAsBool("FoundNearbyEnemyCamp"))
 				
 				{
 					//UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));

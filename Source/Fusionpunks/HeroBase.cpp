@@ -4,6 +4,7 @@
 #include "CreepCamp.h"
 #include "PlayerHud.h"
 #include "Creep.h"
+#include "DieselTower.h"
 #include "HeroStats.h"
 #include "Base.h"
 #include "HeroAIController.h"
@@ -356,6 +357,7 @@ bool AHeroBase::CheckForNearbyInteractions()
 	nearbyEnemyCreeps.Empty();
 	nearbyOwnedCreepCamps.Empty();
 	nearbyEnemyHero = nullptr;
+	nearbyEnemyCamp = nullptr;
 	if (Results.Num() > 0)
 	{
 		for (int32 i = 0; i < Results.Num(); i++)
@@ -379,6 +381,11 @@ bool AHeroBase::CheckForNearbyInteractions()
 				{
 					nearbyOwnedCreepCamps.Add(currCamp);
 				}
+
+				else
+				{
+					nearbyEnemyCamp = currCamp;
+				}
 			}
 
 			else if (Results[i].GetActor()->IsA(ACreep::StaticClass()))
@@ -400,7 +407,7 @@ bool AHeroBase::CheckForNearbyInteractions()
 		}
 
 	}
-	return nearbyOwnedCreepCamps.Num() > 0 || nearbyEnemyHero != nullptr  || nearbyEnemyCreeps.Num() > 0;
+	return nearbyOwnedCreepCamps.Num() > 0 || nearbyEnemyHero != nullptr  || nearbyEnemyCreeps.Num() > 0 || nearbyEnemyCamp != nullptr;
 }
 
 bool AHeroBase::CheckForNearbyOnwedCreepCamps()
@@ -597,6 +604,11 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 
 	if (currentHealth <= 0 && !bIsRespawning)
 	{
+		if (DamageCauser->IsA(ADieselTower::StaticClass()))
+		{
+			Cast<ADieselTower>(DamageCauser)->RemoveFromTargetList(this);
+		}
+
 		AHeroBase* hero = Cast<AHeroBase>(DamageCauser);
 		if (hero)
 		{

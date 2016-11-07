@@ -97,6 +97,10 @@ protected:
 
 //editable stats in blueprint
 protected:
+
+	//UPROPERTY(EditDefaultsOnly, Category = NavMod)
+	//	class UNavModifierComponent* navModComp;
+
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float maxHealth;
 
@@ -230,11 +234,14 @@ public:
 	FORCEINLINE TArray<class ACreep*> GetNearbyEnemyCreeps() const { return nearbyEnemyCreeps; }
 	FORCEINLINE AHeroBase* GetNearbyEnemyHero() const { return nearbyEnemyHero; }
 	FORCEINLINE TArray<class ACreepCamp*> GetNearbyOwnedCreepCamps() const { return nearbyOwnedCreepCamps; }
+	FORCEINLINE class ACreepCamp* GetNearbyEnemyCamp() const { return nearbyEnemyCamp; }
 private:
 	//AIHERO
 	TArray<class ACreep*> nearbyEnemyCreeps;
 	AHeroBase* nearbyEnemyHero;
 	TArray<class ACreepCamp*> nearbyOwnedCreepCamps;
+	class ACreepCamp* nearbyEnemyCamp;
+
 
 public:
 	TArray<ACreep*> AHeroBase::GetCreepArmyArray();

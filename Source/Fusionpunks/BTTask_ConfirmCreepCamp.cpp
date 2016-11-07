@@ -41,7 +41,7 @@ void UBTTask_ConfirmCreepCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
-	UE_LOG(LogTemp, Error, TEXT("Capture Perenctage: %f."), targetCamp->GetDieselCapturePercentage());
+	//UE_LOG(LogTemp, Error, TEXT("Capture Perenctage: %f."), targetCamp->GetDieselCapturePercentage());
 	if (targetCamp->GetCampType() == teamCampType && ((hero->ActorHasTag("Cyber") && targetCamp->GetCyberCapturePercentage() >= 1) || (hero->ActorHasTag("Diesel") && targetCamp->GetDieselCapturePercentage() >= 1)))
 	{
 		//bNotifyTaskFinished = true;

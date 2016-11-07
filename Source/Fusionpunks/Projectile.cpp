@@ -2,6 +2,8 @@
 
 #include "Fusionpunks.h"
 #include "HeroBase.h"
+#include "Creep.h"
+#include "DieselTower.h"
 #include "Projectile.h"
 
 
@@ -26,6 +28,7 @@ AProjectile::AProjectile()
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+	owningTower = Cast<ADieselTower>(GetOwner());
 	
 }
 
@@ -38,12 +41,60 @@ void AProjectile::SetDamage(float amount)
 void AProjectile::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	if (enemyPlayer) 
+		
+
+	if (enemyType == ETypeOfEnemy::TE_Hero)
 	{
-		FVector direction = (enemyPlayer->GetActorLocation() - GetActorLocation() ).GetSafeNormal();
-		FVector newPos = GetActorLocation() + (direction * DeltaTime*750);
-		SetActorLocation(newPos);
+		if (enemyHero != nullptr)
+		{
+			if (!enemyHero->IsRespawning())
+			{
+				FVector direction = (enemyHero->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+				FVector newPos = GetActorLocation() + (direction * DeltaTime * 1000);
+				SetActorLocation(newPos);
+			}
+
+			else 
+			{
+				this->Destroy();
+			}
+
+
+		}
+
+		else 
+		{
+			this->Destroy();
+		}
 	}
+
+
+
+	else if (enemyType == ETypeOfEnemy::TE_Creep)
+	{
+		if (enemyCreep != nullptr)
+		{
+			if (enemyCreep->GetHealthAsDecimal() >= 0)
+			{
+				FVector direction = (enemyCreep->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+				FVector newPos = GetActorLocation() + (direction * DeltaTime * 1000);
+				SetActorLocation(newPos);
+			}
+
+			else
+			{
+				this->Destroy();
+			}
+
+
+		}
+
+		else
+		{
+			this->Destroy();
+		}
+	}
+
 
 	
 
@@ -51,7 +102,28 @@ void AProjectile::Tick( float DeltaTime )
 
 void AProjectile::SetTarget(class AActor* OtherActor)
 {
-	enemyPlayer = OtherActor;
+
+	enemyCreep = nullptr;
+	enemyHero = nullptr;
+
+	if (OtherActor->IsA(AHeroBase::StaticClass()))
+	{
+		enemyHero = Cast<AHeroBase>(OtherActor);
+		enemyType = ETypeOfEnemy::TE_Hero;
+	}
+
+	else if (OtherActor->IsA(ACreep::StaticClass()))
+	{
+		enemyCreep = Cast<ACreep>(OtherActor);
+		enemyType = ETypeOfEnemy::TE_Creep;
+	}
+	
+	
+	
+	//enemyPlayer = OtherActor;
+
+
+
 }
 
 void AProjectile::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
@@ -60,7 +132,7 @@ void AProjectile::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor
 	{
 		FDamageEvent DamageEvent;
 
-		float damageTaken = OtherActor->TakeDamage(damage, DamageEvent, NULL, this);
+		float damageTaken = OtherActor->TakeDamage(damage, DamageEvent, NULL, owningTower);
 		
 		Destroy();
 		

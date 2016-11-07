@@ -15,6 +15,7 @@ public:
 	// Sets default values for this actor's properties
 	ADieselTower();
 
+	void RemoveFromTargetList(AActor* enemy);
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
@@ -27,6 +28,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
 		TSubclassOf<class AProjectile> whatToSpawn;
+
+	
 
 	AProjectile* currProjectile;
 	class AProjectileTowerDamage* towerDMG;
