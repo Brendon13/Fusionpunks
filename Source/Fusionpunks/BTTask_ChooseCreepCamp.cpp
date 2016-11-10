@@ -9,32 +9,32 @@ EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent&
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
+	UE_LOG(LogTemp, Error, TEXT("CHOOSING CAMP"));
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
+	{
+		//UE_LOG(LogTemp, Error, TEXT("Already Reached Camp..Skip Choose!"));
+		return EBTNodeResult::Succeeded;
+	}
+
+	
 	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("FoundNearbyEnemyCamp"))
 	{
 		OwnerComp.GetBlackboardComponent()->SetValueAsObject("CampTarget", OwnerComp.GetBlackboardComponent()->GetValueAsObject("NearbyEnemyCamp"));
+	    //UE_LOG(LogTemp, Error, TEXT("Found Nearby Enemy Camp..Skip Choose!!"));
 		return EBTNodeResult::Succeeded;
 	}
 	
 
-
-	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
-		return EBTNodeResult::Succeeded;
-
-
 	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp"))
 	{	
-		UE_LOG(LogTemp, Error, TEXT("Hero is defending a camp"));
+		//UE_LOG(LogTemp, Error, TEXT("Hero is defending a camp..Skip Choose!"));
 		OwnerComp.GetBlackboardComponent()->SetValueAsObject("CampTarget", OwnerComp.GetBlackboardComponent()->GetValueAsObject("DefendCampTarget"));
 		return EBTNodeResult::Succeeded;
 	}
 
 
 
-	AHeroAIController* heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
-	
-
-
-	
+	AHeroAIController* heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());	
 	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("CapturedCamp"))
 	{	
 		//CAMP HAS ALREADY BEEN CAPTURED SO CHOOSE NEW CAMP
@@ -74,7 +74,7 @@ EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent&
 				}
 
 				// TARGET CAMP IS NULL 
-				UE_LOG(LogTemp, Error, TEXT("NO SAFE CAMPS!"));
+				//UE_LOG(LogTemp, Error, TEXT("NO SAFE CAMPS!"));
 				return EBTNodeResult::Failed;
 
 			}
@@ -82,15 +82,18 @@ EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent&
 			else
 			{
 				//CANT FIND CREEP CAMPS
+				//UE_LOG(LogTemp, Error, TEXT("CANT FIND CREEP CAMPS!"));
 				return EBTNodeResult::Failed;
 			}
 
 
 		}
 		// HERO AI PTR IS NULL
+		//UE_LOG(LogTemp, Error, TEXT("HERO AI PTR IS NULL!"));
 		return EBTNodeResult::Failed;
 	}
 	// IF TARGET CAMP HAS NOT BEEN CAPTURED YET
+	//UE_LOG(LogTemp, Error, TEXT("TARGET CAMP HAS NOT BEEN CAPTURED YET!"));
 	return EBTNodeResult::Succeeded;
 }
 

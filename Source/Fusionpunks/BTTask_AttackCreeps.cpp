@@ -59,7 +59,7 @@ void UBTTask_AttackCreeps::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 			if (attackTimerHandle.IsValid())
 			{
 				GetWorld()->GetTimerManager().ClearTimer(attackTimerHandle);
-				FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+				FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 			}
 		}
 }

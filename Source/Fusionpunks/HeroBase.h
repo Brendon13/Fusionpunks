@@ -156,6 +156,8 @@ public:
 	FVector startingLocation;
 	bool bIsRespawning = false;
 
+	//AI HERO STUFFS
+
 	FORCEINLINE bool IsRespawning() const { return bIsRespawning; }
 	FORCEINLINE int32 GetArmySize() const { return CreepArmy.Num(); }
 	FORCEINLINE float GetRespawnTime() const { return respawnTime; }
@@ -167,13 +169,20 @@ public:
 	FORCEINLINE bool IsCapturing() const { return isCapturing; }
 	FORCEINLINE  ACreepCamp* GetCampBeingCaptured() const { return campBeingCaptured; }
 	FORCEINLINE void SetInsideHealingWell(bool status) {bInsideHealingWell = status;}
-	FORCEINLINE bool InsideHealingWell() {return bInsideHealingWell;}
-	
+	FORCEINLINE bool InsideHealingWell() const {return bInsideHealingWell;}
+	FORCEINLINE bool IsCreepAttacking() const { return bCreepIsAttacking; }
+	FORCEINLINE bool IsHeroAttacking() const { return bHeroIsAttacking; }
+	FORCEINLINE void SetCreepAttacking(bool status) {  bCreepIsAttacking = status; }
+	FORCEINLINE void SetHeroAttacking(bool status)  { bHeroIsAttacking = status; }
+	FORCEINLINE class ACreep* GetAttackingCreep() const { return attackingCreep; }
 	void AddToCapturedCamps(class ACreepCamp* camp);
 	void RemoveFromCapturedCamps(class ACreepCamp* camp);
 	void UpdateHeroStats();
 	void SetIsCapturing(bool status, class ACreepCamp* camp);
+	
+
 protected:
+	//AI HERO STUFFS
 	class ACreepCamp* campBeingCaptured;
 
 	UPROPERTY(EditDefaultsOnly, Category = Respawn)
@@ -191,6 +200,11 @@ protected:
 	class AHeroAIController* heroAI;
 	
 	bool isCapturing = false;
+
+	bool bCreepIsAttacking = false;
+	bool bHeroIsAttacking = false;
+
+	class ACreep* attackingCreep = nullptr;
 
 
 protected:

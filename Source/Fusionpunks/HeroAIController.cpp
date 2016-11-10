@@ -2,6 +2,7 @@
 
 #include "Fusionpunks.h"
 #include "HeroBase.h"
+#include "CreepCamp.h"
 #include "HealingWell.h"
 #include "HeroAIController.h"
 
@@ -114,6 +115,21 @@ TArray<ACreepCamp*> AHeroAIController::GetSortedOwnedCampList()
 void AHeroAIController::ResetAllCampsRecruitStatus()
 {
 	campPriorityList.ResetCampsRecruitedStatus();
+}
+
+bool AHeroAIController::SafetyCheck(ACreepCamp* camp) 
+{
+	if (hero->ActorHasTag("Cyber") && camp->IsDieselCapturing() && (camp->GetNumOfCreepsAtCamp() + enemyHero->GetArmySize()) - hero->GetArmySize() <= 5)
+		return true;
+	else if (hero->ActorHasTag("Diesel") && camp->IsCyberCapturing() &&
+		(camp->GetNumOfCreepsAtCamp() + enemyHero->GetArmySize()) - hero->GetArmySize() <= 5)
+		return true;
+	else if (hero->ActorHasTag("Cyber") && !camp->IsDieselCapturing() && camp->GetNumOfCreepsAtCamp() - hero->GetArmySize() <= 3)
+		return true;
+	else if (hero->ActorHasTag("Diesel") && !camp->IsCyberCapturing() && camp->GetNumOfCreepsAtCamp() - hero->GetArmySize() <= 3)
+		return true;
+	else
+		return false;
 }
 
 

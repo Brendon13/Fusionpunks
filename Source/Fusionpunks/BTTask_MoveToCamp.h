@@ -31,7 +31,7 @@ protected:
 	class AHeroAIController* heroAI;
 	class HeroStats* heroStats;
 	bool neutralCampExists;
-
+	class AAbilityBase* sacrificeCreepAbility;
 	UPROPERTY(EditAnywhere)
 		EReasonForGoingToCamp campGoal;
 	UPROPERTY(EditAnywhere)

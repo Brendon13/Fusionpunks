@@ -16,15 +16,14 @@ EBTNodeResult::Type UBTTask_CheckHealth::ExecuteTask(UBehaviorTreeComponent& Own
 	
 	if (hero != nullptr)
 	{
-		HeroStats* heroStats = hero->GetHeroStats();
-		heroStats->UpdateStats();
-		if (heroStats->GetHealthPercent() >= healthPercentage )
+		
+		if (hero->GetPlayerHealthAsDecimal() >= healthPercentage || hero->bIsRespawning)
 		{
 			return EBTNodeResult::Succeeded;
 		}
 		else 
 		{
-			UE_LOG(LogTemp, Warning, TEXT("AI has too little hp"));
+			UE_LOG(LogTemp, Error, TEXT("AI Needs To Heal"));
 
 			return EBTNodeResult::Failed;
 		}

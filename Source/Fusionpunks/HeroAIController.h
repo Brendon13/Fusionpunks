@@ -112,6 +112,7 @@ public:
 	void ResetAllCampsRecruitStatus();
 	void RestartHeroAITree();
 	bool CheckCampBeingAttacked();
+	bool SafetyCheck(class ACreepCamp*);
 	FORCEINLINE class ACreepCamp* GetCampBeingAttacked() const  { return campBeingAttacked; }
 	
 protected:

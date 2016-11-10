@@ -37,12 +37,12 @@ public:
 private:
 	AActor* source, *target;
 	UPROPERTY(EditAnywhere)
-		UParticleSystemComponent* beam;
+		class UParticleSystemComponent* beam;
 
 	UPROPERTY(EditAnywhere)
-		UShapeComponent* boxCollider;
+		class UShapeComponent* boxCollider;
 	UPROPERTY(EditAnywhere)
-		UStaticMeshComponent* mesh;
+		class UStaticMeshComponent* mesh;
 	
 	UPROPERTY(EditAnywhere, category = Ability)
 		TSubclassOf<AAbilityBase> chainLightningAbility;

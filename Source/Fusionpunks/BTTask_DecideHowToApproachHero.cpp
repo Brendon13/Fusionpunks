@@ -20,6 +20,7 @@ EBTNodeResult::Type UBTTask_DecideHowToApproachHero::ExecuteTask(UBehaviorTreeCo
 		attackTarget = Cast<AHeroBase>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("AttackTarget"));
 		campTarget = Cast<ACreepCamp>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("CampTarget"));
 		healingWell = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("HealingWell"));
+		enemyCreep = nullptr;
 		if (attackTarget != nullptr && campTarget!= nullptr)
 		{
 
@@ -78,7 +79,7 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 
 
 
-	if (hero->GetPlayerHealthAsDecimal() <= healthPercentRequired &&
+	if (hero->GetPlayerHealthAsDecimal() <= healthPercentRequired && attackTarget->GetPlayerHealthAsDecimal() - hero->GetPlayerHealthAsDecimal() >0 &&
 		attackTarget->GetPlayerHealthAsDecimal() - hero->GetPlayerHealthAsDecimal() > healthPercentDifferenceAllowed)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Health to low to engage"));
@@ -98,8 +99,86 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 			heroAI->ResetAllCampsSafetyStatus();
 			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		}*/
+		if (hero->IsHeroAttacking() || !hero->IsCreepAttacking())
+		{
+			if (attackTarget->IsCapturing() || attackTarget->GetDistanceTo(campTarget) <= 1000 || attackTarget->GetPlayerHealthAsDecimal() <= 0.2f)
+			{
+				if (hero->CheckForNearbyEnemyHero())
+				{
+					if (hero->GetDistanceTo(attackTarget) >= 300)
+					{
+						OwnerComp.GetAIOwner()->MoveToActor(attackTarget, 50, false, true, false);
+					}
+					else
+					{
+						//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF ENEMY HERO"));
+						FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+					}
+				}
 
-		if (attackTarget->IsCapturing() || attackTarget->GetDistanceTo(campTarget)<=1000 || attackTarget->GetPlayerHealthAsDecimal() <= 0.2f)
+				else
+				{
+					if (hero->GetDistanceTo(campTarget) >= 600)
+					{
+						OwnerComp.GetAIOwner()->MoveToActor(campTarget, 500, true, true, false);
+					}
+					else
+					{
+						//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF DEFENSIVE CAMP"));
+					/*	if (hero->CheckForNearbyEnemyHero())
+						{
+							FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), attackTarget->GetActorLocation());
+							lookAtTargetRotation.Pitch = 0;
+							hero->SetActorRotation(lookAtTargetRotation);
+						} */
+						FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+					}
+
+				}
+			}
+			else
+			{
+				if (hero->GetDistanceTo(campTarget) >= 600)
+				{
+					OwnerComp.GetAIOwner()->MoveToActor(campTarget, 500, true, true, false);
+				}
+				else
+				{
+					/*	if (hero->CheckForNearbyEnemyHero())
+					{
+					FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), attackTarget->GetActorLocation());
+					lookAtTargetRotation.Pitch = 0;
+					hero->SetActorRotation(lookAtTargetRotation);
+					} */
+					//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF DEFENSIVE CAMP"));
+					FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+				}
+
+			}
+		}
+
+		else if (hero->IsCreepAttacking())
+		{
+			if (enemyCreep == nullptr)
+				enemyCreep = hero->GetAttackingCreep();
+
+			if (hero->GetDistanceTo(enemyCreep) >= 300)
+			{
+				OwnerComp.GetAIOwner()->MoveToActor(enemyCreep, 50, false, true, false);
+			}
+			else
+			{
+				//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF ENEMY HERO"));
+				OwnerComp.GetBlackboardComponent()->SetValueAsObject("AttackTarget", enemyCreep);
+				FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+			}
+		}
+
+	}
+	else if (approachStatus == EApproachStatus::AS_AgressiveChase)
+	{
+
+		if (hero->IsHeroAttacking() || !hero->IsCreepAttacking())
 		{
 			if (hero->CheckForNearbyEnemyHero())
 			{
@@ -109,73 +188,33 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 				}
 				else
 				{
-					//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF ENEMY HERO"));
 					FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 				}
 			}
 
 			else
 			{
-				if (hero->GetDistanceTo(campTarget) >= 600)
-				{
-					OwnerComp.GetAIOwner()->MoveToActor(campTarget, 500, true, true, false);
-				}
-				else
-				{
-					//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF DEFENSIVE CAMP"));
-				/*	if (hero->CheckForNearbyEnemyHero())
-					{
-						FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), attackTarget->GetActorLocation());
-						lookAtTargetRotation.Pitch = 0;
-						hero->SetActorRotation(lookAtTargetRotation);
-					} */
-					FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-				}
-
-			}
-		}
-		else
-		{
-			if (hero->GetDistanceTo(campTarget) >= 600)
-			{
-				OwnerComp.GetAIOwner()->MoveToActor(campTarget, 500, true, true, false);
-			}
-			else
-			{
-				/*	if (hero->CheckForNearbyEnemyHero())
-				{
-				FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), attackTarget->GetActorLocation());
-				lookAtTargetRotation.Pitch = 0;
-				hero->SetActorRotation(lookAtTargetRotation);
-				} */
-				//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF DEFENSIVE CAMP"));
 				FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 			}
-			
+
 		}
 
-	}
-	else if (approachStatus == EApproachStatus::AS_AgressiveChase)
-	{
-
-
-		if (hero->CheckForNearbyEnemyHero())
+		else if (hero->IsCreepAttacking())
 		{
-			if (hero->GetDistanceTo(attackTarget) >= 300)
+			if (enemyCreep == nullptr)
+				enemyCreep = hero->GetAttackingCreep();
+
+			if (hero->GetDistanceTo(enemyCreep) >= 300)
 			{
-				OwnerComp.GetAIOwner()->MoveToActor(attackTarget, 50, false, true, false);
+				OwnerComp.GetAIOwner()->MoveToActor(enemyCreep, 50, false, true, false);
 			}
 			else
 			{
+				//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF ENEMY HERO"));
+				OwnerComp.GetBlackboardComponent()->SetValueAsObject("AttackTarget", enemyCreep);
 				FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 			}
 		}
-
-		else
-		{
-			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-		}
-	
 	}
 
 	else if (approachStatus == EApproachStatus::AS_EscapingToRecruitCreeps)

@@ -4,8 +4,9 @@
 #include "CreepCamp.h"
 #include "HeroAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include"HeroBase.h"
-#include"HeroStats.h"
+#include "HeroBase.h"
+#include "HeroStats.h"
+#include "AbilityBase.h"
 #include "BTTask_MoveToCamp.h"
 
 EBTNodeResult::Type UBTTask_MoveToCamp::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -16,6 +17,8 @@ EBTNodeResult::Type UBTTask_MoveToCamp::ExecuteTask(UBehaviorTreeComponent& Owne
 	heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
 	hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
 	neutralCampExists = OwnerComp.GetBlackboardComponent()->GetValueAsBool("NeutralCampsExist");
+	if (hero->CheckForNearbyEnemyHero())
+		return EBTNodeResult::Failed;
 
 	if (campGoal == EReasonForGoingToCamp::RGC_Capturing)
 	{
@@ -37,6 +40,7 @@ EBTNodeResult::Type UBTTask_MoveToCamp::ExecuteTask(UBehaviorTreeComponent& Owne
 	if (hero != nullptr)
 	{
 		heroStats = hero->GetHeroStats();
+		sacrificeCreepAbility = hero->GetAbility(3);
 		return EBTNodeResult::InProgress;	
 	}
 
@@ -54,6 +58,12 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 	heroStats->UpdateStats();
 	
+	if (heroStats->GetHealthPercent() <= 0.5f && heroStats->GetArmySize() > 0 && sacrificeCreepAbility != nullptr && sacrificeCreepAbility->CanUse() ) 
+	{
+		UE_LOG(LogTemp, Error, TEXT("AI Sacrificed Creep"));
+		sacrificeCreepAbility->Use();
+	}
+
 
 	if (heroStats->GetHealthPercent() < healthPercentageAbort)
 	{
@@ -64,6 +74,7 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 	}
 
 
+
 	if (campGoal == EReasonForGoingToCamp::RGC_Capturing)
 	{
 		if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
@@ -71,7 +82,7 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 			return FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		}
 
-		else if (hero->IsCapturing())
+		else if (hero->IsCapturing() && hero->GetCampBeingCaptured() == targetCamp)
 		{
 
 			UE_LOG(LogTemp, Error, TEXT("Capturing Camp"));
@@ -108,8 +119,8 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 			
 			if (hero->GetNearbyEnemyCamp() != nullptr)
 			{
-				
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject("NearbyEnemyCamp", hero->GetNearbyEnemyCamp());
+				if (heroAI->SafetyCheck(hero->GetNearbyEnemyCamp()))
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject("NearbyEnemyCamp", hero->GetNearbyEnemyCamp());
 			}
 			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 

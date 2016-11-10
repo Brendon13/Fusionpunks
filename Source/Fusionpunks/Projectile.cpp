@@ -47,7 +47,7 @@ void AProjectile::Tick( float DeltaTime )
 	{
 		if (enemyHero != nullptr)
 		{
-			if (!enemyHero->IsRespawning())
+			if (!enemyHero->bIsRespawning || enemyHero->GetPlayerHealthAsDecimal() > 0 )
 			{
 				FVector direction = (enemyHero->GetActorLocation() - GetActorLocation()).GetSafeNormal();
 				FVector newPos = GetActorLocation() + (direction * DeltaTime * 1000);
@@ -56,7 +56,7 @@ void AProjectile::Tick( float DeltaTime )
 
 			else 
 			{
-				this->Destroy();
+				Destroy();
 			}
 
 
@@ -64,7 +64,7 @@ void AProjectile::Tick( float DeltaTime )
 
 		else 
 		{
-			this->Destroy();
+			Destroy();
 		}
 	}
 
@@ -74,7 +74,7 @@ void AProjectile::Tick( float DeltaTime )
 	{
 		if (enemyCreep != nullptr)
 		{
-			if (enemyCreep->GetHealthAsDecimal() >= 0)
+			if (enemyCreep->GetHealthAsDecimal() > 0 || !enemyCreep->GetBIsDead())
 			{
 				FVector direction = (enemyCreep->GetActorLocation() - GetActorLocation()).GetSafeNormal();
 				FVector newPos = GetActorLocation() + (direction * DeltaTime * 1000);
@@ -83,7 +83,7 @@ void AProjectile::Tick( float DeltaTime )
 
 			else
 			{
-				this->Destroy();
+				Destroy();
 			}
 
 
@@ -91,7 +91,7 @@ void AProjectile::Tick( float DeltaTime )
 
 		else
 		{
-			this->Destroy();
+			Destroy();
 		}
 	}
 
@@ -105,8 +105,10 @@ void AProjectile::SetTarget(class AActor* OtherActor)
 
 	enemyCreep = nullptr;
 	enemyHero = nullptr;
-
-	if (OtherActor->IsA(AHeroBase::StaticClass()))
+	if (OtherActor == nullptr || OtherActor->IsActorBeingDestroyed()) {
+		Destroy();
+	}
+	else if (OtherActor->IsA(AHeroBase::StaticClass()))
 	{
 		enemyHero = Cast<AHeroBase>(OtherActor);
 		enemyType = ETypeOfEnemy::TE_Hero;
@@ -128,7 +130,7 @@ void AProjectile::SetTarget(class AActor* OtherActor)
 
 void AProjectile::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-	if (OtherActor->IsA(AHeroBase::StaticClass()))
+	if (OtherActor->IsA(ACharacter::StaticClass()))
 	{
 		FDamageEvent DamageEvent;
 

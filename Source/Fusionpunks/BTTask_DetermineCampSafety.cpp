@@ -17,10 +17,19 @@ EBTNodeResult::Type UBTTask_DetermineCampSafety::ExecuteTask(UBehaviorTreeCompon
 	ACreepCamp* targetCamp = Cast<ACreepCamp>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("CampTarget"));
 	if (hero != nullptr && targetCamp!= nullptr)
 	{
+
+		if (hero->ActorHasTag("Cyber"))
+			enemyHero = targetCamp->GetDieselHero();
+		else
+			enemyHero = targetCamp->GetCyberHero();
 		HeroStats* heroStats = hero->GetHeroStats();
 		heroStats->UpdateStats();
-		if (heroStats->GetHealthPercent() >= healthPercentage && 
-			 targetCamp->GetNumOfCreepsAtCamp()- heroStats->GetArmySize() <= allowedCreepDifference )
+		
+		if(hero->ActorHasTag("Cyber") && targetCamp->GetCampType() == ECampType::CT_Cyber  || hero->ActorHasTag("Diesel") && targetCamp->GetCampType() == ECampType::CT_Diesel)
+			return EBTNodeResult::Succeeded;
+
+
+		if (heroStats->GetHealthPercent() >= healthPercentage && targetCamp->GetNumOfCreepsAtCamp() -  heroStats->GetArmySize() <= allowedCreepDifference)
 		{
 			bool neutralCampExists = false;
 			TArray<ACreepCamp*> creepCamps = heroAI->GetCreepCampList();
@@ -37,18 +46,12 @@ EBTNodeResult::Type UBTTask_DetermineCampSafety::ExecuteTask(UBehaviorTreeCompon
 				}
 
 				OwnerComp.GetBlackboardComponent()->SetValueAsBool("NeutralCampsExist", neutralCampExists);
-
 				
-				if (hero->IsCapturing() || hero->GetDistanceTo(targetCamp) <= 700)
-				{
-					return EBTNodeResult::Succeeded;
-				}
-				
-				else if (hero->ActorHasTag("Cyber") && targetCamp->IsDieselCapturing() && neutralCampExists && !OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp")
-					&& !OwnerComp.GetBlackboardComponent()->GetValueAsBool("FoundNearbyEnemyCamp"))
-				{
+				 if ((hero->ActorHasTag("Cyber") && targetCamp->IsDieselCapturing() && neutralCampExists && !OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp")
+					&& !OwnerComp.GetBlackboardComponent()->GetValueAsBool("FoundNearbyEnemyCamp")))
+				{  
 
-					//UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));
+					UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe...Being Captured!"));
 					targetCamp->SetCampSafety(false);
 					OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
 					OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);
@@ -59,22 +62,47 @@ EBTNodeResult::Type UBTTask_DetermineCampSafety::ExecuteTask(UBehaviorTreeCompon
 					!OwnerComp.GetBlackboardComponent()->GetValueAsBool("FoundNearbyEnemyCamp"))
 				
 				{
-					//UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));
+					UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe...Being Captured!"));
 					targetCamp->SetCampSafety(false);
 					OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
 					OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);
 					return EBTNodeResult::Failed;
 				}
+
+
+				else if (hero->ActorHasTag("Cyber") && targetCamp->IsDieselCapturing() &&
+					(targetCamp->GetNumOfCreepsAtCamp() + enemyHero->GetArmySize()) - heroStats->GetArmySize() >= 5)
+				{
+					UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe...Enemy Too Strong!"));
+					targetCamp->SetCampSafety(false);
+					OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
+					OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);
+					OwnerComp.GetBlackboardComponent()->SetValueAsBool("DefendingCamp", false);
+					OwnerComp.GetBlackboardComponent()->SetValueAsBool("FoundNearbyEnemyCamp", false);
+					return EBTNodeResult::Failed;
+				}
+
+				else if (hero->ActorHasTag("Diesel") && targetCamp->IsCyberCapturing() &&
+					(targetCamp->GetNumOfCreepsAtCamp() + enemyHero->GetArmySize()) - heroStats->GetArmySize() >= 5)
+				{
+					UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe...Enemy Too Strong!"));
+					targetCamp->SetCampSafety(false);
+					OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
+					OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);
+					OwnerComp.GetBlackboardComponent()->SetValueAsBool("DefendingCamp", false);
+					OwnerComp.GetBlackboardComponent()->SetValueAsBool("FoundNearbyEnemyCamp", false);
+					return EBTNodeResult::Failed;
+				}
 				else
 				{
-					//UE_LOG(LogTemp, Error, TEXT("Camp Flagged as SAFE!"));
+					UE_LOG(LogTemp, Error, TEXT("Camp Flagged as SAFE!"));
 					return EBTNodeResult::Succeeded;
 				}
 			}
 			return EBTNodeResult::Failed;
 		
 		}
-		//UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe!"));
+		UE_LOG(LogTemp, Error, TEXT("Camp Flagged as Unsafe..Too many creeps!"));
 		targetCamp->SetCampSafety(false);
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);

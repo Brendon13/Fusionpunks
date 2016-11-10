@@ -29,10 +29,12 @@ class FUSIONPUNKS_API UBTTask_DecideHowToApproachHero : public UBTTaskNode
 	class AHeroBase* hero;
 	class HeroStats* heroStats;
 	class AHeroBase* attackTarget;
+	class ACreep* enemyCreep;
 	class ACreepCamp* campTarget;
 	class AHeroAIController* heroAI;
 	ECampType teamCampType;
 	AActor* healingWell;
+
 	UPROPERTY(EditAnywhere)
 		EApproachStatus approachStatus;
 	UPROPERTY(EditAnywhere)

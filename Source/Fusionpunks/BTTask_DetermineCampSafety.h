@@ -23,6 +23,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 		int32 allowedCreepDifference;
 
-	
+	class AHeroBase* enemyHero;
 
 };

@@ -147,6 +147,14 @@ void AHeroBase::BeginPlay()
 		heroAI = Cast<AHeroAIController>(GetController());
 	}
 
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+	//Abilities[1] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[1], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+	//Abilities[2] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[2], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+	if(AbilitiesClass[3]!= nullptr)
+		Abilities[3] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[3], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+	//Abilities[4] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[4], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
+	
 }
 
 // Called every frame
@@ -170,6 +178,16 @@ void AHeroBase::Tick( float DeltaTime )
 	//			//FLinearColor(1 - GetPlayerHealthAsDecimal(), GetPlayerHealthAsDecimal(), 0, 1.0f);
 	//	}
 	//}
+
+	if (ActorHasTag("AI"))
+	{
+		if (bCreepIsAttacking && attackingCreep->GetBIsDead() || attackingCreep == nullptr)
+		{
+			attackingCreep = nullptr;
+			bCreepIsAttacking = false;
+
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -588,7 +606,18 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	currentHealth -= DamageAmount;
-	//UE_LOG(LogTemp, Log, TEXT("Hero took %f damage."), DamageAmount);
+	UE_LOG(LogTemp, Log, TEXT("Hero took %f damage."), DamageAmount);
+
+	//FOR AI HERO
+	if (ActorHasTag("AI") && DamageCauser->IsA(AHeroBase::StaticClass()))
+		bHeroIsAttacking = true;
+
+	else if (ActorHasTag("AI") && DamageCauser->IsA(ACreep::StaticClass()) && !bCreepIsAttacking)
+	{
+		bCreepIsAttacking = true;
+		attackingCreep = Cast<ACreep>(DamageCauser);
+	}
+
 
 	if (!DamageCauser->ActorHasTag("AI") && !DamageCauser->ActorHasTag("Creep") && FloatingDamageWidgetClass)
 	{
@@ -886,6 +915,7 @@ bool AHeroBase::SacrificeCreep()
 	{
 		ACreep* creep = CreepArmy.Pop();
 		creep->TakeDamage(10000000, FDamageEvent::FDamageEvent(), GetController(), this);
+	    UE_LOG(LogTemp, Warning, TEXT("Sacrificed Creep...From herobase"));
 		HealOverTime();
 		return true;
 	}

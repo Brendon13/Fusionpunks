@@ -7,6 +7,7 @@
 #include "FloatingDamageWidget.h"
 #include "CreepAIController.h"
 #include "HeroBase.h"
+#include "DieselTower.h"
 #include "Creep.h"
 
 
@@ -209,6 +210,10 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 	
 	if (currentHealth <= 0)
 	{
+		if (DamageCauser->IsA(ADieselTower::StaticClass()))
+		{
+			Cast<ADieselTower>(DamageCauser)->RemoveFromTargetList(this);
+		}
 		bIsDead = true; 
 		GetCapsuleComponent()->bGenerateOverlapEvents = false; 
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

@@ -56,7 +56,7 @@ EBTNodeResult::Type UBTTask_CheckStatusOfOwnedCamps::ExecuteTask(UBehaviorTreeCo
 				}
 
 				if (hero->GetDistanceTo(campBeingAttacked) <= hero->GetDistanceTo(otherCampObjective)
-					|| (enemyHero->GetArmySize() - hero->GetArmySize() <= creepDifferenceAllowed
+					&& (enemyHero->GetArmySize() - hero->GetArmySize() <= creepDifferenceAllowed
 					&& enemyHero->GetPlayerHealthAsDecimal() - hero->GetPlayerHealthAsDecimal() <= healthPercentDifferenceAllowed
 					&& enemyHero->GetLevel() - hero->GetLevel() <= levelDifferenceAllowed))
 				{
