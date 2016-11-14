@@ -22,17 +22,27 @@ EBTNodeResult::Type UBTTask_MoveToCamp::ExecuteTask(UBehaviorTreeComponent& Owne
 
 	if (campGoal == EReasonForGoingToCamp::RGC_Capturing)
 	{
+		if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("GoingForWin") && !OwnerComp.GetBlackboardComponent()->GetValueAsBool("FoundNearbyEnemyCamp"))
+		{
+			return EBTNodeResult::Failed;
+		}
+
 		targetCamp = Cast<ACreepCamp>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("CampTarget"));
 		if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
 			return EBTNodeResult::Succeeded;
 	}
 	else if (campGoal == EReasonForGoingToCamp::RGC_Recruiting)
 	{
+		
 		targetCamp = Cast<ACreepCamp>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("RecruitCamp"));
 	}
 
 	else if (campGoal == EReasonForGoingToCamp::RGC_DefendingCamp)
 	{
+		if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("GoingForWin"))
+		{
+			return EBTNodeResult::Failed;
+		}
 		targetCamp = Cast<ACreepCamp>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("DefendCampTarget"));
 	}
 
@@ -85,7 +95,7 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 		else if (hero->IsCapturing() && hero->GetCampBeingCaptured() == targetCamp)
 		{
 
-			UE_LOG(LogTemp, Error, TEXT("Capturing Camp"));
+			UE_LOG(LogTemp, Error, TEXT("Reached Camp"));
 			OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", true);
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 
@@ -182,4 +192,20 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 
 	}
+
+
+	else if (campGoal == EReasonForGoingToCamp::RGC_GoingForWin)
+	{
+		if (hero->CheckForNearbyInteractions())
+		{
+			if (hero->GetNearbyEnemyCamp() != nullptr)
+			{
+				if (heroAI->SafetyCheck(hero->GetNearbyEnemyCamp()))
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject("NearbyEnemyCamp", hero->GetNearbyEnemyCamp());
+			}
+			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		}
+
+	}
+
 }

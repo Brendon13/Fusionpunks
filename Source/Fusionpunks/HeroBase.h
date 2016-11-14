@@ -175,6 +175,7 @@ public:
 	FORCEINLINE void SetCreepAttacking(bool status) {  bCreepIsAttacking = status; }
 	FORCEINLINE void SetHeroAttacking(bool status)  { bHeroIsAttacking = status; }
 	FORCEINLINE class ACreep* GetAttackingCreep() const { return attackingCreep; }
+	FORCEINLINE class ABase* GetEnemyBase() const { return enemyBase; }
 	void AddToCapturedCamps(class ACreepCamp* camp);
 	void RemoveFromCapturedCamps(class ACreepCamp* camp);
 	void UpdateHeroStats();
@@ -187,6 +188,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Respawn)
 		TSubclassOf<class ARespawnOverTime> respawnClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = EnemyBase)
+		TSubclassOf<class ABase> enemyBaseClass;
+
+	class ABase* enemyBase;
+
 
 	class ARespawnOverTime* respawnEffect;
 
@@ -245,17 +252,19 @@ public:
 	bool CheckForNearbyEnemyHero();
 	bool CheckForNearbyOnwedCreepCamps();
  	bool CheckForNearbyInteractions();
+	bool CheckForNearbyEnemyTowers();
 	FORCEINLINE TArray<class ACreep*> GetNearbyEnemyCreeps() const { return nearbyEnemyCreeps; }
 	FORCEINLINE AHeroBase* GetNearbyEnemyHero() const { return nearbyEnemyHero; }
 	FORCEINLINE TArray<class ACreepCamp*> GetNearbyOwnedCreepCamps() const { return nearbyOwnedCreepCamps; }
 	FORCEINLINE class ACreepCamp* GetNearbyEnemyCamp() const { return nearbyEnemyCamp; }
+	FORCEINLINE class ATowerBase* GetNearbyEnemyTower() const { return nearbyEnemyTower; }
 private:
 	//AIHERO
 	TArray<class ACreep*> nearbyEnemyCreeps;
 	AHeroBase* nearbyEnemyHero;
 	TArray<class ACreepCamp*> nearbyOwnedCreepCamps;
 	class ACreepCamp* nearbyEnemyCamp;
-
+	class ATowerBase* nearbyEnemyTower;
 
 public:
 	TArray<ACreep*> AHeroBase::GetCreepArmyArray();
@@ -294,6 +303,8 @@ protected:
 	TArray<AAbilityBase*> Abilities;
 
 	const int8 NUMBEROFABILITIES = 5;
+
+
 
 public:
 	FORCEINLINE AAbilityBase* GetAbility(int i) const { return (Abilities.Num() >= i ? Abilities[i] : nullptr); }

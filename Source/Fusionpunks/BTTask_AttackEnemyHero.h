@@ -14,6 +14,7 @@ enum class ETargetType : uint8
 {
 	TT_Hero UMETA(DisplayName = "Hero"),
 	TT_Creep UMETA(DisplayName = "Creep"),
+	TT_Tower UMETA(DisplayName = "Tower"),
 	TT_None UMETA(DisplayName = "None")
 
 };
@@ -34,6 +35,7 @@ protected:
 	bool isAttacking = false;
 	class AHeroBase* enemyHero;
 	class ACreep* enemyCreep;
+	class ATowerBase* enemyTower;
 	FTimerHandle attackTimerHandle;
 
 	UPROPERTY(EditAnywhere)
@@ -44,6 +46,8 @@ protected:
 		void AttackHeroOnTimer();
 	UFUNCTION()
 		void AttackCreepOnTimer();
+	UFUNCTION()
+		void AttackTowerOnTimer();
 	
 	ETargetType targetType = ETargetType::TT_None;
 	

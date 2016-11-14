@@ -2,6 +2,7 @@
 
 #include "Fusionpunks.h"
 #include "HeroBase.h"
+#include "TowerBase.h"
 #include "Creep.h"
 #include "HeroAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -21,6 +22,12 @@ EBTNodeResult::Type UBTTask_AttackEnemyHero::ExecuteTask(UBehaviorTreeComponent&
 	{
 		enemyCreep = Cast<ACreep>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("AttackTarget"));
 		targetType = ETargetType::TT_Creep;
+	}
+
+	else if (OwnerComp.GetBlackboardComponent()->GetValueAsObject("AttackTarget")->IsA(ATowerBase::StaticClass()))
+	{
+		enemyTower = Cast<ATowerBase>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("AttackTarget"));
+		targetType = ETargetType::TT_Tower;
 	}
 
 	isAttacking = false;
@@ -55,7 +62,8 @@ void UBTTask_AttackEnemyHero::TickTask(UBehaviorTreeComponent& OwnerComp, uint8*
 		}
 
 		if ( (hero->GetPlayerHealthAsDecimal() <= healthPercentageAbort && enemyHero->GetPlayerHealthAsDecimal() - hero->GetPlayerHealthAsDecimal() >0 &&
-			enemyHero->GetPlayerHealthAsDecimal() - hero->GetPlayerHealthAsDecimal() > healthPercentageAbort) || hero->GetDistanceTo(enemyHero) > 300 || enemyHero->bIsRespawning|| enemyHero->GetPlayerHealthAsDecimal() <= 0 )
+			enemyHero->GetPlayerHealthAsDecimal() - hero->GetPlayerHealthAsDecimal() > healthPercentageAbort) || hero->GetPlayerHealthAsDecimal() <= 0 || hero->bIsRespawning ||
+			hero->GetDistanceTo(enemyHero) > 300 || enemyHero->bIsRespawning|| enemyHero->GetPlayerHealthAsDecimal() <= 0 )
 		{
 			UE_LOG(LogTemp, Error, TEXT("STOP ATTACK Hero TIMER"));
 			enemyHero = nullptr;
@@ -99,6 +107,37 @@ void UBTTask_AttackEnemyHero::TickTask(UBehaviorTreeComponent& OwnerComp, uint8*
 		}
 	}
 
+	if (targetType == ETargetType::TT_Tower && enemyTower != nullptr)
+	{
+		if (!isAttacking && enemyTower != nullptr)
+		{
+			GetWorld()->GetTimerManager().SetTimer(attackTimerHandle, this, &UBTTask_AttackEnemyHero::AttackTowerOnTimer, attackSpeed, true, 0);
+			isAttacking = true;
+			UE_LOG(LogTemp, Error, TEXT("Starting Attack Tower Timer!"));
+		}
+
+		if (isAttacking && enemyTower != nullptr)
+		{
+			FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), enemyTower->GetActorLocation());
+			lookAtTargetRotation.Pitch = 0;
+			hero->SetActorRotation(lookAtTargetRotation);
+		}
+
+		if (hero->GetPlayerHealthAsDecimal() <= healthPercentageAbort || hero->GetDistanceTo(enemyTower) > 300 || enemyTower->GetHpPercent() <= 0)
+		{
+			UE_LOG(LogTemp, Error, TEXT("STOP ATTACK TOWER TIMER"));
+			enemyTower = nullptr;
+
+			if (attackTimerHandle.IsValid())
+			{
+				GetWorld()->GetTimerManager().ClearTimer(attackTimerHandle);
+				//hero->SetCreepAttacking(false);
+				FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+			}
+		}
+	}
+
+
 	else if(targetType == ETargetType::TT_None)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
@@ -115,4 +154,8 @@ void UBTTask_AttackEnemyHero::AttackCreepOnTimer()
 	if (enemyCreep!= nullptr)
 		hero->Attack(enemyCreep);
 }
-
+void UBTTask_AttackEnemyHero::AttackTowerOnTimer()
+{
+	if (enemyTower != nullptr)
+		hero->Attack(enemyTower);
+}

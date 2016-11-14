@@ -12,7 +12,8 @@ UENUM(BlueprintType)		//"BlueprintType" is essential to include
 enum class ETargetEnemyType : uint8
 {
 	TE_Creeps UMETA(DisplayName = "Creeps"),
-	TE_Hero UMETA(DisplayName = "Hero")
+	TE_Hero UMETA(DisplayName = "Hero"),
+	TE_Tower UMETA(DisplayName = "Tower")
 };
 
 UCLASS()

@@ -12,9 +12,18 @@ EBTNodeResult::Type UBTTask_DetermineCampSafety::ExecuteTask(UBehaviorTreeCompon
 {
 
 	Super::ExecuteTask(OwnerComp, NodeMemory);
+
+
+	
+
 	AHeroBase* hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
 	AHeroAIController* heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
 	ACreepCamp* targetCamp = Cast<ACreepCamp>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("CampTarget"));
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("GoingForWin") || heroAI->GetNumOwnedCamps() == 5)
+	{
+		//UE_LOG(LogTemp, Error, TEXT("Going for win..Skip Choose!"));
+		return EBTNodeResult::Succeeded;
+	}
 	if (hero != nullptr && targetCamp!= nullptr)
 	{
 
@@ -95,7 +104,7 @@ EBTNodeResult::Type UBTTask_DetermineCampSafety::ExecuteTask(UBehaviorTreeCompon
 				}
 				else
 				{
-					UE_LOG(LogTemp, Error, TEXT("Camp Flagged as SAFE!"));
+					//UE_LOG(LogTemp, Error, TEXT("Camp Flagged as SAFE!"));
 					return EBTNodeResult::Succeeded;
 				}
 			}

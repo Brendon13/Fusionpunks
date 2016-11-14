@@ -13,7 +13,8 @@ enum class EReasonForGoingToCamp : uint8
 {
 	RGC_Capturing UMETA(DisplayName = "CapturingCamp"),
 	RGC_Recruiting UMETA(DisplayName = "RecruitingCamp"),
-	RGC_DefendingCamp UMETA(DisplayName = "DefendingCamp")
+	RGC_DefendingCamp UMETA(DisplayName = "DefendingCamp"),
+	RGC_GoingForWin	UMETA(DisplayName ="GoingForWin")
 
 };
 

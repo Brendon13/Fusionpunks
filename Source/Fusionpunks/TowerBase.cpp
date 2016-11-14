@@ -95,4 +95,10 @@ float ATowerBase::GetHpPercent()
 {
 	return currHP / maxHP;
 }
-
+void ATowerBase::RemoveFromTargetList(AActor* enemy)
+{
+	if (enemyUnits.Contains(enemy))
+	{
+		enemyUnits.Remove(enemy);
+	}
+}

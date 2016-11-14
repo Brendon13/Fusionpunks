@@ -51,7 +51,11 @@ void UBTTask_ConfirmCreepCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("IsDefendingCamp", false);
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool("FoundNearbyEnemyCamp", false);
 		heroAICont->ResetAllCampsSafetyStatus();
+
+		//testing
+		heroAICont->ResetAllCampsRecruitStatus();
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 

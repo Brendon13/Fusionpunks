@@ -4,7 +4,7 @@
 #include "CreepCamp.h"
 #include "PlayerHud.h"
 #include "Creep.h"
-#include "DieselTower.h"
+#include "TowerBase.h"
 #include "HeroStats.h"
 #include "Base.h"
 #include "HeroAIController.h"
@@ -155,6 +155,22 @@ void AHeroBase::BeginPlay()
 		Abilities[3] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[3], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
 	//Abilities[4] = GetWorld()->SpawnActor<AAbilityBase>(AbilitiesClass[4], GetActorLocation(), FRotator::ZeroRotator, spawnParams);
 	
+
+	if (ActorHasTag("AI"))
+	{
+		TArray<AActor*> bases;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), enemyBaseClass, bases);
+
+		if (bases.Num() == 1)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Found Enemy Base!!!!"));
+			enemyBase = Cast<ABase>(bases[0]);
+			heroAI->LinkEnemyBaseProps(enemyBase);
+		}
+	}
+
+
+
 }
 
 // Called every frame
@@ -339,7 +355,7 @@ bool AHeroBase::CheckForNearbyEnemyHero()
 		GetActorLocation(),
 		FQuat(),
 		obejctQP,
-		FCollisionShape::MakeSphere(1300),
+		FCollisionShape::MakeSphere(1000),
 		QueryParameters);
 		
 	nearbyEnemyHero = nullptr;
@@ -352,6 +368,48 @@ bool AHeroBase::CheckForNearbyEnemyHero()
 	return nearbyEnemyHero != nullptr;
 }
 
+bool AHeroBase::CheckForNearbyEnemyTowers() 
+{
+	FCollisionObjectQueryParams objectQP;
+
+	objectQP.AddObjectTypesToQuery(DamageableStructures);
+	//Overlap multi by channel as a sphere (for pick ups?)
+	FCollisionQueryParams QueryParameters;
+	QueryParameters.AddIgnoredActor(this);
+	QueryParameters.OwnerTag = TEXT("Player");
+
+	TArray<FOverlapResult> Results;
+	GetWorld()->OverlapMultiByObjectType(Results,
+		GetActorLocation(),
+		FQuat(),
+		objectQP,
+		FCollisionShape::MakeSphere(1000.f),
+		QueryParameters);
+
+	nearbyEnemyTower = nullptr;
+
+	if (Results.Num() > 0)
+	{
+		for (int32 i = 0; i < Results.Num(); i++)
+		{
+
+			if (Results[i].GetActor()->IsA(ATowerBase::StaticClass()) )
+			{
+
+				if( (ActorHasTag("Cyber") && Results[i].Actor->ActorHasTag("Diesel")) 
+				|| (ActorHasTag("Diesel") && Results[i].Actor->ActorHasTag("Cyber")))
+					nearbyEnemyTower = Cast<ATowerBase>(Results[i].GetActor());
+
+			}
+		}
+
+	}
+
+	return nearbyEnemyTower != nullptr;
+}
+
+
+
 bool AHeroBase::CheckForNearbyInteractions()
 {
 	FCollisionObjectQueryParams obejctQP;
@@ -359,6 +417,7 @@ bool AHeroBase::CheckForNearbyInteractions()
 	obejctQP.AddObjectTypesToQuery(Hero);
 	obejctQP.AddObjectTypesToQuery(CreepCampTrigger);
 	obejctQP.AddObjectTypesToQuery(Creeps);
+	obejctQP.AddObjectTypesToQuery(DamageableStructures);
 	//Overlap multi by channel as a sphere (for pick ups?)
 	FCollisionQueryParams QueryParameters;
 	QueryParameters.AddIgnoredActor(this);
@@ -376,6 +435,7 @@ bool AHeroBase::CheckForNearbyInteractions()
 	nearbyOwnedCreepCamps.Empty();
 	nearbyEnemyHero = nullptr;
 	nearbyEnemyCamp = nullptr;
+	nearbyEnemyTower = nullptr;
 	if (Results.Num() > 0)
 	{
 		for (int32 i = 0; i < Results.Num(); i++)
@@ -384,25 +444,35 @@ bool AHeroBase::CheckForNearbyInteractions()
 			if (Results[i].GetActor()->IsA(AHeroBase::StaticClass()))
 			{
 				nearbyEnemyHero = Cast<AHeroBase>(Results[i].GetActor());
+				UE_LOG(LogTemp, Display, TEXT("FOUND NEARBY HERO"));
 			}
 					
 			else if (Results[i].GetActor()->IsA(ACreepCamp::StaticClass()))
 			{
 
 				ACreepCamp* currCamp = Cast<ACreepCamp>(Results[i].GetActor());
-				if (team.Compare("Diesel") == 0 && currCamp->GetCampType() == ECampType::CT_Diesel)
+				if (team.Compare("Diesel") == 0 && currCamp->GetCampType() == ECampType::CT_Diesel && !currCamp->HasBeenRecruitedFrom())
 				{
 					nearbyOwnedCreepCamps.Add(currCamp);
+					UE_LOG(LogTemp, Display, TEXT("FOUND NEARBY OWNED CAMP"));
 				}
 
-				else if (team.Compare("Cyber") == 0 && currCamp->GetCampType() == ECampType::CT_Cyber)
+				else if (team.Compare("Cyber") == 0 && currCamp->GetCampType() == ECampType::CT_Cyber && !currCamp->HasBeenRecruitedFrom())
 				{
 					nearbyOwnedCreepCamps.Add(currCamp);
+					UE_LOG(LogTemp, Display, TEXT("FOUND NEARBY OWNED CAMP"));
 				}
 
-				else
+				else if (team.Compare("Cyber") == 0 && currCamp->GetCampType() != ECampType::CT_Cyber)
 				{
 					nearbyEnemyCamp = currCamp;
+					UE_LOG(LogTemp, Display, TEXT("FOUND NEARBY ENEMY CAMP"));
+
+				}
+				else if (team.Compare("Diesel") == 0 && currCamp->GetCampType() != ECampType::CT_Diesel)
+				{
+					nearbyEnemyCamp = currCamp;
+					UE_LOG(LogTemp, Display, TEXT("FOUND NEARBY ENEMY CAMP"));
 				}
 			}
 
@@ -413,19 +483,32 @@ bool AHeroBase::CheckForNearbyInteractions()
 				if (team.Compare("Diesel") == 0 && !Results[i].GetActor()->ActorHasTag("Diesel"))
 				{
 					nearbyEnemyCreeps.Add(Cast<ACreep>(Results[i].GetActor()));
+					UE_LOG(LogTemp, Display, TEXT("FOUND NEARBY ENEMY CREEP"));
 				}
 
 				else if (team.Compare("Cyber") == 0 && !Results[i].GetActor()->ActorHasTag("Cyber"))
 				{
 					nearbyEnemyCreeps.Add(Cast<ACreep>(Results[i].GetActor()));
+					UE_LOG(LogTemp, Display, TEXT("FOUND NEARBY ENEMY CREEP"));
 				}
 			}
 
+			else if (Results[i].GetActor()->IsA(ATowerBase::StaticClass()))
+			{
+
+				if ((ActorHasTag("Cyber") && Results[i].Actor->ActorHasTag("Diesel"))
+					|| (ActorHasTag("Diesel") && Results[i].Actor->ActorHasTag("Cyber")))
+				{
+					nearbyEnemyTower = Cast<ATowerBase>(Results[i].GetActor());
+					UE_LOG(LogTemp, Display, TEXT("FOUND NEARBY ENEMY TOWER"));
+				}
+
+			}
 
 		}
 
 	}
-	return nearbyOwnedCreepCamps.Num() > 0 || nearbyEnemyHero != nullptr  || nearbyEnemyCreeps.Num() > 0 || nearbyEnemyCamp != nullptr;
+	return nearbyOwnedCreepCamps.Num() > 0 || nearbyEnemyHero != nullptr  || nearbyEnemyCreeps.Num() > 0 || nearbyEnemyCamp != nullptr || nearbyEnemyTower != nullptr;
 }
 
 bool AHeroBase::CheckForNearbyOnwedCreepCamps()
@@ -633,9 +716,9 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 
 	if (currentHealth <= 0 && !bIsRespawning)
 	{
-		if (DamageCauser->IsA(ADieselTower::StaticClass()))
+		if (DamageCauser->IsA(ATowerBase::StaticClass()))
 		{
-			Cast<ADieselTower>(DamageCauser)->RemoveFromTargetList(this);
+			Cast<ATowerBase>(DamageCauser)->RemoveFromTargetList(this);
 		}
 
 		AHeroBase* hero = Cast<AHeroBase>(DamageCauser);

@@ -103,10 +103,3 @@ AProjectile* ADieselTower::SpawnProjectile()
 	return NULL;
 }
 
-void ADieselTower::RemoveFromTargetList(AActor* enemy)
-{
-	if (enemyUnits.Contains(enemy))
-	{
-		enemyUnits.Remove(enemy);
-	}
-}

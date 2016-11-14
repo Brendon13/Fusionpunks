@@ -3,6 +3,7 @@
 #include "Fusionpunks.h"
 #include "HeroBase.h"
 #include "CreepCamp.h"
+#include "Base.h"
 #include "HealingWell.h"
 #include "HeroAIController.h"
 
@@ -51,6 +52,7 @@ void AHeroAIController::BeginPlay()
 	
 	
 	TArray<AActor*> healingWells;
+
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), baseClass,healingWells );
 	if (healingWells.Num() > 0)
 	{
@@ -66,6 +68,7 @@ void AHeroAIController::BeginPlay()
 	BlackboardComponent->SetValueAsBool("IsDefendingCamp", false);
 	BlackboardComponent->SetValueAsBool("FoundNearbyEnemyCamp", false);
 	BlackboardComponent->SetValueAsBool("ShouldRecruit", false);
+	BlackboardComponent->SetValueAsBool("GoingForWin", false);
 	hero = Cast<AHeroBase>(GetPawn());
 	
 }
@@ -74,6 +77,7 @@ void AHeroAIController::RestartHeroAITree()
 {
 	
 	BehaviorTreeComponent->RestartTree();
+	BlackboardComponent->SetValueAsBool("GoingForWin", false);
 }
 
 void AHeroAIController::ResetAITreeTaskStatus() 
@@ -81,6 +85,8 @@ void AHeroAIController::ResetAITreeTaskStatus()
 	BlackboardComponent->SetValueAsBool("ReachedCamp", false);
 	BlackboardComponent->SetValueAsBool("CapturedCamp", true);
 	BlackboardComponent->SetValueAsBool("IsDefendingCamp", false);
+	BlackboardComponent->SetValueAsBool("FoundNearbyEnemyCamp", false);
+	BlackboardComponent->SetValueAsBool("ShouldRecruit", false);
 	ResetAllCampsRecruitStatus();
 	ResetAllCampsSafetyStatus();
 }
@@ -169,4 +175,10 @@ bool AHeroAIController::CheckCampBeingAttacked()
 	}
 	//no owned camps
 	return false;
+}
+
+void AHeroAIController::LinkEnemyBaseProps(ABase* base) 
+{
+	enemyBase = base;
+	BlackboardComponent->SetValueAsObject("EnemyBase", Cast<AActor>(base));
 }

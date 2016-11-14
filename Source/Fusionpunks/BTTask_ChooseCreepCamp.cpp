@@ -8,8 +8,10 @@
 EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
+	AHeroAIController* heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
+	//UE_LOG(LogTemp, Error, TEXT("CHOOSING CAMP"));
+	
 
-	UE_LOG(LogTemp, Error, TEXT("CHOOSING CAMP"));
 	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
 	{
 		//UE_LOG(LogTemp, Error, TEXT("Already Reached Camp..Skip Choose!"));
@@ -24,6 +26,11 @@ EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent&
 		return EBTNodeResult::Succeeded;
 	}
 	
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("GoingForWin") || heroAI->GetNumOwnedCamps() == 5)
+	{
+		//UE_LOG(LogTemp, Error, TEXT("Going for win..Skip Choose!"));
+		return EBTNodeResult::Succeeded;
+	}
 
 	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp"))
 	{	
@@ -34,7 +41,6 @@ EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent&
 
 
 
-	AHeroAIController* heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());	
 	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("CapturedCamp"))
 	{	
 		//CAMP HAS ALREADY BEEN CAPTURED SO CHOOSE NEW CAMP
@@ -83,6 +89,8 @@ EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent&
 			{
 				//CANT FIND CREEP CAMPS
 				//UE_LOG(LogTemp, Error, TEXT("CANT FIND CREEP CAMPS!"));
+
+
 				return EBTNodeResult::Failed;
 			}
 

@@ -14,6 +14,6 @@ void ALightningTowerDamage::ApplyEffect()
 {
 	UE_LOG(LogTemp, Log, TEXT("TOWER DAMAGE!"));
 	FDamageEvent DamageEvent;
-	float damage = effectTarget->TakeDamage(Cast<ACyberTower>(GetOwner())-> damage, DamageEvent,NULL,this);
+	float damage = effectTarget->TakeDamage(Cast<ACyberTower>(GetOwner())-> damage, DamageEvent,NULL, GetOwner());
 }
 

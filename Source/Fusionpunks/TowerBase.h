@@ -23,6 +23,7 @@ public:
 		AActor * DamageCauser
 	) override;
 	
+	void RemoveFromTargetList(AActor* enemy);
 
 	float GetHpPercent();
 
@@ -62,10 +63,15 @@ protected:
 
 	TArray<AActor*> enemyUnits;
 
+	class AHeroBase* enemyHero = nullptr;
+	class ACreep* enemyCreep = nullptr;
+
 	UPROPERTY(EditDefaultsOnly)
 		float maxHP = 100;
 
 	float currHP;
+
+
 
 
 	UPROPERTY(EditDefaultsOnly)

@@ -43,23 +43,27 @@ EBTNodeResult::Type UBTTask_ChooseRecruitCamp::ExecuteTask(UBehaviorTreeComponen
 
 	else if (currSituation == ESituation::SE_NearbyCamp)
 	{
+	
+
 		if (hero->CheckForNearbyOnwedCreepCamps())
 		{
 			TArray<ACreepCamp*> ownedCreepCamps = hero->GetNearbyOwnedCreepCamps();
 			for (int32 i = 0; i < ownedCreepCamps.Num(); i++)
 			{
-				if (!ownedCreepCamps[i]->HasBeenRecruitedFrom() && ownedCreepCamps[i]->GetNumOfCreepsAtCamp() - allowedNumCreepsLeftAtCamp > 0)
+				if (ownedCreepCamps[i]->GetNumOfCreepsAtCamp() - allowedNumCreepsLeftAtCamp > 0)
 				{
 					OwnerComp.GetBlackboardComponent()->SetValueAsInt("NumCreepsToRecruit",
 						ownedCreepCamps[i]->GetNumOfCreepsAtCamp() - allowedNumCreepsLeftAtCamp);
 					OwnerComp.GetBlackboardComponent()->SetValueAsObject("RecruitCamp", ownedCreepCamps[i]);
-					
+					UE_LOG(LogTemp, Error, TEXT("Enough Creeps To Recruit From... Num Creeps at Camp %d, in Army %d"), ownedCreepCamps[i]->GetNumOfCreepsAtCamp(), hero->GetArmySize());
 					return EBTNodeResult::Succeeded;
 				}
 
 			}
+			return EBTNodeResult::Failed;
 
 		}
+		return EBTNodeResult::Failed;
 	}
 
 
