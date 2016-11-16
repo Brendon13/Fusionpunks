@@ -85,6 +85,7 @@ void UCreepFormation::TickComponent( float DeltaTime, ELevelTick TickType, FActo
 void UCreepFormation::CalculateSlotPositions(int ArmySize)
 {
 	int armySize = ArmySize;
+	//CRASH HAPPENED ONCE SO FAR HERE!!
 
 	if (armySize < slotArray.Num())
 	{

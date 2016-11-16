@@ -100,7 +100,7 @@ public:
 
 	
 
-
+	void LinkEnemyBaseProps(class ABase* base);
 
 	//virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn) override;
 
@@ -112,7 +112,9 @@ public:
 	void ResetAllCampsRecruitStatus();
 	void RestartHeroAITree();
 	bool CheckCampBeingAttacked();
+	bool SafetyCheck(class ACreepCamp*);
 	FORCEINLINE class ACreepCamp* GetCampBeingAttacked() const  { return campBeingAttacked; }
+	FORCEINLINE int32 GetNumOwnedCamps() { return GetSortedOwnedCampList().Num(); }
 	
 protected:
 
@@ -120,7 +122,7 @@ protected:
 
 	class AHeroBase* enemyHero;
 
-
+	class ABase* enemyBase;
 
 	class ACreepCamp* campBeingAttacked;
 

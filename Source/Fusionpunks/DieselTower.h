@@ -15,6 +15,7 @@ public:
 	// Sets default values for this actor's properties
 	ADieselTower();
 
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
@@ -22,11 +23,15 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 	
 	class AProjectile* SpawnProjectile();
+
+	FORCEINLINE void PauseAttackTimer() { towerDMG->PauseTimer(); }
 private:
 	
 
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
 		TSubclassOf<class AProjectile> whatToSpawn;
+
+	
 
 	AProjectile* currProjectile;
 	class AProjectileTowerDamage* towerDMG;

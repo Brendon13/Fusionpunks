@@ -47,6 +47,20 @@ EBTNodeResult::Type UBTTask_FindNearbyEnemy::ExecuteTask(UBehaviorTreeComponent&
 			return EBTNodeResult::Failed;
 
 		}
+
+		else if (enemyType == ETargetEnemyType::TE_Tower)
+		{
+			if (hero->CheckForNearbyEnemyTowers())
+			{
+				UE_LOG(LogTemp, Error, TEXT("Found Enemy Tower Target"));
+				OwnerComp.GetBlackboardComponent()->SetValueAsObject("AttackTarget", Cast<AActor>(hero->GetNearbyEnemyTower()));
+				return EBTNodeResult::Succeeded;
+			}
+			return EBTNodeResult::Failed;
+		}
+
+
+
 		UE_LOG(LogTemp, Error, TEXT("werid shit happenin"));
 		return EBTNodeResult::Failed;
 	}

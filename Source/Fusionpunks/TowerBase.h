@@ -23,8 +23,11 @@ public:
 		AActor * DamageCauser
 	) override;
 	
+	void RemoveFromTargetList(AActor* enemy);
 
 	float GetHpPercent();
+
+	FORCEINLINE void SetIsDealingDamage(bool status) { bIsDealingDMG = status; }
 
 	UPROPERTY(EditDefaultsOnly, Category = Damage)
 		float damage;
@@ -62,10 +65,14 @@ protected:
 
 	TArray<AActor*> enemyUnits;
 
+	
+
 	UPROPERTY(EditDefaultsOnly)
 		float maxHP = 100;
 
 	float currHP;
+
+
 
 
 	UPROPERTY(EditDefaultsOnly)
@@ -75,6 +82,7 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = Damage)
 		float damageEverySeconds;
+
 
 
 	bool bIsDealingDMG = false;

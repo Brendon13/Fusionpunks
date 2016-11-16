@@ -44,7 +44,7 @@ void UBTTask_RecruitCreeps::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 	{
 		UE_LOG(LogTemp, Error, TEXT("Finished Recruiting!"));
 		heroAI->ResetAITreeTaskStatus();
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 
 	

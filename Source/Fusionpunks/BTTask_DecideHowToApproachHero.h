@@ -15,7 +15,7 @@ enum class EApproachStatus : uint8
 	AS_DefendingCamp UMETA(DisplayName = "DefendingCamp"),
 	AS_AgressiveChase UMETA(DisplayName = "AgressiveChase"),
 	AS_EscapingToBase UMETA(DisplayName = "EscapingToBase"),
-	AS_EscapingToNextCamp UMETA(DisplayName = "EscapingToNextCamp")
+	AS_EscapingToRecruitCreeps UMETA(DisplayName = "EscapingToNextCamp")
 };
 
 
@@ -29,10 +29,12 @@ class FUSIONPUNKS_API UBTTask_DecideHowToApproachHero : public UBTTaskNode
 	class AHeroBase* hero;
 	class HeroStats* heroStats;
 	class AHeroBase* attackTarget;
+	class ACreep* enemyCreep;
 	class ACreepCamp* campTarget;
 	class AHeroAIController* heroAI;
 	ECampType teamCampType;
 	AActor* healingWell;
+
 	UPROPERTY(EditAnywhere)
 		EApproachStatus approachStatus;
 	UPROPERTY(EditAnywhere)

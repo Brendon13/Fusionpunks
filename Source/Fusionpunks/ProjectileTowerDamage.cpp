@@ -30,3 +30,17 @@ void AProjectileTowerDamage::ApplyEffect()
 
 	//float damage = attackTarget->TakeDamage(20f, DamageEvent, NULL, this);
 }
+void AProjectileTowerDamage::PauseTimer()
+{
+	GetWorld()->GetTimerManager().PauseTimer(applyEffectHandle);
+}
+
+bool AProjectileTowerDamage::IsPaused()
+{
+	return GetWorld()->GetTimerManager().IsTimerPaused(applyEffectHandle);
+}
+void AProjectileTowerDamage::UnPauseTimer(AActor* newTarget)
+{
+	 effectTarget = newTarget;
+	 GetWorld()->GetTimerManager().UnPauseTimer(applyEffectHandle);
+}

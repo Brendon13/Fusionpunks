@@ -34,7 +34,7 @@ void ADieselTower::TriggerExit(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		if (IsValid(towerDMG))
 		{
-			towerDMG->StopTimer();
+			towerDMG->PauseTimer();
 		}
 		
 		bIsDealingDMG = false;
@@ -54,10 +54,17 @@ void ADieselTower::Tick( float DeltaTime )
 	{
 		if (enemyUnits[0]->IsA(ACharacter::StaticClass()))
 		{
-			UE_LOG(LogTemp, Log, TEXT("Attacking Player!"));
+			//UE_LOG(LogTemp, Log, TEXT("Attacking Player!"));
 			if (!bIsDealingDMG)
 			{
-				towerDMG->StartTimer(damageEverySeconds, enemyUnits[0]);
+				if (towerDMG->IsPaused())
+				{
+					towerDMG->UnPauseTimer(enemyUnits[0]);
+				}
+				else
+				{
+					towerDMG->StartTimer(damageEverySeconds, enemyUnits[0]);
+				}
 				bIsDealingDMG = true;
 			}
 		}
@@ -66,7 +73,7 @@ void ADieselTower::Tick( float DeltaTime )
 	{
 		if (bIsDealingDMG)
 		{
-			towerDMG->StopTimer();
+			towerDMG->PauseTimer();
 			bIsDealingDMG = false;
 		}
 	}

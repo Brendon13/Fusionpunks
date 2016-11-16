@@ -7,6 +7,7 @@
 #include "FloatingDamageWidget.h"
 #include "CreepAIController.h"
 #include "HeroBase.h"
+#include "TowerBase.h"
 #include "Creep.h"
 
 
@@ -196,6 +197,7 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 		}
 
 	}
+
 	currentHealth -= Damage;
 
 	if (Damage < 10000000 && !DamageCauser->ActorHasTag("AI") && !DamageCauser->ActorHasTag("Creep") && FloatingDamageWidgetClass)
@@ -209,6 +211,7 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 	
 	if (currentHealth <= 0)
 	{
+		
 		bIsDead = true; 
 		GetCapsuleComponent()->bGenerateOverlapEvents = false; 
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

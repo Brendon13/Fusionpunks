@@ -12,8 +12,9 @@ UENUM(BlueprintType)		//"BlueprintType" is essential to include
 enum class ESituation : uint8
 {
 	SE_CapturingUnsafeCamp UMETA(DisplayName = "CapturingUnsafeCamp"),
-	SE_EngagingEnemyHero UMETA(DisplayName = "JustCause"),
-	SE_NearbyCamp UMETA(DisplayName = "NearbyCamp")
+	SE_EngagingEnemyHero UMETA(DisplayName = "EngageUnsafeEnemy"),
+	SE_NearbyCamp UMETA(DisplayName = "NearbyCamp"),
+	SE_AfterCapturing UMETA(DisplayName = "AfterCapturing")
 };
 
 UCLASS()
@@ -31,7 +32,7 @@ class FUSIONPUNKS_API UBTTask_ChooseRecruitCamp : public UBTTaskNode
 	UPROPERTY(EditAnywhere, Category = RecruitConditions)
 		ESituation currSituation;
 
-
+	class ACreepCamp* nextCaptureObjective;
 		
 
 };

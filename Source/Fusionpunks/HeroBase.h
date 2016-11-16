@@ -97,6 +97,10 @@ protected:
 
 //editable stats in blueprint
 protected:
+
+	//UPROPERTY(EditDefaultsOnly, Category = NavMod)
+	//	class UNavModifierComponent* navModComp;
+
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 		float maxHealth;
 
@@ -152,6 +156,8 @@ public:
 	FVector startingLocation;
 	bool bIsRespawning = false;
 
+	//AI HERO STUFFS
+
 	FORCEINLINE bool IsRespawning() const { return bIsRespawning; }
 	FORCEINLINE int32 GetArmySize() const { return CreepArmy.Num(); }
 	FORCEINLINE float GetRespawnTime() const { return respawnTime; }
@@ -163,17 +169,31 @@ public:
 	FORCEINLINE bool IsCapturing() const { return isCapturing; }
 	FORCEINLINE  ACreepCamp* GetCampBeingCaptured() const { return campBeingCaptured; }
 	FORCEINLINE void SetInsideHealingWell(bool status) {bInsideHealingWell = status;}
-	FORCEINLINE bool InsideHealingWell() {return bInsideHealingWell;}
-	
+	FORCEINLINE bool InsideHealingWell() const {return bInsideHealingWell;}
+	FORCEINLINE bool IsCreepAttacking() const { return bCreepIsAttacking; }
+	FORCEINLINE bool IsHeroAttacking() const { return bHeroIsAttacking; }
+	FORCEINLINE void SetCreepAttacking(bool status) {  bCreepIsAttacking = status; }
+	FORCEINLINE void SetHeroAttacking(bool status)  { bHeroIsAttacking = status; }
+	FORCEINLINE class ACreep* GetAttackingCreep() const { return attackingCreep; }
+	FORCEINLINE class ABase* GetEnemyBase() const { return enemyBase; }
 	void AddToCapturedCamps(class ACreepCamp* camp);
 	void RemoveFromCapturedCamps(class ACreepCamp* camp);
 	void UpdateHeroStats();
 	void SetIsCapturing(bool status, class ACreepCamp* camp);
+	
+
 protected:
+	//AI HERO STUFFS
 	class ACreepCamp* campBeingCaptured;
 
 	UPROPERTY(EditDefaultsOnly, Category = Respawn)
 		TSubclassOf<class ARespawnOverTime> respawnClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = EnemyBase)
+		TSubclassOf<class ABase> enemyBaseClass;
+
+	class ABase* enemyBase;
+
 
 	class ARespawnOverTime* respawnEffect;
 
@@ -187,6 +207,11 @@ protected:
 	class AHeroAIController* heroAI;
 	
 	bool isCapturing = false;
+
+	bool bCreepIsAttacking = false;
+	bool bHeroIsAttacking = false;
+
+	class ACreep* attackingCreep = nullptr;
 
 
 protected:
@@ -227,14 +252,22 @@ public:
 	bool CheckForNearbyEnemyHero();
 	bool CheckForNearbyOnwedCreepCamps();
  	bool CheckForNearbyInteractions();
+	bool CheckForNearbyEnemyTowers();
+	bool CheckForNearbyCreepsInArmy();
+	class ACreep* GetClosestEnemyCreep();
 	FORCEINLINE TArray<class ACreep*> GetNearbyEnemyCreeps() const { return nearbyEnemyCreeps; }
 	FORCEINLINE AHeroBase* GetNearbyEnemyHero() const { return nearbyEnemyHero; }
 	FORCEINLINE TArray<class ACreepCamp*> GetNearbyOwnedCreepCamps() const { return nearbyOwnedCreepCamps; }
+	FORCEINLINE class ACreepCamp* GetNearbyEnemyCamp() const { return nearbyEnemyCamp; }
+	FORCEINLINE class ATowerBase* GetNearbyEnemyTower() const { return nearbyEnemyTower; }
 private:
 	//AIHERO
 	TArray<class ACreep*> nearbyEnemyCreeps;
 	AHeroBase* nearbyEnemyHero;
 	TArray<class ACreepCamp*> nearbyOwnedCreepCamps;
+	class ACreepCamp* nearbyEnemyCamp;
+	class ATowerBase* nearbyEnemyTower;
+	TArray<class ACreep*> nearbyCreepsInArmy;
 
 public:
 	TArray<ACreep*> AHeroBase::GetCreepArmyArray();
@@ -273,6 +306,8 @@ protected:
 	TArray<AAbilityBase*> Abilities;
 
 	const int8 NUMBEROFABILITIES = 5;
+
+
 
 public:
 	FORCEINLINE AAbilityBase* GetAbility(int i) const { return (Abilities.Num() >= i ? Abilities[i] : nullptr); }

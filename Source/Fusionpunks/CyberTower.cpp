@@ -2,6 +2,8 @@
 
 #include "Fusionpunks.h"
 #include "LightningTowerDamage.h"
+#include "HeroBase.h"
+#include "Creep.h"
 #include "CyberTower.h"
 
 
@@ -21,7 +23,7 @@ void ACyberTower::BeginPlay()
 	beam->bAutoActivate = false;
 	beam->SecondsBeforeInactive = 0;
 	sourceLocation = GetActorLocation();
-	sourceLocation.Z += 200;
+	sourceLocation.Z += 500;
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = Instigator;
@@ -71,7 +73,7 @@ void ACyberTower::Tick(float DeltaTime)
 			{
 				towerDMG->StartTimer(damageEverySeconds, enemyUnits[0]);
 				bIsDealingDMG = true;
-			}
+			}			
 		}
 	}
 

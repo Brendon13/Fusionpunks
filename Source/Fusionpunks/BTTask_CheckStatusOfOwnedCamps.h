@@ -20,7 +20,7 @@ class FUSIONPUNKS_API UBTTask_CheckStatusOfOwnedCamps : public UBTTaskNode
 	class ACreepCamp *campBeingAttacked, *otherCampObjective;
 
 	UPROPERTY(EditAnywhere)
-		int32 numCreepsAlwaysDefend =10;
+		int32 numCreepsAlwaysDefend =5;
 	UPROPERTY(EditAnywhere)
 		float ignoreDefendPercentage = 0.6f;
 	

@@ -2,6 +2,8 @@
 
 #include "Fusionpunks.h"
 #include "HeroBase.h"
+#include "Creep.h"
+#include "DieselTower.h"
 #include "Projectile.h"
 
 
@@ -26,6 +28,8 @@ AProjectile::AProjectile()
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+	owningTower = Cast<ADieselTower>(GetOwner());
+	damage = owningTower->damage;
 	
 }
 
@@ -38,12 +42,79 @@ void AProjectile::SetDamage(float amount)
 void AProjectile::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	if (enemyPlayer) 
+		
+	deathTimer += DeltaTime;
+	if (deathTimer >= 2.5f) 
 	{
-		FVector direction = (enemyPlayer->GetActorLocation() - GetActorLocation() ).GetSafeNormal();
-		FVector newPos = GetActorLocation() + (direction * DeltaTime*750);
-		SetActorLocation(newPos);
+		Destroy();
 	}
+
+	if (enemyType == ETypeOfEnemy::TE_Hero)
+	{
+		if (enemyHero != nullptr)
+		{
+			if (!enemyHero->bIsRespawning || enemyHero->GetPlayerHealthAsDecimal() > 0 )
+			{
+				FVector direction = (enemyHero->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+				FVector newPos = GetActorLocation() + (direction * DeltaTime * 1000);
+				SetActorLocation(newPos);
+			}
+
+			else 
+			{
+				Destroy();
+				owningTower->PauseAttackTimer();
+				owningTower->RemoveFromTargetList(enemyHero);
+				owningTower->SetIsDealingDamage(false);
+				
+			}
+
+
+		}
+
+		else 
+		{
+
+			Destroy();
+			owningTower->PauseAttackTimer();
+			owningTower->RemoveFromTargetList(enemyHero);
+			owningTower->SetIsDealingDamage(false);
+		}
+	}
+
+
+
+	else if (enemyType == ETypeOfEnemy::TE_Creep)
+	{
+		if (enemyCreep != nullptr)
+		{
+			if (enemyCreep->GetHealthAsDecimal() > 0 || !enemyCreep->GetBIsDead())
+			{
+				FVector direction = (enemyCreep->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+				FVector newPos = GetActorLocation() + (direction * DeltaTime * 1000);
+				SetActorLocation(newPos);
+			}
+
+			else
+			{
+				Destroy();
+				owningTower->PauseAttackTimer();
+				owningTower->RemoveFromTargetList(enemyCreep);
+				owningTower->SetIsDealingDamage(false);
+			}
+
+
+		}
+
+		else
+		{
+			Destroy();
+			owningTower->PauseAttackTimer();
+			owningTower->RemoveFromTargetList(enemyCreep);
+			owningTower->SetIsDealingDamage(false);
+		}
+	}
+
 
 	
 
@@ -51,18 +122,42 @@ void AProjectile::Tick( float DeltaTime )
 
 void AProjectile::SetTarget(class AActor* OtherActor)
 {
-	enemyPlayer = OtherActor;
+
+	enemyCreep = nullptr;
+	enemyHero = nullptr;
+	if (OtherActor == nullptr || OtherActor->IsActorBeingDestroyed()) {
+		Destroy();
+	}
+	else if (OtherActor->IsA(AHeroBase::StaticClass()))
+	{
+		enemyHero = Cast<AHeroBase>(OtherActor);
+		enemyType = ETypeOfEnemy::TE_Hero;
+	}
+
+	else if (OtherActor->IsA(ACreep::StaticClass()))
+	{
+		enemyCreep = Cast<ACreep>(OtherActor);
+		enemyType = ETypeOfEnemy::TE_Creep;
+	}
+	
+	
+	
+	//enemyPlayer = OtherActor;
+
+
+
 }
 
 void AProjectile::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-	if (OtherActor->IsA(AHeroBase::StaticClass()))
+	if (OtherActor->IsA(ACharacter::StaticClass()))
 	{
 		FDamageEvent DamageEvent;
-
-		float damageTaken = OtherActor->TakeDamage(damage, DamageEvent, NULL, this);
-		
-		Destroy();
+		if (damage > 0) 
+		{
+			float damageTaken = OtherActor->TakeDamage(damage, DamageEvent, NULL, owningTower);
+			Destroy();
+		}
 		
 	}
 }

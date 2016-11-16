@@ -20,8 +20,9 @@ protected:
 	UFUNCTION()
 		virtual	void ApplyEffect() override;
 
-
-
+	class AHeroBase* enemyHero = nullptr;
+	class ACreep* enemyCreep = nullptr;
+	class ACyberTower* towerOwner;
 	
 
 	

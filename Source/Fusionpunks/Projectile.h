@@ -5,6 +5,17 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
+
+UENUM(BlueprintType)		//"BlueprintType" is essential to include
+enum class ETypeOfEnemy : uint8
+{
+	TE_Creep UMETA(DisplayName = "Creep"),
+	TE_Hero UMETA(DisplayName = "Hero"),
+	TE_NoTarget UMETA(DisplayName = "NoTaget")
+	
+};
+
+
 UCLASS()
 class FUSIONPUNKS_API AProjectile : public AActor
 {
@@ -27,9 +38,14 @@ public:
 protected:
 	FVector target;
 	
-	class AActor* enemyPlayer;
+	ETypeOfEnemy enemyType = ETypeOfEnemy::TE_NoTarget;
 
+	class ACreep* enemyCreep;
+	class AHeroBase*  enemyHero;
+	class ADieselTower* owningTower;
 	float damage;
+	float deathTimer = 0;
+
 
 	UPROPERTY(EditAnywhere)
 		UShapeComponent* sphereShape;

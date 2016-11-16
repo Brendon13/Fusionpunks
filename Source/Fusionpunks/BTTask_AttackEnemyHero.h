@@ -8,6 +8,18 @@
 /**
  * 
  */
+
+UENUM(BlueprintType)		//"BlueprintType" is essential to include
+enum class ETargetType : uint8
+{
+	TT_Hero UMETA(DisplayName = "Hero"),
+	TT_Creep UMETA(DisplayName = "Creep"),
+	TT_Tower UMETA(DisplayName = "Tower"),
+	TT_None UMETA(DisplayName = "None")
+
+};
+
+
 UCLASS()
 class FUSIONPUNKS_API UBTTask_AttackEnemyHero : public UBTTaskNode
 {
@@ -21,15 +33,23 @@ protected:
 	class HeroStats* heroStats;
 	bool hasTarget = false;
 	bool isAttacking = false;
-	class AHeroBase* target;
+	class AHeroBase* enemyHero;
+	class ACreep* enemyCreep;
+	class ATowerBase* enemyTower;
 	FTimerHandle attackTimerHandle;
+
 	UPROPERTY(EditAnywhere)
 		float attackSpeed = 0.35f;
 	UPROPERTY(EditAnywhere)
 		float healthPercentageAbort= 0.15f;
 	UFUNCTION()
-		void AttackOnTimer();
+		void AttackHeroOnTimer();
+	UFUNCTION()
+		void AttackCreepOnTimer();
+	UFUNCTION()
+		void AttackTowerOnTimer();
 	
+	ETargetType targetType = ETargetType::TT_None;
 	
 	
 };
