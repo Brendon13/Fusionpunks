@@ -8,7 +8,7 @@
 EBTNodeResult::Type UBTTask_ApproachTower::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
-
+	
 	hero = Cast<AHeroBase>(OwnerComp.GetAIOwner()->GetPawn());
 	heroAI = Cast<AHeroAIController>(OwnerComp.GetAIOwner());
 	if (hero != nullptr && heroAI != nullptr)
@@ -33,13 +33,14 @@ void UBTTask_ApproachTower::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
 
-	if (hero->GetDistanceTo(attackTarget) > 400)
+	
+	if (hero->GetDistanceTo(attackTarget) > 500.0f)
 	{
-		OwnerComp.GetAIOwner()->MoveToActor(attackTarget, 300, true, true, false);
+		OwnerComp.GetAIOwner()->MoveToActor(attackTarget, 300.0f, false, true, false);
 	}
 	else
 	{
-		//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF ENEMY HERO"));
+		UE_LOG(LogTemp, Error, TEXT("IN RANGE OF ENEMY TOWER"));
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

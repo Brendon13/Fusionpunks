@@ -29,6 +29,7 @@ void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 	owningTower = Cast<ADieselTower>(GetOwner());
+	damage = owningTower->damage;
 	
 }
 
@@ -42,6 +43,11 @@ void AProjectile::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 		
+	deathTimer += DeltaTime;
+	if (deathTimer >= 2.5f) 
+	{
+		Destroy();
+	}
 
 	if (enemyType == ETypeOfEnemy::TE_Hero)
 	{
@@ -57,6 +63,10 @@ void AProjectile::Tick( float DeltaTime )
 			else 
 			{
 				Destroy();
+				owningTower->PauseAttackTimer();
+				owningTower->RemoveFromTargetList(enemyHero);
+				owningTower->SetIsDealingDamage(false);
+				
 			}
 
 
@@ -64,7 +74,11 @@ void AProjectile::Tick( float DeltaTime )
 
 		else 
 		{
+
 			Destroy();
+			owningTower->PauseAttackTimer();
+			owningTower->RemoveFromTargetList(enemyHero);
+			owningTower->SetIsDealingDamage(false);
 		}
 	}
 
@@ -84,6 +98,9 @@ void AProjectile::Tick( float DeltaTime )
 			else
 			{
 				Destroy();
+				owningTower->PauseAttackTimer();
+				owningTower->RemoveFromTargetList(enemyCreep);
+				owningTower->SetIsDealingDamage(false);
 			}
 
 
@@ -92,6 +109,9 @@ void AProjectile::Tick( float DeltaTime )
 		else
 		{
 			Destroy();
+			owningTower->PauseAttackTimer();
+			owningTower->RemoveFromTargetList(enemyCreep);
+			owningTower->SetIsDealingDamage(false);
 		}
 	}
 
@@ -133,10 +153,11 @@ void AProjectile::TriggerEnter(class UPrimitiveComponent* ThisComp, class AActor
 	if (OtherActor->IsA(ACharacter::StaticClass()))
 	{
 		FDamageEvent DamageEvent;
-
-		float damageTaken = OtherActor->TakeDamage(damage, DamageEvent, NULL, owningTower);
-		
-		Destroy();
+		if (damage > 0) 
+		{
+			float damageTaken = OtherActor->TakeDamage(damage, DamageEvent, NULL, owningTower);
+			Destroy();
+		}
 		
 	}
 }

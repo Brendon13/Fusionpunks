@@ -26,7 +26,7 @@ EBTNodeResult::Type UBTTask_ChooseCreepCamp::ExecuteTask(UBehaviorTreeComponent&
 		return EBTNodeResult::Succeeded;
 	}
 	
-	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("GoingForWin") || heroAI->GetNumOwnedCamps() == 5)
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("GoingForWin"))
 	{
 		//UE_LOG(LogTemp, Error, TEXT("Going for win..Skip Choose!"));
 		return EBTNodeResult::Succeeded;

@@ -44,6 +44,8 @@ protected:
 	class AHeroBase*  enemyHero;
 	class ADieselTower* owningTower;
 	float damage;
+	float deathTimer = 0;
+
 
 	UPROPERTY(EditAnywhere)
 		UShapeComponent* sphereShape;

@@ -253,6 +253,8 @@ public:
 	bool CheckForNearbyOnwedCreepCamps();
  	bool CheckForNearbyInteractions();
 	bool CheckForNearbyEnemyTowers();
+	bool CheckForNearbyCreepsInArmy();
+	class ACreep* GetClosestEnemyCreep();
 	FORCEINLINE TArray<class ACreep*> GetNearbyEnemyCreeps() const { return nearbyEnemyCreeps; }
 	FORCEINLINE AHeroBase* GetNearbyEnemyHero() const { return nearbyEnemyHero; }
 	FORCEINLINE TArray<class ACreepCamp*> GetNearbyOwnedCreepCamps() const { return nearbyOwnedCreepCamps; }
@@ -265,6 +267,7 @@ private:
 	TArray<class ACreepCamp*> nearbyOwnedCreepCamps;
 	class ACreepCamp* nearbyEnemyCamp;
 	class ATowerBase* nearbyEnemyTower;
+	TArray<class ACreep*> nearbyCreepsInArmy;
 
 public:
 	TArray<ACreep*> AHeroBase::GetCreepArmyArray();

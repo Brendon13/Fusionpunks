@@ -37,5 +37,6 @@ protected:
 		EReasonForGoingToCamp campGoal;
 	UPROPERTY(EditAnywhere)
 		float healthPercentageAbort = 0.2f;
-	
+	UPROPERTY(EditAnywhere)
+		int32 creepDifferenceAllowed = 3;
 };

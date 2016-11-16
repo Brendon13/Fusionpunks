@@ -17,7 +17,7 @@ public:
 	virtual void StartTimer(float time, AActor* Target) override;
 	void PauseTimer();
 	bool IsPaused();
-	void UnPauseTimer();
+	void UnPauseTimer(AActor* newTarget);
 protected:	
 	UFUNCTION()
 		virtual	void ApplyEffect() override;

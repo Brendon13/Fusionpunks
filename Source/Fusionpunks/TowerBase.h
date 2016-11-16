@@ -27,6 +27,8 @@ public:
 
 	float GetHpPercent();
 
+	FORCEINLINE void SetIsDealingDamage(bool status) { bIsDealingDMG = status; }
+
 	UPROPERTY(EditDefaultsOnly, Category = Damage)
 		float damage;
 protected:
@@ -63,8 +65,7 @@ protected:
 
 	TArray<AActor*> enemyUnits;
 
-	class AHeroBase* enemyHero = nullptr;
-	class ACreep* enemyCreep = nullptr;
+	
 
 	UPROPERTY(EditDefaultsOnly)
 		float maxHP = 100;
@@ -81,6 +82,7 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = Damage)
 		float damageEverySeconds;
+
 
 
 	bool bIsDealingDMG = false;

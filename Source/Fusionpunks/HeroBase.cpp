@@ -195,15 +195,7 @@ void AHeroBase::Tick( float DeltaTime )
 	//	}
 	//}
 
-	if (ActorHasTag("AI"))
-	{
-		if (bCreepIsAttacking && attackingCreep->GetBIsDead() || attackingCreep == nullptr)
-		{
-			attackingCreep = nullptr;
-			bCreepIsAttacking = false;
-
-		}
-	}
+	
 }
 
 // Called to bind functionality to input
@@ -339,6 +331,101 @@ bool AHeroBase::CheckForNearbyEnemyCreeps()
 	}
 	return nearbyEnemyCreeps.Num() > 0;	
 }
+ACreep* AHeroBase::GetClosestEnemyCreep()
+{
+	FCollisionObjectQueryParams obejctQP;
+
+	obejctQP.AddObjectTypesToQuery(Creeps);
+
+	//Overlap multi by channel as a sphere (for pick ups?)
+	FCollisionQueryParams QueryParameters;
+	QueryParameters.AddIgnoredActor(this);
+	QueryParameters.OwnerTag = TEXT("Player");
+
+
+	TArray<FOverlapResult> Results;
+	GetWorld()->OverlapMultiByObjectType(Results,
+		GetActorLocation(),
+		FQuat(),
+		obejctQP,
+		FCollisionShape::MakeSphere(1000.f),
+		QueryParameters);
+	TArray<ACreep*> enemyCreeps;
+	ACreep* closestCreep = nullptr;
+
+	if (Results.Num() > 0)
+	{
+		for (int32 i = 0; i < Results.Num(); i++)
+		{
+			ACreep* currCreep = Cast<ACreep>(Results[i].GetActor());
+			if (team.Compare("Diesel") == 0 && !Results[i].GetActor()->ActorHasTag("Diesel") && !currCreep->bBelongsToCamp)
+			{
+				enemyCreeps.Add(currCreep);
+			}
+
+			else if (team.Compare("Cyber") == 0 && !Results[i].GetActor()->ActorHasTag("Cyber") && !currCreep->bBelongsToCamp)
+			{
+				enemyCreeps.Add(currCreep);
+			}
+		}
+
+
+		closestCreep = enemyCreeps[0];
+		for (int i = 0; i < enemyCreeps.Num(); i++)
+		{
+			if (GetDistanceTo(enemyCreeps[i]) <= GetDistanceTo(closestCreep))
+			{
+				closestCreep = enemyCreeps[i];
+			}
+
+		}
+	}
+	return closestCreep;
+
+}
+
+bool AHeroBase::CheckForNearbyCreepsInArmy()
+{
+	FCollisionObjectQueryParams obejctQP;
+
+	obejctQP.AddObjectTypesToQuery(Creeps);
+
+	//Overlap multi by channel as a sphere (for pick ups?)
+	FCollisionQueryParams QueryParameters;
+	QueryParameters.AddIgnoredActor(this);
+	QueryParameters.OwnerTag = TEXT("Player");
+
+
+	TArray<FOverlapResult> Results;
+	GetWorld()->OverlapMultiByObjectType(Results,
+		GetActorLocation(),
+		FQuat(),
+		obejctQP,
+		FCollisionShape::MakeSphere(1000.f),
+		QueryParameters);
+		nearbyCreepsInArmy.Empty();
+		if (Results.Num() > 0)
+		{
+			for (int32 i = 0; i < Results.Num(); i++)
+			{
+				ACreep* currCreep = Cast<ACreep>(Results[i].GetActor());
+				if (team.Compare("Diesel") == 0 && !Results[i].GetActor()->ActorHasTag("Diesel") && !currCreep->bBelongsToCamp)
+				{
+					nearbyCreepsInArmy.Add(currCreep);
+				}
+
+				else if (team.Compare("Cyber") == 0 && !Results[i].GetActor()->ActorHasTag("Cyber") && !currCreep->bBelongsToCamp)
+				{
+					nearbyCreepsInArmy.Add(currCreep);
+				}
+			}
+		}
+
+		return nearbyCreepsInArmy.Num() > 0;
+
+}
+
+
 bool AHeroBase::CheckForNearbyEnemyHero()
 {
 	FCollisionObjectQueryParams obejctQP;
@@ -451,13 +538,15 @@ bool AHeroBase::CheckForNearbyInteractions()
 			{
 
 				ACreepCamp* currCamp = Cast<ACreepCamp>(Results[i].GetActor());
-				if (team.Compare("Diesel") == 0 && currCamp->GetCampType() == ECampType::CT_Diesel && !currCamp->HasBeenRecruitedFrom())
+				if (team.Compare("Diesel") == 0 && currCamp->GetCampType() == ECampType::CT_Diesel && !currCamp->HasBeenRecruitedFrom() && 
+					currCamp->GetNumOfCreepsAtCamp() - 2 > 0)
 				{
 					nearbyOwnedCreepCamps.Add(currCamp);
 					UE_LOG(LogTemp, Display, TEXT("FOUND NEARBY OWNED CAMP"));
 				}
 
-				else if (team.Compare("Cyber") == 0 && currCamp->GetCampType() == ECampType::CT_Cyber && !currCamp->HasBeenRecruitedFrom())
+				else if (team.Compare("Cyber") == 0 && currCamp->GetCampType() == ECampType::CT_Cyber && !currCamp->HasBeenRecruitedFrom() &&
+					currCamp->GetNumOfCreepsAtCamp() - 2 > 0)
 				{
 					nearbyOwnedCreepCamps.Add(currCamp);
 					UE_LOG(LogTemp, Display, TEXT("FOUND NEARBY OWNED CAMP"));
@@ -716,11 +805,7 @@ float AHeroBase::TakeDamage(float DamageAmount, struct FDamageEvent const & Dama
 
 	if (currentHealth <= 0 && !bIsRespawning)
 	{
-		if (DamageCauser->IsA(ATowerBase::StaticClass()))
-		{
-			Cast<ATowerBase>(DamageCauser)->RemoveFromTargetList(this);
-		}
-
+		
 		AHeroBase* hero = Cast<AHeroBase>(DamageCauser);
 		if (hero)
 		{

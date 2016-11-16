@@ -115,6 +115,8 @@ EBTNodeResult::Type UBTTask_DetermineCampSafety::ExecuteTask(UBehaviorTreeCompon
 		targetCamp->SetCampSafety(false);
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool("DefendingCamp", false);
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool("FoundNearbyEnemyCamp", false);
 		return EBTNodeResult::Failed;
 	}
 	return EBTNodeResult::Failed;

@@ -46,7 +46,6 @@ EBTNodeResult::Type UBTTask_MoveToCamp::ExecuteTask(UBehaviorTreeComponent& Owne
 		targetCamp = Cast<ACreepCamp>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("DefendCampTarget"));
 	}
 
-
 	if (hero != nullptr)
 	{
 		heroStats = hero->GetHeroStats();
@@ -87,12 +86,13 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 	if (campGoal == EReasonForGoingToCamp::RGC_Capturing)
 	{
+		//UE_LOG(LogTemp, Error, TEXT("DISTANCE TO CAMP: %f"), hero->GetDistanceTo(targetCamp));
 		if (OwnerComp.GetBlackboardComponent()->GetValueAsBool("ReachedCamp"))
 		{
 			return FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		}
 
-		else if (hero->IsCapturing() && hero->GetCampBeingCaptured() == targetCamp)
+		else if ((hero->IsCapturing() && hero->GetCampBeingCaptured() == targetCamp) || hero->GetDistanceTo(targetCamp) <= 500.0f )
 		{
 
 			UE_LOG(LogTemp, Error, TEXT("Reached Camp"));
@@ -160,7 +160,11 @@ void UBTTask_MoveToCamp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 		{
 			//UE_LOG(LogTemp, Display, TEXT("AI SENSES ENEMY WHILE HEADING TO RECURIT CAMP"));
 			//heroAI->ResetAITreeTaskStatus();
-			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+			if (hero->GetNearbyEnemyHero()->GetArmySize() - hero->GetArmySize() <= creepDifferenceAllowed)
+			{
+				UE_LOG(LogTemp, Error, TEXT("Senses safe enemy nearby...was recruiting"));
+				FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+			}
 		}
 
 

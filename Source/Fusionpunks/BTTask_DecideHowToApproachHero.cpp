@@ -35,7 +35,7 @@ EBTNodeResult::Type UBTTask_DecideHowToApproachHero::ExecuteTask(UBehaviorTreeCo
 			
 			}
 
-			else if ((hero->IsCapturing() || hero->GetDistanceTo(campTarget) <= 1200) && campTarget->GetCampType() != teamCampType)
+			else if ((hero->IsCapturing() || hero->GetDistanceTo(campTarget) <= 1000) && campTarget->GetCampType() != teamCampType || OwnerComp.GetBlackboardComponent()->GetValueAsBool("IsDefendingCamp"))
 			{	
 				//OwnerComp.GetBlackboardComponent()->SetValueAsObject("HeroAttackSituationTarget", campTarget);
 				approachStatus = EApproachStatus::AS_DefendingCamp;
@@ -69,8 +69,8 @@ EBTNodeResult::Type UBTTask_DecideHowToApproachHero::ExecuteTask(UBehaviorTreeCo
 		UE_LOG(LogTemp, Error, TEXT("Cant Find Hero/Hero AI in Decide how to approach"));
 		return EBTNodeResult::Failed;
 	}
-
-
+	hero->SetCreepAttacking(false);
+	hero->SetHeroAttacking(false);
 }
 
 void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -88,34 +88,24 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 
 	if (approachStatus == EApproachStatus::AS_DefendingCamp)
 	{
-		
-	/* if (campTarget->GetCampType() == teamCampType)
+		if (attackTarget->IsCapturing() || attackTarget->GetDistanceTo(campTarget) <= 1000 || attackTarget->GetPlayerHealthAsDecimal() <= 0.2f)
 		{
-			//bNotifyTaskFinished = true;
-			
-			UE_LOG(LogTemp, Error, TEXT("AI Successfully Captured Camp from defensive state."));
-			OwnerComp.GetBlackboardComponent()->SetValueAsBool("ReachedCamp", false);
-			OwnerComp.GetBlackboardComponent()->SetValueAsBool("CapturedCamp", true);
-			heroAI->ResetAllCampsSafetyStatus();
-			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-		}*/
-		if (hero->IsHeroAttacking() || !hero->IsCreepAttacking())
-		{
-			if (attackTarget->IsCapturing() || attackTarget->GetDistanceTo(campTarget) <= 1000 || attackTarget->GetPlayerHealthAsDecimal() <= 0.2f)
+			if ((hero->IsHeroAttacking() || !hero->IsCreepAttacking()))
 			{
 				if (hero->CheckForNearbyEnemyHero())
 				{
 					if (hero->GetDistanceTo(attackTarget) >= 300)
 					{
+						//FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), attackTarget->GetActorLocation());
+						//lookAtTargetRotation.Pitch = 0;
+						//hero->SetActorRotation(lookAtTargetRotation);
 						OwnerComp.GetAIOwner()->MoveToActor(attackTarget, 50, false, true, false);
 					}
 					else
 					{
-						//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF ENEMY HERO"));
 						FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 					}
 				}
-
 				else
 				{
 					if (hero->GetDistanceTo(campTarget) >= 600)
@@ -124,54 +114,66 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 					}
 					else
 					{
-						//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF DEFENSIVE CAMP"));
-					/*	if (hero->CheckForNearbyEnemyHero())
+						/*	if (hero->CheckForNearbyEnemyHero())
 						{
-							FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), attackTarget->GetActorLocation());
-							lookAtTargetRotation.Pitch = 0;
-							hero->SetActorRotation(lookAtTargetRotation);
+						FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), attackTarget->GetActorLocation());
+						lookAtTargetRotation.Pitch = 0;
+						hero->SetActorRotation(lookAtTargetRotation);
 						} */
+						//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF DEFENSIVE CAMP"));
+						hero->SetHeroAttacking(false);
 						FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 					}
 
 				}
 			}
-			else
+		else if (hero->IsCreepAttacking())
+		{
+			if (hero->CheckForNearbyCreepsInArmy())
 			{
-				if (hero->GetDistanceTo(campTarget) >= 600)
+				if (enemyCreep == nullptr || enemyCreep->GetBIsDead())
+					enemyCreep = hero->GetClosestEnemyCreep();
+
+				if (hero->GetDistanceTo(enemyCreep) >= 300)
 				{
-					OwnerComp.GetAIOwner()->MoveToActor(campTarget, 500, true, true, false);
+					//FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), enemyCreep->GetActorLocation());
+					//lookAtTargetRotation.Pitch = 0;
+					//hero->SetActorRotation(lookAtTargetRotation);
+					OwnerComp.GetAIOwner()->MoveToActor(enemyCreep, 50, false, true, false);
 				}
 				else
 				{
-					/*	if (hero->CheckForNearbyEnemyHero())
-					{
-					FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), attackTarget->GetActorLocation());
-					lookAtTargetRotation.Pitch = 0;
-					hero->SetActorRotation(lookAtTargetRotation);
-					} */
-					//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF DEFENSIVE CAMP"));
-					FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-				}
-
+					//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF ENEMY HERO"));
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject("AttackTarget", enemyCreep);
+					FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 			}
-		}
-
-		else if (hero->IsCreepAttacking())
-		{
-			if (enemyCreep == nullptr)
-				enemyCreep = hero->GetAttackingCreep();
-
-			if (hero->GetDistanceTo(enemyCreep) >= 300)
-			{
-				OwnerComp.GetAIOwner()->MoveToActor(enemyCreep, 50, false, true, false);
 			}
 			else
 			{
-				//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF ENEMY HERO"));
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject("AttackTarget", enemyCreep);
-				FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+				hero->SetCreepAttacking(false);
 			}
+		}
+	}
+
+		else
+		{
+			if (hero->GetDistanceTo(campTarget) >= 600)
+			{
+				OwnerComp.GetAIOwner()->MoveToActor(campTarget, 500, true, true, false);
+			}
+			else
+			{
+				/*	if (hero->CheckForNearbyEnemyHero())
+				{
+				FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), attackTarget->GetActorLocation());
+				lookAtTargetRotation.Pitch = 0;
+				hero->SetActorRotation(lookAtTargetRotation);
+				} */
+				//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF DEFENSIVE CAMP"));
+				hero->SetHeroAttacking(false);
+				FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+			}
+
 		}
 
 	}
@@ -184,6 +186,9 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 			{
 				if (hero->GetDistanceTo(attackTarget) >= 300)
 				{
+					//FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), attackTarget->GetActorLocation());
+					//lookAtTargetRotation.Pitch = 0;
+					//hero->SetActorRotation(lookAtTargetRotation);
 					OwnerComp.GetAIOwner()->MoveToActor(attackTarget, 50, false, true, false);
 				}
 				else
@@ -194,6 +199,7 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 
 			else
 			{
+				hero->SetHeroAttacking(false);
 				FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 			}
 
@@ -201,19 +207,30 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 
 		else if (hero->IsCreepAttacking())
 		{
-			if (enemyCreep == nullptr)
-				enemyCreep = hero->GetAttackingCreep();
-
-			if (hero->GetDistanceTo(enemyCreep) >= 300)
+			if (hero->CheckForNearbyCreepsInArmy())
 			{
-				OwnerComp.GetAIOwner()->MoveToActor(enemyCreep, 50, false, true, false);
+				if (enemyCreep == nullptr || enemyCreep->GetBIsDead())
+					enemyCreep = hero->GetClosestEnemyCreep();
+
+				if (hero->GetDistanceTo(enemyCreep) >= 300)
+				{
+					//FRotator lookAtTargetRotation = UKismetMathLibrary::FindLookAtRotation(hero->GetActorLocation(), enemyCreep->GetActorLocation());
+					//lookAtTargetRotation.Pitch = 0;
+					//hero->SetActorRotation(lookAtTargetRotation);
+					OwnerComp.GetAIOwner()->MoveToActor(enemyCreep, 50, false, true, false);
+				}
+				else
+				{
+					//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF ENEMY HERO"));
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject("AttackTarget", enemyCreep);
+					FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+				}
 			}
 			else
 			{
-				//UE_LOG(LogTemp, Error, TEXT("IN RANGE OF ENEMY HERO"));
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject("AttackTarget", enemyCreep);
-				FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+				hero->SetCreepAttacking(false);
 			}
+
 		}
 	}
 
@@ -221,6 +238,8 @@ void UBTTask_DecideHowToApproachHero::TickTask(UBehaviorTreeComponent& OwnerComp
 	{
 		//heroAI->GetSortedOwnedCampList();
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("ShouldRecruit", true);
+		heroAI->ResetAllCampsRecruitStatus();
+		//UE_LOG(LogTemp, Error, TEXT("Escaping to recruit creeps TICK"));
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	}
 }

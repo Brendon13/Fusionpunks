@@ -21,4 +21,5 @@ protected:
 		class AHeroBase* hero;
 		class AHeroAIController* heroAI;
 		AActor* attackTarget;
+		//EPathFollowingRequestResult epath;
 };

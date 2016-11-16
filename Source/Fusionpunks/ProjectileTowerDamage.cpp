@@ -37,9 +37,10 @@ void AProjectileTowerDamage::PauseTimer()
 
 bool AProjectileTowerDamage::IsPaused()
 {
-	return  GetWorld()->GetTimerManager().IsTimerPaused(applyEffectHandle);
+	return GetWorld()->GetTimerManager().IsTimerPaused(applyEffectHandle);
 }
-void AProjectileTowerDamage::UnPauseTimer()
+void AProjectileTowerDamage::UnPauseTimer(AActor* newTarget)
 {
-	return  GetWorld()->GetTimerManager().UnPauseTimer(applyEffectHandle);
+	 effectTarget = newTarget;
+	 GetWorld()->GetTimerManager().UnPauseTimer(applyEffectHandle);
 }

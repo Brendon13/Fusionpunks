@@ -211,10 +211,7 @@ float ACreep::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 	
 	if (currentHealth <= 0)
 	{
-		if (DamageCauser->IsA(ATowerBase::StaticClass()))
-		{
-			Cast<ATowerBase>(DamageCauser)->RemoveFromTargetList(this);
-		}
+		
 		bIsDead = true; 
 		GetCapsuleComponent()->bGenerateOverlapEvents = false; 
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

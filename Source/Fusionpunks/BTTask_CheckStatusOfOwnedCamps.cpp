@@ -33,7 +33,9 @@ EBTNodeResult::Type UBTTask_CheckStatusOfOwnedCamps::ExecuteTask(UBehaviorTreeCo
 				else
 					enemyHero = campBeingAttacked->GetCyberHero();
 
-				if (campBeingAttacked->GetNumOfCreepsAtCamp() >= numCreepsAlwaysDefend)
+				if (campBeingAttacked->GetNumOfCreepsAtCamp() >= numCreepsAlwaysDefend && (enemyHero->GetArmySize() - hero->GetArmySize() <= creepDifferenceAllowed
+					&& enemyHero->GetPlayerHealthAsDecimal() - hero->GetPlayerHealthAsDecimal() <= healthPercentDifferenceAllowed
+					&& enemyHero->GetLevel() - hero->GetLevel() <= levelDifferenceAllowed))
 				{
 					//Too Many Creeps At Camp...Defend
 					UE_LOG(LogTemp, Error, TEXT("Too Many Creeps At Camp...Defend"));

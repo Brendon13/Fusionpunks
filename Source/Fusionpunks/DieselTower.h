@@ -23,6 +23,8 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 	
 	class AProjectile* SpawnProjectile();
+
+	FORCEINLINE void PauseAttackTimer() { towerDMG->PauseTimer(); }
 private:
 	
 

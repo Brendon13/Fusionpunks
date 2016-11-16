@@ -54,13 +54,17 @@ void ADieselTower::Tick( float DeltaTime )
 	{
 		if (enemyUnits[0]->IsA(ACharacter::StaticClass()))
 		{
-			UE_LOG(LogTemp, Log, TEXT("Attacking Player!"));
+			//UE_LOG(LogTemp, Log, TEXT("Attacking Player!"));
 			if (!bIsDealingDMG)
 			{
 				if (towerDMG->IsPaused())
-					towerDMG->UnPauseTimer();
-				else		
+				{
+					towerDMG->UnPauseTimer(enemyUnits[0]);
+				}
+				else
+				{
 					towerDMG->StartTimer(damageEverySeconds, enemyUnits[0]);
+				}
 				bIsDealingDMG = true;
 			}
 		}

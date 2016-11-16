@@ -73,38 +73,7 @@ void ACyberTower::Tick(float DeltaTime)
 			{
 				towerDMG->StartTimer(damageEverySeconds, enemyUnits[0]);
 				bIsDealingDMG = true;
-			}
-
-			if (bIsDealingDMG && enemyUnits[0]->IsA(AHeroBase::StaticClass()))
-			{
-				if (enemyHero == nullptr)
-				{
-					enemyHero = Cast<AHeroBase>(enemyUnits[0]);
-				}
-				if (enemyHero != nullptr && enemyHero->GetPlayerHealthAsDecimal() <= 0)
-				{
-					towerDMG->StopTimer();
-					bIsDealingDMG = false;
-					enemyHero = nullptr;
-				}
-
-			}
-
-
-			else if (bIsDealingDMG && enemyUnits[0]->IsA(ACreep::StaticClass()))
-			{
-				if (enemyCreep == nullptr)
-				{
-					enemyCreep = Cast<ACreep>(enemyUnits[0]);
-				}
-				if (enemyCreep != nullptr && enemyCreep->GetBIsDead())
-				{
-					towerDMG->StopTimer();
-					bIsDealingDMG = false;
-					enemyCreep = nullptr;
-				}
-
-			}
+			}			
 		}
 	}
 
